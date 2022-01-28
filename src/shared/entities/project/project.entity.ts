@@ -43,4 +43,7 @@ export class Project {
 
   @OneToOne(() => Plan, (plan) => plan.projectId)
   plan: Plan;
+
+  @OneToOne(() => Status, (status) => status.projectId)
+  status: Status;
 }
