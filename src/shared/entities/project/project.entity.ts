@@ -41,6 +41,9 @@ export class Project {
   @CreateDateColumn()
   createdAt: Date;
 
+  @OneToMany(() => Comment, (comment) => comment.projectId)
+  comments: Comment[];
+
   @OneToOne(() => Plan, (plan) => plan.projectId)
   plan: Plan;
 
