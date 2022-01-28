@@ -41,4 +41,6 @@ export class Project {
   @CreateDateColumn()
   createdAt: Date;
 
+  @OneToOne(() => Plan, (plan) => plan.projectId)
+  plan: Plan;
 }
