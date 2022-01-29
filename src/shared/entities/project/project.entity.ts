@@ -41,8 +41,11 @@ export class Project {
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToOne(() => Status, (status) => status.projectId)
-  status: Status;
+  @OneToMany(() => Comment, (comment) => comment.projectId)
+  comments: Comment[];
+
+  @OneToMany(() => Member, (member) => member.projectId)
+  members: Member[];
 
   @OneToOne(() => Plan, (plan) => plan.projectId)
   plan: Plan;
@@ -50,9 +53,6 @@ export class Project {
   @OneToOne(() => Report, (report) => report.projectId)
   report: Report;
 
-  @OneToMany(() => Member, (member) => member.projectId)
-  members: Member[];
-
-  @OneToMany(() => Comment, (comment) => comment.projectId)
-  comments: Comment[];
+  @OneToOne(() => Status, (status) => status.projectId)
+  status: Status;
 }
