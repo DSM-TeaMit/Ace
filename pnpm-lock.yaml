@@ -20,7 +20,7 @@ specifiers:
   eslint: ^8.0.1
   eslint-config-prettier: ^8.3.0
   eslint-plugin-prettier: ^4.0.0
-  helmet: ^5.0.1
+  helmet: 5.0.2
   jest: ^27.2.5
   pg: ^8.7.1
   prettier: ^2.3.2
@@ -45,7 +45,7 @@ dependencies:
   class-transformer: 0.5.1
   class-validator: 0.13.2
   dotenv: 14.3.2
-  helmet: 5.0.1
+  helmet: 5.0.2
   pg: 8.7.1
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
@@ -2928,8 +2928,8 @@ packages:
       function-bind: 1.1.1
     dev: true
 
-  /helmet/5.0.1:
-    resolution: {integrity: sha512-iyYpGYH2nbQVaQtauYDnemWg45S2RyGvJ+iKj+V9jp7Dc1NTtAJHmD+hFOSYS7Xdwe1GeyVEYSydggXLOg6TKQ==}
+  /helmet/5.0.2:
+    resolution: {integrity: sha512-QWlwUZZ8BtlvwYVTSDTBChGf8EOcQ2LkGMnQJxSzD1mUu8CCjXJZq/BXP8eWw4kikRnzlhtYo3lCk0ucmYA3Vg==}
     engines: {node: '>=12.0.0'}
     dev: false
 
