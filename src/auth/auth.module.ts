@@ -2,6 +2,7 @@ import { CacheModule, Module } from '@nestjs/common';
 import * as redisStore from 'cache-manager-redis-store';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { GoogleOauthStrategy } from './strategies/google-oauth.strategy';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { AuthController } from './auth.controller';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, GoogleOauthStrategy],
 })
 export class AuthModule {}
