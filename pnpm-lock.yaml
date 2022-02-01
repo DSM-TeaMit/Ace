@@ -22,6 +22,7 @@ specifiers:
   '@types/uuid': ^8.3.4
   '@typescript-eslint/eslint-plugin': ^5.0.0
   '@typescript-eslint/parser': ^5.0.0
+  axios: ^0.25.0
   cache-manager: ^3.6.0
   cache-manager-redis-store: ^2.0.0
   class-transformer: ^0.5.1
@@ -60,6 +61,7 @@ dependencies:
   '@nestjs/passport': 8.1.0_fad574eebf217792c1a96edf566992e9
   '@nestjs/platform-express': 8.2.5_dd9ef2e1e23f087665d46fe53bbbed58
   '@nestjs/typeorm': 8.0.3_fa8dda60a9697e2f31bd24497506afa8
+  axios: 0.25.0
   cache-manager: 3.6.0
   cache-manager-redis-store: 2.0.0
   class-transformer: 0.5.1
@@ -1774,6 +1776,14 @@ packages:
 
   /axios/0.24.0:
     resolution: {integrity: sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA==}
+    dependencies:
+      follow-redirects: 1.14.7
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /axios/0.25.0:
+    resolution: {integrity: sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==}
     dependencies:
       follow-redirects: 1.14.7
     transitivePeerDependencies:
