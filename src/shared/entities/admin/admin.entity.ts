@@ -9,6 +9,9 @@ export class Admin {
   @Column({ length: 36 })
   uuid: string;
 
+  @Column({ length: 16 })
+  uid: string;
+
   @Column({ length: 6 })
   name: string;
 
