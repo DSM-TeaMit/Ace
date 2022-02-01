@@ -10,6 +10,7 @@ import {
 } from './strategies/jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
+import { GithubOauthStrategy } from './strategies/github-oauth.strategy';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UserRepository } from 'src/shared/entities/user/user.repository';
   controllers: [AuthController],
   providers: [
     AuthService,
+    GithubOauthStrategy,
     GoogleOauthStrategy,
     JwtRegistrationStrategy,
     JwtStrategy,
