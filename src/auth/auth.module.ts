@@ -11,6 +11,8 @@ import {
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { GithubOauthStrategy } from './strategies/github-oauth.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
+import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
 
 @Module({
   imports: [
@@ -24,7 +26,7 @@ import { GithubOauthStrategy } from './strategies/github-oauth.strategy';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1d' },
     }),
-    TypeOrmModule.forFeature([UserRepository]),
+    TypeOrmModule.forFeature([AdminRepository, UserRepository]),
   ],
   controllers: [AuthController],
   providers: [
@@ -33,6 +35,7 @@ import { GithubOauthStrategy } from './strategies/github-oauth.strategy';
     GoogleOauthStrategy,
     JwtRegistrationStrategy,
     JwtStrategy,
+    LocalStrategy,
   ],
 })
 export class AuthModule {}
