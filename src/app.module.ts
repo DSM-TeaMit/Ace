@@ -10,6 +10,7 @@ import { Project } from './shared/entities/project/project.entity';
 import { Report } from './shared/entities/report/report.entity';
 import { Status } from './shared/entities/status/status.entity';
 import { User } from './shared/entities/user/user.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { User } from './shared/entities/user/user.entity';
       entities: [Admin, Comment, Member, Plan, Project, Report, Status, User],
       namingStrategy: new SnakeNamingStrategy(),
     }),
+    AuthModule,
   ],
   controllers: [],
   providers: [],
