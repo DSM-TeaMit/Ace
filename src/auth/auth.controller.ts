@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 import { LoginResponseDto } from './dto/response/login.dto';
 import { GithubOauthGuard } from './guards/github-oauth.guard';
 import { GoogleOauthGuard } from './guards/google-oauth.guard';
+import { LocalGuard } from './guards/local.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -37,5 +38,11 @@ export class AuthController {
   @UseGuards(GithubOauthGuard)
   async githubAuthRedirect(@Req() req: Request) {
     return this.authService.githubLogin(req);
+  }
+
+  @Post('uidlogin')
+  @UseGuards(LocalGuard)
+  async uidLogin(@Req() req: Request) {
+    return this.authService.uidLogin(req);
   }
 }

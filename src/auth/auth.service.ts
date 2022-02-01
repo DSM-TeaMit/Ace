@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { Cache } from 'cache-manager';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
@@ -69,5 +70,17 @@ export class AuthService {
       ttl: 1200,
     });
     return;
+  }
+
+  async uidLogin(req: Request): Promise<LoginResponseDto> {
+    const payload: JwtPayload = {
+      sub: req.user.userId,
+      role: 'admin',
+      registrationOnly: false,
+    };
+    return {
+      accessToken: this.jwtService.sign(payload),
+      refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
+    };
   }
 }
