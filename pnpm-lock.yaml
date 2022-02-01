@@ -18,6 +18,7 @@ specifiers:
   '@types/passport-google-oauth20': ^2.0.11
   '@types/passport-jwt': ^3.0.6
   '@types/supertest': ^2.0.11
+  '@types/uuid': ^8.3.4
   '@typescript-eslint/eslint-plugin': ^5.0.0
   '@typescript-eslint/parser': ^5.0.0
   cache-manager: ^3.6.0
@@ -47,6 +48,7 @@ specifiers:
   typeorm: ^0.2.41
   typeorm-naming-strategies: ^2.0.0
   typescript: ^4.3.5
+  uuid: ^8.3.2
 
 dependencies:
   '@nestjs/common': 8.2.5_17d6ce38cc74803538e351a8f2ca91ba
@@ -71,6 +73,7 @@ dependencies:
   rxjs: 7.5.2
   typeorm: 0.2.41_pg@8.7.1
   typeorm-naming-strategies: 2.0.0_typeorm@0.2.41
+  uuid: 8.3.2
 
 devDependencies:
   '@nestjs/cli': 8.2.0_eslint@8.7.0
@@ -83,6 +86,7 @@ devDependencies:
   '@types/passport-google-oauth20': 2.0.11
   '@types/passport-jwt': 3.0.6
   '@types/supertest': 2.0.11
+  '@types/uuid': 8.3.4
   '@typescript-eslint/eslint-plugin': 5.10.0_3b6b276e93ead7cf6063f183a5e18d1f
   '@typescript-eslint/parser': 5.10.0_eslint@8.7.0+typescript@4.5.4
   eslint: 8.7.0
@@ -1292,6 +1296,10 @@ packages:
     resolution: {integrity: sha512-uci4Esokrw9qGb9bvhhSVEjd6rkny/dk5PK/Qz4yxKiyppEI+dOPlNrZBahE3i+PoKFYyDxChVXZ/ysS/nrm1Q==}
     dependencies:
       '@types/superagent': 4.1.14
+    dev: true
+
+  /@types/uuid/8.3.4:
+    resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
     dev: true
 
   /@types/yargs-parser/20.2.1:
