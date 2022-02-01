@@ -1,13 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { GoogleAuthTokenResponseDto } from './dto/response/google-auth.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import axios from 'axios';
+
+interface GithubResponse {
+  email: string;
+  primary: boolean;
+  verified: boolean;
+  visibility: string;
+}
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
     private readonly jwtService: JwtService,
     private readonly userRepository: UserRepository,
   ) {}
@@ -27,5 +44,30 @@ export class AuthService {
         ? this.jwtService.sign(payload, { expiresIn: '7d' })
         : undefined,
     };
+  }
+
+  async githubLogin(req: Request): Promise<void> {
+    const { githubToken } = req.user;
+    const githubResponse = (
+      await axios
+        .get<GithubResponse[]>(
+          `${process.env.GITHUB_API_BASE_URL}/user/emails`,
+          {
+            headers: {
+              Authorization: 'token ' + githubToken,
+            },
+          },
+        )
+        .catch(() => {
+          throw new InternalServerErrorException();
+        })
+    ).data.filter(
+      (res) => res.verified && res.email.split('@')[1] === 'dsm.hs.kr',
+    );
+    if (!githubResponse.length) throw new UnauthorizedException();
+    this.cacheManager.set(githubResponse[0].email, 'GITHUB_VERIFIED', {
+      ttl: 1200,
+    });
+    return;
   }
 }
