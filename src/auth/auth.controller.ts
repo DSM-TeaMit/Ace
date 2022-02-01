@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { GoogleAuthTokenResponseDto } from './dto/response/google-auth.dto';
+import { LoginResponseDto } from './dto/response/login.dto';
 import { GithubOauthGuard } from './guards/github-oauth.guard';
 import { GoogleOauthGuard } from './guards/google-oauth.guard';
 
@@ -23,9 +23,7 @@ export class AuthController {
 
   @Get('callback-google')
   @UseGuards(GoogleOauthGuard)
-  async googleAuthRedirect(
-    @Req() req: Request,
-  ): Promise<GoogleAuthTokenResponseDto> {
+  async googleAuthRedirect(@Req() req: Request): Promise<LoginResponseDto> {
     return this.authService.googleLogin(req);
   }
 

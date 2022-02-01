@@ -9,7 +9,7 @@ import { Cache } from 'cache-manager';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
-import { GoogleAuthTokenResponseDto } from './dto/response/google-auth.dto';
+import { LoginResponseDto } from './dto/response/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import axios from 'axios';
 
@@ -29,7 +29,7 @@ export class AuthService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async googleLogin(req: Request): Promise<GoogleAuthTokenResponseDto> {
+  async googleLogin(req: Request): Promise<LoginResponseDto> {
     const user = await this.userRepository.findOne(req.user.email);
     const isUserExist = Boolean(user);
     const payload: JwtPayload = {
