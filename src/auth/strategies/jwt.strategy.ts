@@ -1,15 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import 'dotenv/config';
 
-interface JwtPayload {
-  sub: string;
-  role: 'user' | 'admin';
-}
-
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -19,6 +15,26 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
+    if (payload.registrationOnly) throw new ForbiddenException();
+    return { userId: payload.sub, role: payload.role };
+  }
+}
+
+@Injectable()
+export class JwtRegistrationStrategy extends PassportStrategy(
+  Strategy,
+  'jwt_register',
+) {
+  constructor() {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: process.env.JWT_SECRET,
+    });
+  }
+
+  async validate(payload: JwtPayload) {
+    if (!payload.registrationOnly) throw new ForbiddenException();
     return { userId: payload.sub, role: payload.role };
   }
 }

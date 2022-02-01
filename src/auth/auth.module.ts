@@ -4,7 +4,10 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { GoogleOauthStrategy } from './strategies/google-oauth.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './strategies/jwt.strategy';
+import {
+  JwtRegistrationStrategy,
+  JwtStrategy,
+} from './strategies/jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 
@@ -23,6 +26,11 @@ import { UserRepository } from 'src/shared/entities/user/user.repository';
     TypeOrmModule.forFeature([UserRepository]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, GoogleOauthStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    GoogleOauthStrategy,
+    JwtRegistrationStrategy,
+    JwtStrategy,
+  ],
 })
 export class AuthModule {}
