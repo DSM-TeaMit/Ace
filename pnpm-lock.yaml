@@ -18,6 +18,7 @@ specifiers:
   '@types/passport-github': ^1.1.7
   '@types/passport-google-oauth20': ^2.0.11
   '@types/passport-jwt': ^3.0.6
+  '@types/passport-local': ^1.0.34
   '@types/supertest': ^2.0.11
   '@types/uuid': ^8.3.4
   '@typescript-eslint/eslint-plugin': ^5.0.0
@@ -37,6 +38,7 @@ specifiers:
   passport-github: ^1.1.0
   passport-google-oauth20: ^2.0.0
   passport-jwt: ^4.0.0
+  passport-local: ^1.0.0
   pg: ^8.7.1
   prettier: ^2.3.2
   reflect-metadata: ^0.1.13
@@ -72,6 +74,7 @@ dependencies:
   passport-github: 1.1.0
   passport-google-oauth20: 2.0.0
   passport-jwt: 4.0.0
+  passport-local: 1.0.0
   pg: 8.7.1
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
@@ -91,6 +94,7 @@ devDependencies:
   '@types/passport-github': 1.1.7
   '@types/passport-google-oauth20': 2.0.11
   '@types/passport-jwt': 3.0.6
+  '@types/passport-local': 1.0.34
   '@types/supertest': 2.0.11
   '@types/uuid': 8.3.4
   '@typescript-eslint/eslint-plugin': 5.10.0_3b6b276e93ead7cf6063f183a5e18d1f
@@ -1252,6 +1256,14 @@ packages:
     dependencies:
       '@types/express': 4.17.13
       '@types/jsonwebtoken': 8.5.8
+      '@types/passport-strategy': 0.2.35
+    dev: true
+
+  /@types/passport-local/1.0.34:
+    resolution: {integrity: sha512-PSc07UdYx+jhadySxxIYWuv6sAnY5e+gesn/5lkPKfBeGuIYn9OPR+AAEDq73VRUh6NBTpvE/iPE62rzZUslog==}
+    dependencies:
+      '@types/express': 4.17.13
+      '@types/passport': 1.0.7
       '@types/passport-strategy': 0.2.35
     dev: true
 
@@ -4521,6 +4533,13 @@ packages:
     resolution: {integrity: sha512-BwC0n2GP/1hMVjR4QpnvqA61TxenUMlmfNjYNgK0ZAs0HK4SOQkHcSv4L328blNTLtHq7DbmvyNJiH+bn6C5Mg==}
     dependencies:
       jsonwebtoken: 8.5.1
+      passport-strategy: 1.0.0
+    dev: false
+
+  /passport-local/1.0.0:
+    resolution: {integrity: sha1-H+YyaMkudWBmJkN+O5BmYsFbpu4=}
+    engines: {node: '>= 0.4.0'}
+    dependencies:
       passport-strategy: 1.0.0
     dev: false
 
