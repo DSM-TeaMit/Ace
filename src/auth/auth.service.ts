@@ -5,14 +5,16 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
+import axios from 'axios';
 import * as bcrypt from 'bcrypt';
 import { Cache } from 'cache-manager';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { LoginResponseDto } from './dto/response/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
-import axios from 'axios';
+import { RegisterAdminRequestDto } from './dto/request/register-admin.dto';
 
 interface GithubResponse {
   email: string;
@@ -24,6 +26,7 @@ interface GithubResponse {
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly adminRepository: AdminRepository,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     private readonly jwtService: JwtService,
@@ -82,5 +85,10 @@ export class AuthService {
       accessToken: this.jwtService.sign(payload),
       refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
     };
+  }
+
+  async registerAdmin(payload: RegisterAdminRequestDto) {
+    payload.password = await bcrypt.hash(payload.password, 12);
+    return await this.adminRepository.insertOne(payload);
   }
 }

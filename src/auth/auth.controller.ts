@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
@@ -7,11 +8,16 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
+import { Roles } from 'src/shared/decorators/roles.decorator';
+import { Role } from 'src/shared/enums/role.enum';
 import { AuthService } from './auth.service';
+import { RegisterAdminRequestDto } from './dto/request/register-admin.dto';
 import { LoginResponseDto } from './dto/response/login.dto';
 import { GithubOauthGuard } from './guards/github-oauth.guard';
 import { GoogleOauthGuard } from './guards/google-oauth.guard';
+import { JwtAuthGuard } from './guards/jwt.guard';
 import { LocalGuard } from './guards/local.guard';
+import { RolesGuard } from './guards/roles.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -44,5 +50,13 @@ export class AuthController {
   @UseGuards(LocalGuard)
   async uidLogin(@Req() req: Request) {
     return this.authService.uidLogin(req);
+  }
+
+  @Post('register-admin')
+  @Roles(Role.Admin)
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  async registerAdmin(@Body() payload: RegisterAdminRequestDto) {
+    return this.authService.registerAdmin(payload);
   }
 }
