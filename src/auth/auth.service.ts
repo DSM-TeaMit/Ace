@@ -15,6 +15,7 @@ import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { LoginResponseDto } from './dto/response/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RegisterAdminRequestDto } from './dto/request/register-admin.dto';
+import { v4 } from 'uuid';
 
 interface GithubResponse {
   email: string;
@@ -37,7 +38,7 @@ export class AuthService {
     const user = await this.userRepository.findOne(req.user.email);
     const isUserExist = Boolean(user);
     const payload: JwtPayload = {
-      sub: req.user.email,
+      sub: user?.uuid || req.user.email,
       role: 'user',
       registrationOnly: !isUserExist,
     };
