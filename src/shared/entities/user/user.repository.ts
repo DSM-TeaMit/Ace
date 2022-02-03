@@ -22,4 +22,13 @@ export class UserRepository extends AbstractRepository<User> {
       })
       .execute();
   }
+
+  async findOneByUuid(uuid: string): Promise<User | undefined> {
+    const user = await this.createQueryBuilder('user')
+      .select()
+      .where('user.uuid = :uuid', { uuid })
+      .getOne();
+
+    return user;
+  }
 }
