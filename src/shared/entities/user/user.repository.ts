@@ -1,4 +1,6 @@
 import { AbstractRepository, EntityRepository } from 'typeorm';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { v4 } from 'uuid';
 import { User } from './user.entity';
 
 @EntityRepository(User)
@@ -8,5 +10,16 @@ export class UserRepository extends AbstractRepository<User> {
       .select()
       .where('email = :email', { email })
       .getOne();
+  }
+
+  async insert(payload: QueryDeepPartialEntity<User>) {
+    return this.createQueryBuilder('user')
+      .insert()
+      .into(User)
+      .values({
+        ...payload,
+        uuid: v4(),
+      })
+      .execute();
   }
 }
