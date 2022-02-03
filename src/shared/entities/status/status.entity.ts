@@ -14,6 +14,12 @@ export class Status {
   isReportSubmitted: boolean;
 
   @Column()
+  isPlanAccepted: boolean;
+
+  @Column()
+  isReportAccepted: boolean;
+
+  @Column()
   plabSubmittedAt: Date;
 
   @Column()
