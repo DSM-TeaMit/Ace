@@ -10,7 +10,7 @@ export class User {
   @Column({ length: 36 })
   uuid: string;
 
-  @Column({ length: 30, unique: true })
+  @Column({ length: 40, unique: true })
   email: string;
 
   @Column({ length: 6 })
@@ -19,7 +19,7 @@ export class User {
   @Column()
   studentNo: number;
 
-  @Column({ nullable: true })
+  @Column({ length: 20, nullable: true })
   githubId: string;
 
   @OneToMany(() => Member, (member) => member.userId)
