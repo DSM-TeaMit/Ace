@@ -11,6 +11,7 @@ import { Report } from './shared/entities/report/report.entity';
 import { Status } from './shared/entities/status/status.entity';
 import { User } from './shared/entities/user/user.entity';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuthModule } from './auth/auth.module';
       namingStrategy: new SnakeNamingStrategy(),
     }),
     AuthModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],
