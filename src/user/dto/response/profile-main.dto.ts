@@ -3,11 +3,22 @@ export interface ProfileMainResponseDto {
   name: string;
   email: string;
   githubId?: string;
+  pendingCount: number;
+  pendingProjects?: PendingProject[];
   projectCount: number;
   projects: Project[];
 }
 
+interface PendingProject {
+  uuid: string;
+  projectName: string;
+  type: string;
+  status: string;
+  thumbnailUrl?: string;
+}
+
 interface Project {
+  uuid: string;
   projectName: string;
   projectDescription?: string;
   projectType: string;
