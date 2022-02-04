@@ -13,10 +13,10 @@ export class Status {
   @Column()
   isReportSubmitted: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   isPlanAccepted: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   isReportAccepted: boolean;
 
   @Column()
