@@ -22,6 +22,9 @@ export class User {
   @Column({ length: 20, nullable: true })
   githubId: string;
 
+  @Column({ length: 200, nullable: true })
+  thumbnailUrl: string;
+
   @OneToMany(() => Member, (member) => member.userId)
   members: Member[];
 
