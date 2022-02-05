@@ -10,9 +10,13 @@ import { Request } from 'express';
 import { Project } from 'src/shared/entities/project/project.entity';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
-import { ProfileRequestDto } from './dto/request/profile.dto';
+import {
+  ProfileRequestDto,
+  ProfileRequestQueryDto,
+} from './dto/request/profile.dto';
 import { RegisterUserRequestDto } from './dto/request/register-user.dto';
 import { ProfileMainResponseDto } from './dto/response/profile-main.dto';
+import { ProfileProjectsDto } from './dto/response/profile-projects.dto';
 
 @Injectable()
 export class UserService {
@@ -40,7 +44,7 @@ export class UserService {
 
   async getProfile(
     req: Request,
-    payload: ProfileMainRequestDto,
+    payload: ProfileRequestDto,
   ): Promise<ProfileMainResponseDto> {
     const uuid = payload.uuid ?? req.user.userId;
     const isMine = !payload.uuid || payload.uuid === req.user.userId;
@@ -94,6 +98,39 @@ export class UserService {
       pendingCount: pendingProjects?.length,
       pendingProjects: pendingProjects,
       projectCount: projects[1],
+      projects: projects[0].map((project) => ({
+        uuid: project.uuid,
+        projectName: project.projectName,
+        projectDescription: project.projectDescription,
+        projectType: project.projectType,
+        fields: project.field,
+        members: project.members.map((member) => ({
+          uuid: member.userId.uuid,
+          name: member.userId.name,
+          thumbnailUrl: member.userId.thumbnailUrl,
+        })),
+      })),
+    };
+  }
+
+  async getProjects(
+    req: Request,
+    param: ProfileRequestDto,
+    query: ProfileRequestQueryDto,
+  ): Promise<ProfileProjectsDto> {
+    const uuid = param.uuid ?? req.user.userId;
+    const isMine = !param.uuid || param.uuid === req.user.userId;
+    const user = await this.userRepository.findOneByUuid(uuid);
+
+    const projects = await this.projectRepository.getProjectsOfUser(
+      user.id,
+      isMine,
+      query.page,
+      query.limit,
+    );
+
+    return {
+      count: projects[1],
       projects: projects[0].map((project) => ({
         uuid: project.uuid,
         projectName: project.projectName,
