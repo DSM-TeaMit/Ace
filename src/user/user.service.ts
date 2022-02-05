@@ -49,6 +49,8 @@ export class UserService {
     const projects = await this.projectRepository.getProjectsOfUser(
       user.id,
       isMine,
+      1,
+      4,
     );
 
     const pendingProjects = isMine
