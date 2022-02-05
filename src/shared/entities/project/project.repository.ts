@@ -1,4 +1,4 @@
-import { AbstractRepository, EntityRepository } from 'typeorm';
+import { AbstractRepository, Brackets, EntityRepository } from 'typeorm';
 import { Project } from './project.entity';
 
 @EntityRepository(Project)
@@ -30,18 +30,32 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .select()
       .leftJoinAndSelect('project.status', 'status')
       .leftJoinAndSelect('project.members', 'members')
-      .where((qb) => {
-        qb.where((qb) => {
-          qb.where('status.isPlanSubmitted = true').andWhere(
-            'status.isPlanAccepted IS NULL',
+      .where(
+        new Brackets((qb) => {
+          qb.where(
+            new Brackets((qb) => {
+              qb.where('status.isPlanSubmitted = true').andWhere(
+                new Brackets((qb) => {
+                  qb.where('status.isPlanAccepted IS NULL').orWhere(
+                    'status.isPlanAccepted = false',
+                  );
+                }),
+              );
+            }),
           );
-        });
-        qb.orWhere((qb) => {
-          qb.where('status.isReportSubmitted = true').andWhere(
-            'status.isReportAccepted IS NULL',
+          qb.orWhere(
+            new Brackets((qb) => {
+              qb.where('status.isReportSubmitted = true').andWhere(
+                new Brackets((qb) => {
+                  qb.where('status.isReportAccepted IS NULL').orWhere(
+                    'status.isReportAccepted = false',
+                  );
+                }),
+              );
+            }),
           );
-        });
-      })
+        }),
+      )
       .take(4);
     if (userId) qb.andWhere('members.userId = :userId', { userId });
 

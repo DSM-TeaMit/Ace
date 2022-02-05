@@ -59,9 +59,9 @@ export class UserService {
 
     const pendingProjects = isMine
       ? (
-          (await this.projectRepository.getPendingProjects(
-            user.id,
-          )[0]) as Project[]
+          (
+            await this.projectRepository.getPendingProjects(user.id)
+          )[0] as Project[]
         )?.map((project) => {
           const type =
             project.status.isPlanSubmitted && !project.status.isPlanAccepted
