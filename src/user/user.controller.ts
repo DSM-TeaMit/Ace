@@ -12,7 +12,7 @@ import { JwtAuthGuard, JwtRegistrationGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { Role } from 'src/shared/enums/role.enum';
-import { ProfileMainRequestDto } from './dto/request/profile-main.dto';
+import { ProfileRequestDto } from './dto/request/profile.dto';
 import { RegisterUserRequestDto } from './dto/request/register-user.dto';
 import { UserService } from './user.service';
 

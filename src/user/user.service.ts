@@ -10,7 +10,7 @@ import { Request } from 'express';
 import { Project } from 'src/shared/entities/project/project.entity';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
-import { ProfileMainRequestDto } from './dto/request/profile-main.dto';
+import { ProfileRequestDto } from './dto/request/profile.dto';
 import { RegisterUserRequestDto } from './dto/request/register-user.dto';
 import { ProfileMainResponseDto } from './dto/response/profile-main.dto';
 
