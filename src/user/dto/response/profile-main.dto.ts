@@ -9,7 +9,7 @@ export interface ProfileMainResponseDto {
   projects: Project[];
 }
 
-interface PendingProject {
+export interface PendingProject {
   uuid: string;
   projectName: string;
   type: string;
