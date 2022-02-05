@@ -1,6 +1,7 @@
 import {
   CACHE_MANAGER,
   ConflictException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -17,6 +18,7 @@ import {
 import { RegisterUserRequestDto } from './dto/request/register-user.dto';
 import { ProfileMainResponseDto } from './dto/response/profile-main.dto';
 import { ProfileProjectsDto } from './dto/response/profile-projects.dto';
+import { ProfileReportsDto } from './dto/response/profile-reports.dto';
 
 @Injectable()
 export class UserService {
@@ -139,6 +141,58 @@ export class UserService {
           thumbnailUrl: member.userId.thumbnailUrl,
         })),
       })),
+    };
+  }
+
+  async getReports(
+    req: Request,
+    param: ProfileRequestDto,
+    query: ProfileRequestQueryDto,
+  ): Promise<ProfileReportsDto> {
+    const uuid = param.uuid ?? req.user.userId;
+    const isMine = !param.uuid || param.uuid === req.user.userId;
+    if (!isMine) throw new ForbiddenException();
+    const user = await this.userRepository.findOneByUuid(uuid);
+
+    const projects = (
+      await Promise.all([
+        this.projectRepository.getReports(
+          user.id,
+          query.page,
+          query.limit,
+          true,
+        ),
+        this.projectRepository.getReports(
+          user.id,
+          query.page,
+          query.limit,
+          false,
+        ),
+        this.projectRepository.getReports(
+          user.id,
+          query.page,
+          query.limit,
+          null,
+        ),
+      ])
+    ).map((res) => ({
+      count: res[1],
+      projects: res[0].map((project) => {
+        return {
+          uuid: project.uuid,
+          projectName: project.projectName,
+          type:
+            project.status.isPlanSubmitted && !project.status.isPlanAccepted
+              ? 'PLAN'
+              : 'REPORT',
+        };
+      }),
+    }));
+
+    return {
+      accepted: projects[0],
+      rejected: projects[1],
+      pending: projects[2],
     };
   }
 }

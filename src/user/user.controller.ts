@@ -48,6 +48,16 @@ export class UserController {
     return this.userService.getProjects(req, param, query);
   }
 
+  @Get('profile/reports')
+  @UseGuards(JwtAuthGuard)
+  async getReports(
+    @Req() req: Request,
+    @Param() param: ProfileRequestDto,
+    @Query() query: ProfileRequestQueryDto,
+  ) {
+    return this.userService.getReports(req, param, query);
+  }
+
   @Get('profile/:uuid')
   @UseGuards(JwtAuthGuard)
   async getProfileWithUuid(
@@ -65,5 +75,15 @@ export class UserController {
     @Query() query: ProfileRequestQueryDto,
   ) {
     return this.userService.getProjects(req, param, query);
+  }
+
+  @Get('profile/:uuid/reports')
+  @UseGuards(JwtAuthGuard)
+  async getReportsWithUuid(
+    @Req() req: Request,
+    @Param() param: ProfileRequestDto,
+    @Query() query: ProfileRequestQueryDto,
+  ) {
+    return this.userService.getReports(req, param, query);
   }
 }
