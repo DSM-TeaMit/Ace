@@ -17,7 +17,7 @@ interface PendingProject {
   thumbnailUrl?: string;
 }
 
-interface Project {
+export interface Project {
   uuid: string;
   projectName: string;
   projectDescription?: string;
