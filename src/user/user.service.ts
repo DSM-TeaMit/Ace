@@ -5,12 +5,14 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { Request } from 'express';
 import { Project } from 'src/shared/entities/project/project.entity';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
+import { ChangeGithubIdRequestDto } from './dto/request/change-github-id.dto';
 import {
   ProfileRequestDto,
   ProfileRequestQueryDto,
@@ -194,5 +196,17 @@ export class UserService {
       rejected: projects[1],
       pending: projects[2],
     };
+  }
+
+  async changeGithubId(
+    req: Request,
+    payload: ChangeGithubIdRequestDto,
+  ): Promise<void> {
+    const cache = await this.cacheManager.get<string>(payload.githubId);
+    if (!cache) throw new UnprocessableEntityException();
+    const user = await this.userRepository.findOneByUuid(req.user.userId);
+    if (cache !== user.email) throw new ForbiddenException();
+    await this.userRepository.updateGithubId(user.id, payload.githubId);
+    return;
   }
 }

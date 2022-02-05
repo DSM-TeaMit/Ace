@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -13,6 +14,7 @@ import { JwtAuthGuard, JwtRegistrationGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { Role } from 'src/shared/enums/role.enum';
+import { ChangeGithubIdRequestDto } from './dto/request/change-github-id.dto';
 import {
   ProfileRequestDto,
   ProfileRequestQueryDto,
@@ -56,6 +58,15 @@ export class UserController {
     @Query() query: ProfileRequestQueryDto,
   ) {
     return this.userService.getReports(req, param, query);
+  }
+
+  @Put('profile/githubId')
+  @UseGuards(JwtAuthGuard)
+  async changeGithubId(
+    @Req() req: Request,
+    @Body() payload: ChangeGithubIdRequestDto,
+  ) {
+    return this.userService.changeGithubId(req, payload);
   }
 
   @Get('profile/:uuid')
