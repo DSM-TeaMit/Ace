@@ -61,4 +61,44 @@ export class ProjectRepository extends AbstractRepository<Project> {
 
     return qb.getManyAndCount();
   }
+
+  async getReports(
+    userId: number,
+    page: number,
+    limit: number,
+    type: boolean | null,
+  ) {
+    return this.createQueryBuilder('project')
+      .select()
+      .leftJoinAndSelect('project.status', 'status')
+      .leftJoinAndSelect('project.members', 'members')
+      .where(
+        new Brackets((qb) => {
+          qb.where(
+            new Brackets((qb) => {
+              qb.where('status.isPlanSubmitted = true').andWhere(
+                type !== null
+                  ? 'status.isPlanAccepted = :type'
+                  : 'status.isPlanAccepted IS NULL',
+                { type },
+              );
+            }),
+          );
+          qb.orWhere(
+            new Brackets((qb) => {
+              qb.where('status.isReportSubmitted = true').andWhere(
+                type !== null
+                  ? 'status.isReportAccepted = :type'
+                  : 'status.isReportAccepted IS NULL',
+                { type },
+              );
+            }),
+          );
+        }),
+      )
+      .andWhere('members.userId = :userId', { userId })
+      .take(limit)
+      .skip(limit * (page - 1))
+      .getManyAndCount();
+  }
 }
