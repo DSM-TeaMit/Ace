@@ -70,14 +70,10 @@ export class UserService {
           const status = (() => {
             switch (type) {
               case 'PLAN':
-                if (project.status.isPlanAccepted) return 'ACCEPTED';
-                else if (project.status.isPlanAccepted === false)
-                  return 'DECLINED';
+                if (project.status.isPlanAccepted === false) return 'DECLINED';
                 else return 'PENDING';
               case 'REPORT':
-                if (project.status.isPlanAccepted) return 'ACCEPTED';
-                else if (project.status.isPlanAccepted === false)
-                  return 'DECLINED';
+                if (project.status.isPlanAccepted === false) return 'DECLINED';
                 else return 'PENDING';
             }
           })();
