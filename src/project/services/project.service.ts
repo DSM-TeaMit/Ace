@@ -7,11 +7,11 @@ import { Request } from 'express';
 import { CommentRepository } from 'src/shared/entities/comment/comment.repository';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
-import { CreateProjectRequestDto } from './dto/request/create-project.dto';
-import { ModifyProjectRequestDto } from './dto/request/modify-project.dto';
-import { ProjectParamsDto } from './dto/request/project-params.dto';
-import { CreateProjectResponseDto } from './dto/response/create-project.dto';
-import { GetProjectResponseDto } from './dto/response/get-project.dto';
+import { CreateProjectRequestDto } from '../dto/request/create-project.dto';
+import { ModifyProjectRequestDto } from '../dto/request/modify-project.dto';
+import { ProjectParamsDto } from '../dto/request/project-params.dto';
+import { CreateProjectResponseDto } from '../dto/response/create-project.dto';
+import { GetProjectResponseDto } from '../dto/response/get-project.dto';
 
 @Injectable()
 export class ProjectService {
