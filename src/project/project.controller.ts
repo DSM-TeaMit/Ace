@@ -14,10 +14,8 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { Role } from 'src/shared/enums/role.enum';
 import { CreateProjectRequestDto } from './dto/request/create-project.dto';
-import {
-  ModifyProjectParamsDto,
-  ModifyProjectRequestDto,
-} from './dto/request/modify-project.dto';
+import { ModifyProjectRequestDto } from './dto/request/modify-project.dto';
+import { ProjectParamsDto } from './dto/request/project-params.dto';
 import { ProjectService } from './project.service';
 
 @Controller('project')
@@ -38,7 +36,7 @@ export class ProjectController {
   @UseGuards(JwtAuthGuard)
   modifyProject(
     @Req() req: Request,
-    @Param() param: ModifyProjectParamsDto,
+    @Param() param: ProjectParamsDto,
     @Body() payload: ModifyProjectRequestDto,
   ) {
     return this.projectService.modifyProject(req, param, payload);
@@ -48,7 +46,7 @@ export class ProjectController {
   @Roles(Role.User)
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
-  deleteProject(@Req() req: Request, @Param() param: ModifyProjectParamsDto) {
+  deleteProject(@Req() req: Request, @Param() param: ProjectParamsDto) {
     return this.projectService.deleteProject(req, param);
   }
 }

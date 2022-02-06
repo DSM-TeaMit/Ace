@@ -7,10 +7,8 @@ import { Request } from 'express';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { CreateProjectRequestDto } from './dto/request/create-project.dto';
-import {
-  ModifyProjectParamsDto,
-  ModifyProjectRequestDto,
-} from './dto/request/modify-project.dto';
+import { ModifyProjectRequestDto } from './dto/request/modify-project.dto';
+import { ProjectParamsDto } from './dto/request/project-params.dto';
 import { CreateProjectResponseDto } from './dto/response/create-project.dto';
 
 @Injectable()
@@ -46,7 +44,7 @@ export class ProjectService {
 
   async modifyProject(
     req: Request,
-    param: ModifyProjectParamsDto,
+    param: ProjectParamsDto,
     payload: ModifyProjectRequestDto,
   ): Promise<void> {
     if (
@@ -75,10 +73,7 @@ export class ProjectService {
     return;
   }
 
-  async deleteProject(
-    req: Request,
-    param: ModifyProjectParamsDto,
-  ): Promise<void> {
+  async deleteProject(req: Request, param: ProjectParamsDto): Promise<void> {
     const project = await this.projectRepository.findOne(param);
     if (
       !(
