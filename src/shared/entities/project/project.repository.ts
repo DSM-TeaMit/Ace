@@ -1,4 +1,12 @@
-import { AbstractRepository, Brackets, EntityRepository } from 'typeorm';
+import { CreateProjectRequestDto } from 'src/project/dto/request/create-project.dto';
+import {
+  AbstractRepository,
+  Brackets,
+  EntityRepository,
+  getConnection,
+} from 'typeorm';
+import { v4 } from 'uuid';
+import { Member } from '../member/member.entity';
 import { Project } from './project.entity';
 
 @EntityRepository(Project)
@@ -100,5 +108,52 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .take(limit)
       .skip(limit * (page - 1))
       .getManyAndCount();
+  }
+
+  async createProject(
+    payload: CreateProjectRequestDto,
+    members: {
+      id: number;
+      role: string;
+    }[],
+  ): Promise<string | undefined> {
+    const queryRunner = getConnection().createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    const uuid = v4();
+    try {
+      const projectId: number = (
+        await queryRunner.manager
+          .createQueryBuilder()
+          .insert()
+          .into(Project)
+          .values({
+            uuid: uuid,
+            projectName: payload.name,
+            projectType: payload.type,
+            field: payload.field,
+          })
+          .execute()
+      ).identifiers[0].id;
+      await queryRunner.manager
+        .createQueryBuilder()
+        .insert()
+        .into(Member)
+        .values(
+          members.map((member) => ({
+            projectId: () => projectId.toString(),
+            userId: () => member.id.toString(),
+            role: member.role,
+          })),
+        )
+        .execute();
+
+      await queryRunner.commitTransaction();
+      return uuid;
+    } catch (e) {
+      if (queryRunner.isTransactionActive) {
+        await queryRunner.rollbackTransaction();
+      }
+    }
   }
 }
