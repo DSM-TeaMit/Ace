@@ -25,6 +25,9 @@ export class User {
   @Column({ length: 200, nullable: true })
   thumbnailUrl: string;
 
+  @Column({ default: false })
+  deleted: boolean;
+
   @OneToMany(() => Member, (member) => member.userId)
   members: Member[];
 

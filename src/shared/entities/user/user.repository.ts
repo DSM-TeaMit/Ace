@@ -43,4 +43,12 @@ export class UserRepository extends AbstractRepository<User> {
       ).affected,
     );
   }
+
+  async deleteUser(uuid: string) {
+    return this.createQueryBuilder('user')
+      .update(User)
+      .set({ deleted: true })
+      .where('uuid = :uuid', { uuid })
+      .execute();
+  }
 }
