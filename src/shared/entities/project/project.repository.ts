@@ -244,4 +244,36 @@ export class ProjectRepository extends AbstractRepository<Project> {
       ).affected,
     );
   }
+
+  async getDoneProjects(
+    page: number,
+    limit: number,
+    {
+      popularity,
+      recently,
+    }: {
+      popularity?: boolean;
+      recently?: boolean;
+    },
+  ) {
+    const qb = this.createQueryBuilder('project')
+      .select()
+      .leftJoinAndSelect('project.status', 'status')
+      .where('status.isPlanAccepted = true')
+      .andWhere('status.isReportAccepted = true')
+      .take(limit)
+      .skip(limit * (page - 1));
+
+    if (popularity)
+      qb.orderBy('project.viewCount', 'DESC').addOrderBy(
+        'project.createdAt',
+        'DESC',
+      );
+    if (recently)
+      qb.orderBy('project.createdAt', 'DESC').addOrderBy(
+        'project.viewCount',
+        'DESC',
+      );
+    return qb.getManyAndCount();
+  }
 }
