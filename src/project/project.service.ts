@@ -1,4 +1,8 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
@@ -21,7 +25,7 @@ export class ProjectService {
     payload: CreateProjectRequestDto,
   ): Promise<CreateProjectResponseDto> {
     if (!payload.members.map((member) => member.uuid).includes(req.user.userId))
-      throw new UnprocessableEntityException();
+      throw new ForbiddenException();
     const members: {
       id: number;
       role: string;
@@ -52,7 +56,7 @@ export class ProjectService {
           .includes(req.user.userId) ?? true
       )
     )
-      throw new UnprocessableEntityException();
+      throw new ForbiddenException();
     const members: {
       id: number;
       role: string;
