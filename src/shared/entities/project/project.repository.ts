@@ -148,6 +148,16 @@ export class ProjectRepository extends AbstractRepository<Project> {
           })),
         )
         .execute();
+      await queryRunner.manager
+        .createQueryBuilder()
+        .insert()
+        .into(Status)
+        .values({
+          projectId: () => projectId.toString(),
+          isPlanSubmitted: false,
+          isReportSubmitted: false,
+        })
+        .execute();
 
       await queryRunner.commitTransaction();
       return uuid;
