@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Patch,
   Post,
@@ -28,6 +29,12 @@ export class ProjectController {
   @UseGuards(JwtAuthGuard)
   createProject(@Req() req: Request, @Body() payload: CreateProjectRequestDto) {
     return this.projectService.createProject(req, payload);
+  }
+
+  @Get(':uuid')
+  @UseGuards(JwtAuthGuard)
+  getProject(@Param() param: ProjectParamsDto) {
+    return this.projectService.getProject(param);
   }
 
   @Patch(':uuid')

@@ -224,8 +224,9 @@ export class ProjectRepository extends AbstractRepository<Project> {
   async findOne({ uuid, id }: { uuid?: string; id?: string }) {
     const qb = this.createQueryBuilder('project')
       .select()
-      .leftJoinAndSelect('project.member', 'member')
-      .leftJoinAndSelect('member.userId', 'userId');
+      .leftJoinAndSelect('project.members', 'members')
+      .leftJoinAndSelect('members.userId', 'userId')
+      .leftJoinAndSelect('project.status', 'status');
     if (uuid) qb.where('project.uuid = :uuid', { uuid });
     if (id) qb.where('project.id = :id', { id });
 
