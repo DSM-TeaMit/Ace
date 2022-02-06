@@ -23,16 +23,16 @@ export class Project {
   @Column({ length: 45 })
   projectName: string;
 
-  @Column({ length: 250 })
-  projectDescription: string;
+  @Column({ length: 250, nullable: true })
+  projectDescription?: string;
 
-  @Column({ length: 250 })
-  projectResult: string;
+  @Column({ length: 250, nullable: true })
+  projectResult?: string;
 
   @Column({ type: 'enum', enum: ['PERS', 'TEAM', 'CLUB'] })
   projectType: 'PERS' | 'TEAM' | 'CLUB';
 
-  @Column()
+  @Column({ default: 0 })
   viewCount: number;
 
   @Column({ length: 200, nullable: true })
