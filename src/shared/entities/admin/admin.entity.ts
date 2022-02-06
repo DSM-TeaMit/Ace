@@ -18,6 +18,9 @@ export class Admin {
   @Column({ length: 60 })
   password: string;
 
+  @Column({ length: 200, nullable: true })
+  thumbnailUrl: string;
+
   @OneToMany(() => Comment, (comment) => comment.adminId)
   comments: Comment[];
 }

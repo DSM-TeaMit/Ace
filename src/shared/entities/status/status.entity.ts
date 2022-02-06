@@ -13,9 +13,15 @@ export class Status {
   @Column()
   isReportSubmitted: boolean;
 
-  @Column()
+  @Column({ nullable: true })
+  isPlanAccepted: boolean;
+
+  @Column({ nullable: true })
+  isReportAccepted: boolean;
+
+  @Column({ nullable: true })
   plabSubmittedAt: Date;
 
-  @Column()
+  @Column({ nullable: true })
   reportSubmittedAt: Date;
 }
