@@ -9,7 +9,10 @@ import { Project } from '../project/project.entity';
 
 @Entity()
 export class Report {
-  @OneToOne(() => Project, (project) => project.report, { primary: true })
+  @OneToOne(() => Project, (project) => project.report, {
+    primary: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   projectId: Project;
 
