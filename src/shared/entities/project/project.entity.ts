@@ -35,7 +35,7 @@ export class Project {
   @Column()
   viewCount: number;
 
-  @Column({ length: 200 })
+  @Column({ length: 200, nullable: true })
   thumbnailUrl: string;
 
   @Column({ length: 20 })

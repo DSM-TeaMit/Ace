@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
@@ -35,7 +36,10 @@ export class AuthService {
   ) {}
 
   async googleLogin(req: Request): Promise<LoginResponseDto> {
+    if (req.user.email.split('@')[1] !== 'dsm.hs.kr')
+      throw new ForbiddenException();
     const user = await this.userRepository.findOne(req.user.email);
+    if (user?.deleted) throw new UnprocessableEntityException();
     const isUserExist = Boolean(user);
     const payload: JwtPayload = {
       sub: user?.uuid || req.user.email,
