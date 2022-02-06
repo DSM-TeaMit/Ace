@@ -209,4 +209,9 @@ export class UserService {
     await this.userRepository.updateGithubId(user.id, payload.githubId);
     return;
   }
+
+  async deleteUser(req: Request): Promise<void> {
+    await this.userRepository.deleteUser(req.user.userId);
+    return;
+  }
 }

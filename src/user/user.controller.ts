@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -32,6 +33,14 @@ export class UserController {
   @UseGuards(JwtRegistrationGuard)
   async register(@Req() req: Request, @Body() payload: RegisterUserRequestDto) {
     return this.userService.register(req, payload);
+  }
+
+  @Delete()
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  async deleteUser(@Req() req: Request) {
+    return this.userService.deleteUser(req);
   }
 
   @Get('profile')
