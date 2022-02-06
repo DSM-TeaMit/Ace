@@ -1,4 +1,5 @@
 import { CreateProjectRequestDto } from 'src/project/dto/request/create-project.dto';
+import { ModifyProjectRequestDto } from 'src/project/dto/request/modify-project.dto';
 import {
   AbstractRepository,
   Brackets,
@@ -135,6 +136,58 @@ export class ProjectRepository extends AbstractRepository<Project> {
           })
           .execute()
       ).identifiers[0].id;
+      await queryRunner.manager
+        .createQueryBuilder()
+        .insert()
+        .into(Member)
+        .values(
+          members.map((member) => ({
+            projectId: () => projectId.toString(),
+            userId: () => member.id.toString(),
+            role: member.role,
+          })),
+        )
+        .execute();
+
+      await queryRunner.commitTransaction();
+      return uuid;
+    } catch (e) {
+      if (queryRunner.isTransactionActive) {
+        await queryRunner.rollbackTransaction();
+      }
+    }
+  }
+
+  async modifyProject(
+    uuid: string,
+    payload: ModifyProjectRequestDto,
+    members: {
+      id: number;
+      role: string;
+    }[],
+  ): Promise<string | undefined> {
+    const queryRunner = getConnection().createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const projectId: number = (
+        await queryRunner.manager
+          .createQueryBuilder()
+          .update(Project)
+          .set({
+            projectName: payload.name,
+            projectType: payload.type,
+            field: payload.field,
+          })
+          .where('project.uuid = :uuid', { uuid })
+          .execute()
+      ).generatedMaps[0].id;
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(Member)
+        .where('projectId = :projectId', { projectId })
+        .execute();
       await queryRunner.manager
         .createQueryBuilder()
         .insert()

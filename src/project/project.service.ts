@@ -3,6 +3,10 @@ import { Request } from 'express';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { CreateProjectRequestDto } from './dto/request/create-project.dto';
+import {
+  ModifyProjectParamsDto,
+  ModifyProjectRequestDto,
+} from './dto/request/modify-project.dto';
 import { CreateProjectResponseDto } from './dto/response/create-project.dto';
 
 @Injectable()
@@ -34,5 +38,36 @@ export class ProjectService {
     return {
       uuid: await this.projectRepository.createProject(payload, members),
     };
+  }
+
+  async modifyProject(
+    req: Request,
+    param: ModifyProjectParamsDto,
+    payload: ModifyProjectRequestDto,
+  ): Promise<void> {
+    if (
+      !(
+        payload.members
+          ?.map((member) => member.uuid)
+          .includes(req.user.userId) ?? true
+      )
+    )
+      throw new UnprocessableEntityException();
+    const members: {
+      id: number;
+      role: string;
+    }[] = [];
+    for await (const member of payload.members) {
+      const user = await this.userRepository.findOneByUuid(member.uuid);
+      if (!user) throw new UnprocessableEntityException();
+      members.push({
+        id: user.id,
+        role: member.role,
+      });
+    }
+
+    await this.projectRepository.modifyProject(param.uuid, payload, members);
+
+    return;
   }
 }
