@@ -74,4 +74,23 @@ export class ProjectService {
 
     return;
   }
+
+  async deleteProject(
+    req: Request,
+    param: ModifyProjectParamsDto,
+  ): Promise<void> {
+    const project = await this.projectRepository.findOne(param);
+    if (
+      !(
+        project.members
+          ?.map((member) => member.userId.uuid)
+          .includes(req.user.userId) ?? true
+      )
+    )
+      throw new ForbiddenException();
+
+    await this.projectRepository.deleteProject(param.uuid);
+
+    return;
+  }
 }

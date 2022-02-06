@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { v4 } from 'uuid';
 import { Member } from '../member/member.entity';
+import { Status } from '../status/status.entity';
 import { Project } from './project.entity';
 
 @EntityRepository(Project)
@@ -218,5 +219,28 @@ export class ProjectRepository extends AbstractRepository<Project> {
         await queryRunner.rollbackTransaction();
       }
     }
+  }
+
+  async findOne({ uuid, id }: { uuid?: string; id?: string }) {
+    const qb = this.createQueryBuilder('project')
+      .select()
+      .leftJoinAndSelect('project.member', 'member')
+      .leftJoinAndSelect('member.userId', 'userId');
+    if (uuid) qb.where('project.uuid = :uuid', { uuid });
+    if (id) qb.where('project.id = :id', { id });
+
+    return qb.getOne();
+  }
+
+  async deleteProject(uuid: string) {
+    return Boolean(
+      (
+        await this.createQueryBuilder('project')
+          .delete()
+          .from(Project)
+          .where('project.uuid = :uuid', { uuid })
+          .execute()
+      ).affected,
+    );
   }
 }

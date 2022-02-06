@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Param,
   Patch,
   Post,
@@ -41,5 +42,13 @@ export class ProjectController {
     @Body() payload: ModifyProjectRequestDto,
   ) {
     return this.projectService.modifyProject(req, param, payload);
+  }
+
+  @Delete(':uuid')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  deleteProject(@Req() req: Request, @Param() param: ModifyProjectParamsDto) {
+    return this.projectService.deleteProject(req, param);
   }
 }
