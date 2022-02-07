@@ -1,14 +1,10 @@
 import { CreatePlanRequestDto } from 'src/project/dto/request/create-plan.dto';
 import { CreateProjectRequestDto } from 'src/project/dto/request/create-project.dto';
+import { CreateReportRequestDto } from 'src/project/dto/request/create-report.dto';
 import { ModifyPlanRequestDto } from 'src/project/dto/request/modify-plan.dto';
 import { ModifyProjectRequestDto } from 'src/project/dto/request/modify-project.dto';
 import { SearchRequestDto } from 'src/project/dto/request/search.dto';
-import {
-  AbstractRepository,
-  Brackets,
-  EntityRepository,
-  getConnection,
-} from 'typeorm';
+import { AbstractRepository, EntityRepository, getConnection } from 'typeorm';
 import { v4 } from 'uuid';
 import { Member } from '../member/member.entity';
 import { Plan } from '../plan/plan.entity';
@@ -260,6 +256,39 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .from(Plan, 'plan')
       .where('plan.projectId = :id', { id })
       .execute();
+  }
+
+  async createReport(
+    projectId: number,
+    payload: CreateReportRequestDto,
+  ): Promise<void> {
+    this.createQueryBuilder('project')
+      .insert()
+      .into(Report)
+      .values({
+        projectId: () => projectId.toString(),
+        ...payload,
+      })
+      .execute();
+  }
+
+  async getReport({ projectId, uuid }: { projectId?: number; uuid?: string }) {
+    const qb = this.createQueryBuilder('pr')
+      .select()
+      .from(Report, 'report')
+      .leftJoinAndSelect('report.projectId', 'project')
+      .leftJoinAndSelect('report.writerId', 'writer')
+      .leftJoinAndSelect('project.members', 'member')
+      .leftJoinAndSelect('project.status', 'status')
+      .leftJoinAndSelect('member.userId', 'user');
+
+    if (projectId) qb.where('report.projectId = :projectId', { projectId });
+    if (uuid)
+      qb.where('project.uuid = :uuid', {
+        uuid,
+      });
+
+    return qb.getOne();
   }
 
   async updateConfirmed(id: number, type: 'plan' | 'report', value: boolean) {
