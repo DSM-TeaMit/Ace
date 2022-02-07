@@ -202,7 +202,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .insert()
       .into(Plan)
       .values({
-        projectId,
+        projectId: () => projectId.toString(),
         goal: payload.goal,
         content: payload.content,
         startDate: payload.startDate,
