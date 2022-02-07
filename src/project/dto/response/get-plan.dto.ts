@@ -2,10 +2,17 @@ export interface GetPlanResponseDto {
   projectName: string;
   startDate: string;
   endDate: string;
-  writerId: string;
+  writer: Omit<Member, 'role'>;
+  members: Member[];
   goal: string;
   content: string;
   includes: Inclusion;
+}
+
+interface Member {
+  studentNo: number;
+  name: string;
+  role: string;
 }
 
 interface Inclusion {

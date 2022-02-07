@@ -25,11 +25,20 @@ export class PlanService {
 
   async getPlan(param: ProjectParamsDto): Promise<GetPlanResponseDto> {
     const plan = await this.projectRepository.getPlan(param);
+    if (!plan) throw new NotFoundException();
     return {
       projectName: plan.projectId.projectName,
       startDate: plan.startDate,
       endDate: plan.endDate,
-      writerId: plan.projectId.writerId.uuid,
+      writer: {
+        studentNo: plan.projectId.writerId.studentNo,
+        name: plan.projectId.writerId.name,
+      },
+      members: plan.projectId.members.map((member) => ({
+        studentNo: member.userId.studentNo,
+        name: member.userId.name,
+        role: member.role,
+      })),
       goal: plan.goal,
       content: plan.content,
       includes: {
