@@ -7,6 +7,8 @@ import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { CommentRepository } from 'src/shared/entities/comment/comment.repository';
 import { FeedService } from './services/feed.service';
 import { FeedController } from './controllers/feed.controller';
+import { PlanService } from './services/plan.service';
+import { PlanController } from './controllers/plan.controller';
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import { FeedController } from './controllers/feed.controller';
       UserRepository,
     ]),
   ],
-  providers: [FeedService, ProjectService],
-  controllers: [FeedController, ProjectController],
+  providers: [FeedService, PlanService, ProjectService],
+  controllers: [FeedController, PlanController, ProjectController],
 })
 export class ProjectModule {}

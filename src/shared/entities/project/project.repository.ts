@@ -1,3 +1,4 @@
+import { CreatePlanRequestDto } from 'src/project/dto/request/create-plan.dto';
 import { CreateProjectRequestDto } from 'src/project/dto/request/create-project.dto';
 import { ModifyProjectRequestDto } from 'src/project/dto/request/modify-project.dto';
 import { SearchRequestDto } from 'src/project/dto/request/search.dto';
@@ -9,6 +10,7 @@ import {
 } from 'typeorm';
 import { v4 } from 'uuid';
 import { Member } from '../member/member.entity';
+import { Plan } from '../plan/plan.entity';
 import { Status } from '../status/status.entity';
 import { Project } from './project.entity';
 
@@ -190,5 +192,38 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .take(query.limit)
       .skip(query.limit * (query.page - 1))
       .getManyAndCount();
+  }
+
+  async createPlan(
+    projectId: number,
+    payload: CreatePlanRequestDto,
+  ): Promise<void> {
+    this.createQueryBuilder('project')
+      .insert()
+      .into(Plan)
+      .values({
+        projectId,
+        goal: payload.goal,
+        content: payload.content,
+        startDate: payload.startDate,
+        endDate: payload.endDate,
+        includeResultReport: payload.includes.report,
+        includeCode: payload.includes.code,
+        includeOutcome: payload.includes.outcome,
+        includeOthers: payload.includes.others,
+      })
+      .execute();
+  }
+
+  async getPlan({ projectId, uuid }: { projectId?: number; uuid?: string }) {
+    const qb = this.createQueryBuilder('project').select().from(Plan, 'plan');
+
+    if (projectId) qb.where('plan.projectId = :projectId', { projectId });
+    if (uuid)
+      qb.leftJoin('plan.projectId', 'project').where('project.uuid = :uuid', {
+        uuid,
+      });
+
+    return qb.getOne();
   }
 }
