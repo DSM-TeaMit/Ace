@@ -252,4 +252,12 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .where('plan.projectId = :id', { id })
       .execute();
   }
+
+  async deletePlan(id: number) {
+    this.createQueryBuilder('pr')
+      .delete()
+      .from(Plan, 'plan')
+      .where('plan.projectId = :id', { id })
+      .execute();
+  }
 }

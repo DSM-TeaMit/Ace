@@ -69,4 +69,19 @@ export class PlanService {
 
     return;
   }
+
+  async deletePlan(req: Request, param: ProjectParamsDto) {
+    const plan = await this.projectRepository.getPlan(param);
+    if (!plan) throw new NotFoundException();
+    if (
+      !(
+        plan.projectId.members
+          ?.map((member) => member.userId.uuid)
+          .includes(req.user.userId) ?? true
+      )
+    )
+      throw new ForbiddenException();
+    this.projectRepository.deletePlan(plan.projectId.id);
+    return;
+  }
 }

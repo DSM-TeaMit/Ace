@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -49,5 +50,13 @@ export class PlanController {
     @Body() payload: ModifyPlanRequestDto,
   ) {
     return this.planService.modifyPlan(req, param, payload);
+  }
+
+  @Delete(':uuid/plan')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  async deletePlan(@Req() req: Request, @Param() param: ProjectParamsDto) {
+    return this.planService.deletePlan(req, param);
   }
 }
