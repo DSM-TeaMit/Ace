@@ -16,6 +16,9 @@ export class Report {
   @JoinColumn()
   projectId: Project;
 
+  @Column({ length: 40 })
+  subject: string;
+
   @Column({ length: 15000 })
   content: string;
 
