@@ -39,4 +39,24 @@ export class ReportService {
     };
   }
 
+  async modifyReport(
+    req: Request,
+    param: ProjectParamsDto,
+    payload: ModifyReportRequestDto,
+  ): Promise<void> {
+    const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
+    if (
+      !(
+        project.members
+          ?.map((member) => member.userId.uuid)
+          .includes(req.user.userId) ?? true
+      )
+    )
+      throw new ForbiddenException();
+    await this.projectRepository.modifyReport(project.id, payload);
+
+
+    return;
+  }
 }

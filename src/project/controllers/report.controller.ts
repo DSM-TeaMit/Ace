@@ -39,4 +39,16 @@ export class PlanController {
   async getReport(@Param() param: ProjectParamsDto) {
     return this.reportService.getReport(param);
   }
+
+  @Patch(':uuid/report')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  async modifyReport(
+    @Req() req: Request,
+    @Param() param: ProjectParamsDto,
+    @Body() payload: ModifyReportRequestDto,
+  ) {
+    return this.reportService.modifyReport(req, param, payload);
+  }
 }

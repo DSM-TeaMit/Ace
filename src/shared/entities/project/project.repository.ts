@@ -291,6 +291,16 @@ export class ProjectRepository extends AbstractRepository<Project> {
     return qb.getOne();
   }
 
+  async modifyReport(id: number, payload: ModifyReportRequestDto) {
+    this.createQueryBuilder('plan')
+      .update(Report)
+      .set({
+        ...payload,
+      })
+      .where('plan.projectId = :id', { id })
+      .execute();
+  }
+
   async updateConfirmed(id: number, type: 'plan' | 'report', value: boolean) {
     const qb = this.createQueryBuilder('status')
       .update(Status)
