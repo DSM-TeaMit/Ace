@@ -6,6 +6,7 @@ import {
 import { Request } from 'express';
 import { CommentRepository } from 'src/shared/entities/comment/comment.repository';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
+import { User } from 'src/shared/entities/user/user.entity';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { CreateProjectRequestDto } from '../dto/request/create-project.dto';
 import { ModifyProjectRequestDto } from '../dto/request/modify-project.dto';
@@ -31,9 +32,11 @@ export class ProjectService {
       id: number;
       role: string;
     }[] = [];
+    let writer: User = undefined;
     for await (const member of payload.members) {
       const user = await this.userRepository.findOneByUuid(member.uuid);
       if (!user) throw new UnprocessableEntityException();
+      if (member.uuid === req.user.userId) writer = user;
       members.push({
         id: user.id,
         role: member.role,
@@ -41,7 +44,11 @@ export class ProjectService {
     }
 
     return {
-      uuid: await this.projectRepository.createProject(payload, members),
+      uuid: await this.projectRepository.createProject(
+        payload,
+        members,
+        writer.id,
+      ),
     };
   }
 

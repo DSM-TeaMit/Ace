@@ -22,6 +22,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       id: number;
       role: string;
     }[],
+    writerId: number,
   ): Promise<string | undefined> {
     const queryRunner = getConnection().createQueryRunner();
     await queryRunner.connect();
@@ -38,6 +39,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
             projectName: payload.name,
             projectType: payload.type,
             field: payload.field,
+            writerId: () => writerId.toString(),
           })
           .execute()
       ).identifiers[0].id;

@@ -2,6 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -11,11 +13,12 @@ import { Member } from '../member/member.entity';
 import { Plan } from '../plan/plan.entity';
 import { Report } from '../report/report.entity';
 import { Status } from '../status/status.entity';
+import { User } from '../user/user.entity';
 
 @Entity()
 export class Project {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column({ length: 36 })
   uuid: string;
@@ -43,6 +46,9 @@ export class Project {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(() => User, (user) => user.projects, { nullable: false })
+  writerId: User;
 
   @OneToMany(() => Comment, (comment) => comment.projectId)
   comments: Comment[];
