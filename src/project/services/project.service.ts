@@ -1,6 +1,8 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Request } from 'express';
@@ -8,6 +10,7 @@ import { CommentRepository } from 'src/shared/entities/comment/comment.repositor
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { User } from 'src/shared/entities/user/user.entity';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
+import { ConfirmProjectQueryDto } from '../dto/request/confirm-project.dto';
 import { CreateProjectRequestDto } from '../dto/request/create-project.dto';
 import { ModifyProjectRequestDto } from '../dto/request/modify-project.dto';
 import { ProjectParamsDto } from '../dto/request/project-params.dto';
@@ -113,6 +116,15 @@ export class ProjectService {
     param: ProjectParamsDto,
     payload: ModifyProjectRequestDto,
   ): Promise<void> {
+    const project = await this.projectRepository.findOne(param);
+    if (
+      !(
+        project.members
+          ?.map((member) => member.userId.uuid)
+          .includes(req.user.userId) ?? true
+      )
+    )
+      throw new ForbiddenException();
     if (
       !(
         payload.members
@@ -120,7 +132,7 @@ export class ProjectService {
           .includes(req.user.userId) ?? true
       )
     )
-      throw new ForbiddenException();
+      throw new UnprocessableEntityException();
     const members: {
       id: number;
       role: string;
@@ -153,5 +165,27 @@ export class ProjectService {
     await this.projectRepository.deleteProject(param.uuid);
 
     return;
+  }
+
+  async confirmProject(
+    req: Request,
+    param: ProjectParamsDto,
+    query: ConfirmProjectQueryDto,
+  ) {
+    let projectId = undefined;
+    switch (query.type) {
+      case 'plan':
+        const plan = await this.projectRepository.getPlan(param);
+        if (!plan) throw new NotFoundException();
+        if (
+          !plan.projectId.status.isPlanSubmitted ||
+          plan.projectId.status.isPlanAccepted
+        )
+          throw new ConflictException();
+        projectId = plan.projectId.id;
+        break;
+    }
+
+    this.projectRepository.updateConfirmed(projectId, query.type, query.value);
   }
 }

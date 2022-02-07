@@ -225,6 +225,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .leftJoinAndSelect('plan.projectId', 'project')
       .leftJoinAndSelect('project.writerId', 'writer')
       .leftJoinAndSelect('project.members', 'member')
+      .leftJoinAndSelect('project.status', 'status')
       .leftJoinAndSelect('member.userId', 'user');
 
     if (projectId) qb.where('plan.projectId = :projectId', { projectId });
@@ -259,5 +260,16 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .from(Plan, 'plan')
       .where('plan.projectId = :id', { id })
       .execute();
+  }
+
+  async updateConfirmed(id: number, type: 'plan' | 'report', value: boolean) {
+    const qb = this.createQueryBuilder('status')
+      .update(Status)
+      .where('status.projectId = :id', { id });
+
+    if (type === 'plan') qb.set({ isPlanAccepted: value });
+    if (type === 'report') qb.set({ isReportAccepted: value });
+
+    qb.execute();
   }
 }
