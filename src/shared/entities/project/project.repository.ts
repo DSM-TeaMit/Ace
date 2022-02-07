@@ -1,5 +1,6 @@
 import { CreateProjectRequestDto } from 'src/project/dto/request/create-project.dto';
 import { ModifyProjectRequestDto } from 'src/project/dto/request/modify-project.dto';
+import { SearchRequestDto } from 'src/project/dto/request/search.dto';
 import {
   AbstractRepository,
   Brackets,
@@ -275,5 +276,18 @@ export class ProjectRepository extends AbstractRepository<Project> {
         'DESC',
       );
     return qb.getManyAndCount();
+  }
+
+  async search(query: SearchRequestDto) {
+    return this.createQueryBuilder('project')
+      .select()
+      .where('project.projectName LIKE "%:keyword%"', {
+        keyword: query.keyword,
+      })
+      .andWhere('status.isPlanAccepted = true')
+      .andWhere('status.isReportAccepted = true')
+      .take(query.limit)
+      .skip(query.limit * (query.page - 1))
+      .getManyAndCount();
   }
 }
