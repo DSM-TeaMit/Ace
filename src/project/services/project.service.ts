@@ -184,6 +184,16 @@ export class ProjectService {
           throw new ConflictException();
         projectId = plan.projectId.id;
         break;
+      case 'report':
+        const report = await this.projectRepository.getReport(param);
+        if (!report) throw new NotFoundException();
+        if (
+          !report.projectId.status.isReportSubmitted ||
+          report.projectId.status.isReportAccepted
+        )
+          throw new ConflictException();
+        projectId = report.projectId.id;
+        break;
     }
 
     this.projectRepository.updateConfirmed(projectId, query.type, query.value);
