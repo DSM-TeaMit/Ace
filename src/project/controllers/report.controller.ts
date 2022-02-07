@@ -34,4 +34,9 @@ export class PlanController {
     return this.reportService.createReport(param, payload);
   }
 
+  @Get(':uuid/report')
+  @UseGuards(JwtAuthGuard)
+  async getReport(@Param() param: ProjectParamsDto) {
+    return this.reportService.getReport(param);
+  }
 }

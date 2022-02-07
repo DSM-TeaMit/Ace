@@ -26,4 +26,17 @@ export class ReportService {
     this.projectRepository.createReport(project.id, payload);
   }
 
+  async getReport(param: ProjectParamsDto): Promise<GetReportResponseDto> {
+    const report = await this.projectRepository.getReport(param);
+    if (!report) throw new NotFoundException();
+    return {
+      subject: report.subject,
+      writer: {
+        studentNo: report.projectId.writerId.studentNo,
+        name: report.projectId.writerId.name,
+      },
+      content: report.content,
+    };
+  }
+
 }
