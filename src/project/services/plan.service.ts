@@ -40,4 +40,24 @@ export class PlanService {
       },
     };
   }
+
+  async modifyPlan(
+    req: Request,
+    param: ProjectParamsDto,
+    payload: ModifyPlanRequestDto,
+  ): Promise<void> {
+    const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
+    if (
+      !(
+        project.members
+          ?.map((member) => member.userId.uuid)
+          .includes(req.user.userId) ?? true
+      )
+    )
+      throw new ForbiddenException();
+    await this.projectRepository.modifyPlan(project.id, payload);
+
+    return;
+  }
 }

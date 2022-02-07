@@ -1,5 +1,6 @@
 import { CreatePlanRequestDto } from 'src/project/dto/request/create-plan.dto';
 import { CreateProjectRequestDto } from 'src/project/dto/request/create-project.dto';
+import { ModifyPlanRequestDto } from 'src/project/dto/request/modify-plan.dto';
 import { ModifyProjectRequestDto } from 'src/project/dto/request/modify-project.dto';
 import { SearchRequestDto } from 'src/project/dto/request/search.dto';
 import {
@@ -218,11 +219,13 @@ export class ProjectRepository extends AbstractRepository<Project> {
   }
 
   async getPlan({ projectId, uuid }: { projectId?: number; uuid?: string }) {
-    const qb = this.createQueryBuilder('project')
+    const qb = this.createQueryBuilder('pr')
       .select()
       .from(Plan, 'plan')
       .leftJoinAndSelect('plan.projectId', 'project')
-      .leftJoinAndSelect('project.writerId', 'writer');
+      .leftJoinAndSelect('project.writerId', 'writer')
+      .leftJoinAndSelect('project.members', 'member')
+      .leftJoinAndSelect('member.userId', 'user');
 
     if (projectId) qb.where('plan.projectId = :projectId', { projectId });
     if (uuid)
@@ -231,5 +234,22 @@ export class ProjectRepository extends AbstractRepository<Project> {
       });
 
     return qb.getOne();
+  }
+
+  async modifyPlan(id: number, payload: ModifyPlanRequestDto) {
+    this.createQueryBuilder('plan')
+      .update(Plan)
+      .set({
+        goal: payload.goal,
+        content: payload.content,
+        startDate: payload.startDate,
+        endDate: payload.endDate,
+        includeResultReport: payload.includes.report,
+        includeCode: payload.includes.code,
+        includeOutcome: payload.includes.outcome,
+        includeOthers: payload.includes.others,
+      })
+      .where('plan.projectId = :id', { id })
+      .execute();
   }
 }
