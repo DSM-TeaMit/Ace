@@ -3,11 +3,13 @@ import { CreateProjectRequestDto } from 'src/project/dto/request/create-project.
 import { CreateReportRequestDto } from 'src/project/dto/request/create-report.dto';
 import { ModifyPlanRequestDto } from 'src/project/dto/request/modify-plan.dto';
 import { ModifyProjectRequestDto } from 'src/project/dto/request/modify-project.dto';
+import { ModifyReportRequestDto } from 'src/project/dto/request/modify-report.dto';
 import { SearchRequestDto } from 'src/project/dto/request/search.dto';
 import { AbstractRepository, EntityRepository, getConnection } from 'typeorm';
 import { v4 } from 'uuid';
 import { Member } from '../member/member.entity';
 import { Plan } from '../plan/plan.entity';
+import { Report } from '../report/report.entity';
 import { Status } from '../status/status.entity';
 import { Project } from './project.entity';
 
@@ -298,6 +300,14 @@ export class ProjectRepository extends AbstractRepository<Project> {
         ...payload,
       })
       .where('plan.projectId = :id', { id })
+      .execute();
+  }
+
+  async deleteReport(id: number) {
+    this.createQueryBuilder('pr')
+      .delete()
+      .from(Report, 'report')
+      .where('report.projectId = :id', { id })
       .execute();
   }
 

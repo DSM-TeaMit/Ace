@@ -56,7 +56,21 @@ export class ReportService {
       throw new ForbiddenException();
     await this.projectRepository.modifyReport(project.id, payload);
 
+    return;
+  }
 
+  async deleteReport(req: Request, param: ProjectParamsDto) {
+    const report = await this.projectRepository.getReport(param);
+    if (!report) throw new NotFoundException();
+    if (
+      !(
+        report.projectId.members
+          ?.map((member) => member.userId.uuid)
+          .includes(req.user.userId) ?? true
+      )
+    )
+      throw new ForbiddenException();
+    this.projectRepository.deleteReport(report.projectId.id);
     return;
   }
 }

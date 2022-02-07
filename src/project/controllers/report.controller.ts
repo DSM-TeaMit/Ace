@@ -51,4 +51,12 @@ export class PlanController {
   ) {
     return this.reportService.modifyReport(req, param, payload);
   }
+
+  @Delete(':uuid/report')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  async deleteReport(@Req() req: Request, @Param() param: ProjectParamsDto) {
+    return this.reportService.deleteReport(req, param);
+  }
 }
