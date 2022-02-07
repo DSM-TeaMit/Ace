@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
@@ -20,5 +20,11 @@ export class PlanController {
     @Body() payload: CreatePlanRequestDto,
   ) {
     return this.planService.createPlan(param, payload);
+  }
+
+  @Get(':uuid/plan')
+  @UseGuards(JwtAuthGuard)
+  async getPlan(@Param() param: ProjectParamsDto) {
+    return this.planService.getPlan(param);
   }
 }

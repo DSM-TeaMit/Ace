@@ -218,11 +218,15 @@ export class ProjectRepository extends AbstractRepository<Project> {
   }
 
   async getPlan({ projectId, uuid }: { projectId?: number; uuid?: string }) {
-    const qb = this.createQueryBuilder('project').select().from(Plan, 'plan');
+    const qb = this.createQueryBuilder('project')
+      .select()
+      .from(Plan, 'plan')
+      .leftJoinAndSelect('plan.projectId', 'project')
+      .leftJoinAndSelect('project.writerId', 'writer');
 
     if (projectId) qb.where('plan.projectId = :projectId', { projectId });
     if (uuid)
-      qb.leftJoin('plan.projectId', 'project').where('project.uuid = :uuid', {
+      qb.where('project.uuid = :uuid', {
         uuid,
       });
 
