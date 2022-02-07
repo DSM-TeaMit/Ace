@@ -54,7 +54,7 @@ export class UserService {
     const isMine = !payload.uuid || payload.uuid === req.user.userId;
     const user = await this.userRepository.findOneByUuid(uuid);
 
-    const projects = await this.projectRepository.getProjectsOfUser(
+    const projects = await this.userRepository.getProjectsOfUser(
       user.id,
       isMine,
       1,
@@ -64,7 +64,7 @@ export class UserService {
     const pendingProjects = isMine
       ? (
           (
-            await this.projectRepository.getPendingProjects(user.id)
+            await this.userRepository.getPendingProjects(user.id)
           )[0] as Project[]
         )?.map((project) => {
           const type =
@@ -122,7 +122,7 @@ export class UserService {
     const isMine = !param.uuid || param.uuid === req.user.userId;
     const user = await this.userRepository.findOneByUuid(uuid);
 
-    const projects = await this.projectRepository.getProjectsOfUser(
+    const projects = await this.userRepository.getProjectsOfUser(
       user.id,
       isMine,
       query.page,
@@ -158,24 +158,9 @@ export class UserService {
 
     const projects = (
       await Promise.all([
-        this.projectRepository.getReports(
-          user.id,
-          query.page,
-          query.limit,
-          true,
-        ),
-        this.projectRepository.getReports(
-          user.id,
-          query.page,
-          query.limit,
-          false,
-        ),
-        this.projectRepository.getReports(
-          user.id,
-          query.page,
-          query.limit,
-          null,
-        ),
+        this.userRepository.getReports(user.id, query.page, query.limit, true),
+        this.userRepository.getReports(user.id, query.page, query.limit, false),
+        this.userRepository.getReports(user.id, query.page, query.limit, null),
       ])
     ).map((res) => ({
       count: res[1],

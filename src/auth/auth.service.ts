@@ -1,5 +1,6 @@
 import {
   CACHE_MANAGER,
+  ForbiddenException,
   Inject,
   Injectable,
   InternalServerErrorException,

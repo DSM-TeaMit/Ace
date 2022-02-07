@@ -3,7 +3,10 @@ import { Project } from '../project/project.entity';
 
 @Entity()
 export class Status {
-  @OneToOne(() => Project, (project) => project.status, { primary: true })
+  @OneToOne(() => Project, (project) => project.status, {
+    primary: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   projectId: Project;
 

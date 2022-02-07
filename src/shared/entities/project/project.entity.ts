@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -11,11 +12,12 @@ import { Member } from '../member/member.entity';
 import { Plan } from '../plan/plan.entity';
 import { Report } from '../report/report.entity';
 import { Status } from '../status/status.entity';
+import { User } from '../user/user.entity';
 
 @Entity()
 export class Project {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column({ length: 36 })
   uuid: string;
@@ -23,16 +25,16 @@ export class Project {
   @Column({ length: 45 })
   projectName: string;
 
-  @Column({ length: 250 })
-  projectDescription: string;
+  @Column({ length: 250, nullable: true })
+  projectDescription?: string;
 
-  @Column({ length: 250 })
-  projectResult: string;
+  @Column({ length: 250, nullable: true })
+  projectResult?: string;
 
   @Column({ type: 'enum', enum: ['PERS', 'TEAM', 'CLUB'] })
   projectType: 'PERS' | 'TEAM' | 'CLUB';
 
-  @Column()
+  @Column({ default: 0 })
   viewCount: number;
 
   @Column({ length: 200, nullable: true })
@@ -43,6 +45,9 @@ export class Project {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(() => User, (user) => user.projects, { nullable: false })
+  writerId: User;
 
   @OneToMany(() => Comment, (comment) => comment.projectId)
   comments: Comment[];

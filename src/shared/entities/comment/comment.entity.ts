@@ -14,7 +14,10 @@ export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Project, (project) => project.comments, { nullable: false })
+  @ManyToOne(() => Project, (project) => project.comments, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   projectId: Project;
 
   @ManyToOne(() => Admin, (admin) => admin.comments, { nullable: true })

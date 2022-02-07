@@ -9,9 +9,12 @@ import { Project } from '../project/project.entity';
 
 @Entity()
 export class Plan {
-  @OneToOne(() => Project, (project) => project.plan, { primary: true })
+  @OneToOne(() => Project, (project) => project.plan, {
+    primary: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
-  projectId: number;
+  projectId: Project;
 
   @Column({ length: 4000 })
   goal: string;
@@ -34,7 +37,7 @@ export class Plan {
   @Column()
   includeOutcome: boolean;
 
-  @Column({ length: 15 })
+  @Column({ length: 15, nullable: true })
   includeOthers: string;
 
   @CreateDateColumn()
