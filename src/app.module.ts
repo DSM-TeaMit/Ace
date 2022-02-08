@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { FileModule } from './file/file.module';
 import { ProjectModule } from './project/project.module';
 import { UserModule } from './user/user.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UserModule } from './user/user.module';
     FileModule,
     ProjectModule,
     UserModule,
+    CommentModule,
   ],
   controllers: [],
   providers: [],

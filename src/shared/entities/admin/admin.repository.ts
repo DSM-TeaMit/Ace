@@ -5,11 +5,11 @@ import { Admin } from './admin.entity';
 
 @EntityRepository(Admin)
 export class AdminRepository extends AbstractRepository<Admin> {
-  async findOne(uid: string): Promise<Admin> {
-    return this.createQueryBuilder('admin')
-      .select()
-      .where('uid = :uid', { uid })
-      .getOne();
+  async findOne(uid?: string, uuid?: string): Promise<Admin> {
+    const qb = this.createQueryBuilder('admin').select();
+    if (uid) qb.where('uid = :uid', { uid });
+    if (uuid) qb.where('uuid = :uuid', { uuid });
+    return qb.getOne();
   }
 
   async insertOne({ id, password, name }: RegisterAdminRequestDto) {

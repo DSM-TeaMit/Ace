@@ -20,6 +20,9 @@ export class Comment {
   })
   projectId: Project;
 
+  @Column({ length: 36 })
+  uuid: string;
+
   @ManyToOne(() => Admin, (admin) => admin.comments, { nullable: true })
   adminId: Admin;
 
