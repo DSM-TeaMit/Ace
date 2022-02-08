@@ -1,15 +1,22 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Request } from 'express';
 import { ProjectParamsDto } from 'src/project/dto/request/project-params.dto';
+import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
 import { CommentRepository } from 'src/shared/entities/comment/comment.repository';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
+import { UserRepository } from 'src/shared/entities/user/user.repository';
+import { v4 } from 'uuid';
 import { CommentQueryDto } from './dto/request/comment.dto';
+import { CreateCommentRequestDto } from './dto/request/create-comment.dto';
 import { GetCommentResponseDto } from './dto/response/get-comment.dto';
 
 @Injectable()
 export class CommentService {
   constructor(
+    private readonly adminRepository: AdminRepository,
     private readonly commentRepository: CommentRepository,
     private readonly projectRepository: ProjectRepository,
+    private readonly userRepository: UserRepository,
   ) {}
 
   async getComments(
@@ -33,5 +40,39 @@ export class CommentService {
         content: comment.content,
       })),
     };
+  }
+
+  async createComments(
+    payload: CreateCommentRequestDto,
+    param: ProjectParamsDto,
+    req: Request,
+  ) {
+    const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
+
+    const adminId =
+      req.user.role === 'admin'
+        ? (
+            await this.adminRepository.findOne(undefined, req.user.userId)
+          ).id.toString()
+        : undefined;
+    const userId =
+      req.user.role === 'user'
+        ? (
+            await this.userRepository.findOne(undefined, req.user.userId)
+          ).id.toString()
+        : undefined;
+
+    await this.commentRepository.createComment(
+      project.id,
+      payload.type.toUpperCase() as 'PROJECT' | 'PLAN' | 'REPORT',
+      {
+        uuid: v4(),
+        adminId: () => adminId,
+        userId: () => userId,
+        content: payload.content,
+      },
+    );
+    return;
   }
 }

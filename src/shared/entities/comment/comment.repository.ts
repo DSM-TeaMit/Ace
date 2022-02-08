@@ -1,4 +1,5 @@
 import { AbstractRepository, EntityRepository } from 'typeorm';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { Comment } from './comment.entity';
 
 @EntityRepository(Comment)
@@ -11,5 +12,20 @@ export class CommentRepository extends AbstractRepository<Comment> {
       .where('comment.projectId = :projectId', { projectId })
       .andWhere('comment.type = :type', { type })
       .getManyAndCount();
+  }
+
+  async createComment(
+    projectId: number,
+    type: 'PROJECT' | 'PLAN' | 'REPORT',
+    payload: QueryDeepPartialEntity<Comment>,
+  ) {
+    return this.createQueryBuilder('comment')
+      .insert()
+      .values({
+        ...payload,
+        projectId: () => projectId.toString(),
+        type,
+      })
+      .execute();
   }
 }

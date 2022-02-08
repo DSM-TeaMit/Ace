@@ -6,11 +6,11 @@ import { User } from './user.entity';
 
 @EntityRepository(User)
 export class UserRepository extends AbstractRepository<User> {
-  async findOne(email: string): Promise<User> {
-    return await this.createQueryBuilder('user')
-      .select()
-      .where('email = :email', { email })
-      .getOne();
+  async findOne(email?: string, uuid?: string): Promise<User> {
+    const qb = this.createQueryBuilder('user').select();
+    if (email) qb.where('email = :email', { email });
+    if (uuid) qb.where('uuid = :uuid', { uuid });
+    return qb.getOne();
   }
 
   async insert(payload: QueryDeepPartialEntity<User>) {
