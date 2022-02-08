@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { CommentRepository } from 'src/shared/entities/comment/comment.repository';
+import { Project } from 'src/shared/entities/project/project.entity';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { User } from 'src/shared/entities/user/user.entity';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
@@ -197,5 +198,16 @@ export class ProjectService {
     }
 
     this.projectRepository.updateConfirmed(projectId, query.type, query.value);
+  }
+
+  checkPermission(project: Project, req: Request) {
+    if (
+      !(
+        project.members
+          ?.map((member) => member.userId.uuid)
+          .includes(req.user.userId) ?? true
+      )
+    )
+      throw new ForbiddenException();
   }
 }
