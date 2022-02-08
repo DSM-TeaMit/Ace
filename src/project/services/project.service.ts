@@ -198,4 +198,15 @@ export class ProjectService {
 
     this.projectRepository.updateConfirmed(projectId, query.type, query.value);
   }
+
+  checkPermission(project: Project, req: Request) {
+    if (
+      !(
+        project.members
+          ?.map((member) => member.userId.uuid)
+          .includes(req.user.userId) ?? true
+      )
+    )
+      throw new ForbiddenException();
+  }
 }

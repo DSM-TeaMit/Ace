@@ -20,5 +20,6 @@ import { PlanController } from './controllers/plan.controller';
   ],
   providers: [FeedService, PlanService, ProjectService],
   controllers: [FeedController, PlanController, ProjectController],
+  exports: [ProjectService],
 })
 export class ProjectModule {}
