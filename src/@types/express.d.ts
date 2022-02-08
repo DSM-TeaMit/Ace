@@ -3,5 +3,6 @@ declare namespace Express {
     email?: string;
     githubToken?: string;
     userId: string;
+    role: 'user' | 'admin';
   }
 }
