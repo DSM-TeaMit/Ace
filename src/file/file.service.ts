@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  StreamableFile,
 } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { Request } from 'express';
@@ -12,6 +13,7 @@ import { ProjectParamsDto } from 'src/project/dto/request/project-params.dto';
 import { ProjectService } from 'src/project/services/project.service';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { v4 as uuid } from 'uuid';
+import { GetImageParamsDto } from './dto/request/get-image.dto';
 import { UploadFileOptions } from './interfaces/uploadFileOptions.interface';
 
 @Injectable()
@@ -38,6 +40,33 @@ export class FileService {
     return uploadedUrl;
   }
 
+  async getImage(
+    param: GetImageParamsDto,
+    req: Request,
+  ): Promise<StreamableFile> {
+    const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
+
+    const s3Path = `${param.uuid}/report/images`;
+    if (
+      !(await this.isExist(
+        param.imageName,
+        `${process.env.AWS_S3_BUCKET}/${s3Path}`,
+      ))
+    )
+      throw new NotFoundException();
+
+    const ext = extname(param.imageName).slice(1);
+    req.res.set({
+      'Content-Type': `image/${ext}; charset=utf-8`,
+    });
+
+    return await this.downloadFromS3(
+      param.imageName,
+      `${process.env.AWS_S3_BUCKET}/${param.uuid}/report/images`,
+    );
+  }
+
   async uploadSingleFile(options: UploadFileOptions): Promise<string> {
     const ext = extname(options.file.originalname).toLowerCase();
     const regex = options.allowedExt;
@@ -60,6 +89,33 @@ export class FileService {
       throw new InternalServerErrorException();
     }
     return location;
+  }
+
+  async isExist(filename: string, bucket: string): Promise<HeadObjectOutput> {
+    const s3 = this.getS3();
+    try {
+      return await s3.headObject({ Bucket: bucket, Key: filename }).promise();
+    } catch (e) {
+      if (e.code === 'NotFound') return null;
+      else throw new InternalServerErrorException();
+    }
+  }
+
+  async downloadFromS3(
+    filename: string,
+    bucket: string,
+  ): Promise<StreamableFile> {
+    const s3 = this.getS3();
+    return new Promise((resolve, reject) => {
+      try {
+        const stream = s3
+          .getObject({ Bucket: bucket, Key: filename })
+          .createReadStream();
+        resolve(new StreamableFile(stream));
+      } catch (e) {
+        reject(e);
+      }
+    });
   }
 
   async uploadToS3(file, bucket, name) {

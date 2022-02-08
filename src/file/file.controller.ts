@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Param,
   Post,
   Req,
@@ -14,6 +15,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../shared/decorators/roles.decorator';
 import { Role } from '../shared/enums/role.enum';
+import { GetImageParamsDto } from './dto/request/get-image.dto';
 import { FileService } from './file.service';
 
 @Controller('file')
@@ -31,5 +33,11 @@ export class FileController {
     @Req() req: Request,
   ) {
     return this.fileService.uploadImage(file, param, req);
+  }
+
+  @Get(':projectId/image/:imageName')
+  @UseGuards(JwtAuthGuard)
+  getImage(@Param() param: GetImageParamsDto, @Req() req: Request) {
+    return this.fileService.getImage(param, req);
   }
 }
