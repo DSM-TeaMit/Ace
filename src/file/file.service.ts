@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -7,6 +8,7 @@ import {
   StreamableFile,
 } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
+import { HeadObjectOutput } from 'aws-sdk/clients/s3';
 import { Request } from 'express';
 import { extname } from 'path';
 import { ProjectParamsDto } from 'src/project/dto/request/project-params.dto';
@@ -95,6 +97,36 @@ export class FileService {
     });
 
     return;
+  }
+
+  async getArchive(param: ProjectParamsDto, req: Request) {
+    const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
+    if (!project.status.isReportSubmitted) throw new NotFoundException();
+
+    const s3Path = `${param.uuid}/report/archive`;
+    const s3Filename = 'archive_outcomes.zip';
+
+    const fileInfo = await this.isExist(
+      s3Filename,
+      `${process.env.AWS_S3_BUCKET}/${s3Path}`,
+    );
+
+    if (!fileInfo) throw new NotFoundException();
+
+    const filename = `[${project.projectType}] ${project.projectName} - ${
+      project.writerId.studentNo
+    } ${project.writerId.name}${extname(s3Filename)}`;
+    req.res.set({
+      'Content-Type': 'application/octet-stream; charset=utf-8',
+      'Content-Disposition': `'attachment; filename="${encodeURI(filename)}"`,
+      'Content-Length': fileInfo.ContentLength,
+    });
+
+    return await this.downloadFromS3(
+      s3Filename,
+      `${process.env.AWS_S3_BUCKET}/${s3Path}`,
+    );
   }
 
   async uploadSingleFile(options: UploadFileOptions): Promise<string> {
