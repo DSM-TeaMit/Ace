@@ -4,6 +4,7 @@ export interface GetCommentResponseDto {
 }
 
 interface Comment {
+  uuid: string;
   writerId: string;
   writerType: 'user' | 'admin';
   writerName: string;

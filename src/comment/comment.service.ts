@@ -25,6 +25,7 @@ export class CommentService {
     return {
       count: comments[1],
       comments: comments[0].map((comment) => ({
+        uuid: comment.uuid,
         writerId: comment.adminId?.uuid ?? comment.userId?.uuid,
         writerType: comment.adminId ? 'admin' : 'user',
         writerName: comment.adminId?.name ?? comment.userId?.name,
