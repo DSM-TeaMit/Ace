@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -36,5 +37,11 @@ export class CommentController {
     @Req() req: Request,
   ) {
     return this.commentService.createComments(payload, param, req);
+  }
+
+  @Delete(':uuid')
+  @UseGuards(JwtAuthGuard)
+  deleteComment(@Param() param: ProjectParamsDto, @Req() req: Request) {
+    return this.commentService.deleteComment(param, req);
   }
 }

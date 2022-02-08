@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { ProjectParamsDto } from 'src/project/dto/request/project-params.dto';
 import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
@@ -73,6 +77,16 @@ export class CommentService {
         content: payload.content,
       },
     );
+    return;
+  }
+
+  async deleteComment(param: ProjectParamsDto, req: Request): Promise<void> {
+    const comment = await this.commentRepository.findOne(param.uuid);
+    if (!comment) throw new NotFoundException();
+    if ((comment.adminId?.uuid ?? comment.userId?.uuid) !== req.user.userId)
+      throw new ForbiddenException();
+
+    await this.commentRepository.delete(param.uuid);
     return;
   }
 }

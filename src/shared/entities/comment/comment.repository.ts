@@ -28,4 +28,20 @@ export class CommentRepository extends AbstractRepository<Comment> {
       })
       .execute();
   }
+
+  async findOne(uuid: string): Promise<Comment> {
+    return this.createQueryBuilder('comment')
+      .select()
+      .where('comment.uuid = :uuid', { uuid })
+      .leftJoinAndSelect('comment.adminId', 'admin')
+      .leftJoinAndSelect('comment.userId', 'user')
+      .getOne();
+  }
+
+  async delete(uuid: string): Promise<void> {
+    this.createQueryBuilder('comment')
+      .delete()
+      .where('comment.uuid = :uuid', { uuid })
+      .execute();
+  }
 }
