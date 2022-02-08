@@ -40,4 +40,17 @@ export class FileController {
   getImage(@Param() param: GetImageParamsDto, @Req() req: Request) {
     return this.fileService.getImage(param, req);
   }
+
+  @Post(':projectId/archive')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('archive'))
+  uploadArchive(
+    @UploadedFile() file: Express.MulterS3.File,
+    @Param() param: ProjectParamsDto,
+    @Req() req: Request,
+  ) {
+    return this.fileService.uploadArchive(file, param, req);
+  }
 }

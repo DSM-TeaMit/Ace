@@ -67,6 +67,36 @@ export class FileService {
     );
   }
 
+  async uploadArchive(
+    file: Express.MulterS3.File,
+    param: ProjectParamsDto,
+    req: Request,
+  ) {
+    const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
+
+    this.projectService.checkPermission(project, req);
+
+    if (
+      await this.isExist(
+        'archive_outcomes.zip',
+        `${process.env.AWS_S3_BUCKET}/${param.uuid}/report/archive`,
+      )
+    )
+      throw new ConflictException();
+
+    await this.uploadSingleFile({
+      file,
+      fileName: 'archive_outcomes',
+      folder: 'report',
+      fileType: 'archive',
+      projectUuid: param.uuid,
+      allowedExt: /(zip)/,
+    });
+
+    return;
+  }
+
   async uploadSingleFile(options: UploadFileOptions): Promise<string> {
     const ext = extname(options.file.originalname).toLowerCase();
     const regex = options.allowedExt;
