@@ -9,6 +9,8 @@ import { FeedService } from './services/feed.service';
 import { FeedController } from './controllers/feed.controller';
 import { PlanService } from './services/plan.service';
 import { PlanController } from './controllers/plan.controller';
+import { ReportController } from './controllers/report.controller';
+import { ReportService } from './services/report.service';
 
 @Module({
   imports: [
@@ -18,8 +20,13 @@ import { PlanController } from './controllers/plan.controller';
       UserRepository,
     ]),
   ],
-  providers: [FeedService, PlanService, ProjectService],
-  controllers: [FeedController, PlanController, ProjectController],
+  providers: [FeedService, PlanService, ProjectService, ReportService],
+  controllers: [
+    FeedController,
+    PlanController,
+    ProjectController,
+    ReportController,
+  ],
   exports: [ProjectService],
 })
 export class ProjectModule {}

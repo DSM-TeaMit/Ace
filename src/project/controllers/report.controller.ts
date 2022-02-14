@@ -20,7 +20,7 @@ import { ProjectParamsDto } from '../dto/request/project-params.dto';
 import { ReportService } from '../services/report.service';
 
 @Controller('project')
-export class PlanController {
+export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 
   @Post(':uuid/report')
