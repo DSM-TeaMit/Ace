@@ -183,7 +183,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
   }
 
   async search(query: SearchRequestDto) {
-    return this.createQueryBuilder('project')
+    const qb = this.createQueryBuilder('project')
       .select()
       .where('project.projectName LIKE "%:keyword%"', {
         keyword: query.keyword,
@@ -191,8 +191,18 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .andWhere('status.isPlanAccepted = true')
       .andWhere('status.isReportAccepted = true')
       .take(query.limit)
-      .skip(query.limit * (query.page - 1))
-      .getManyAndCount();
+      .skip(query.limit * (query.page - 1));
+    if (query.order === 'popularity')
+      qb.orderBy('project.viewCount', 'DESC').addOrderBy(
+        'project.createdAt',
+        'DESC',
+      );
+    if (query.order === 'recently')
+      qb.orderBy('project.createdAt', 'DESC').addOrderBy(
+        'project.viewCount',
+        'DESC',
+      );
+    return qb.getManyAndCount();
   }
 
   async createPlan(
@@ -279,7 +289,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .select()
       .from(Report, 'report')
       .leftJoinAndSelect('report.projectId', 'project')
-      .leftJoinAndSelect('report.writerId', 'writer')
+      .leftJoinAndSelect('project.writerId', 'writer')
       .leftJoinAndSelect('project.members', 'member')
       .leftJoinAndSelect('project.status', 'status')
       .leftJoinAndSelect('member.userId', 'user');
