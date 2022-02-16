@@ -15,7 +15,6 @@ export class SentryInterceptor implements NestInterceptor {
   intercept(_: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       tap({
-        next: null,
         error: (err) => {
           if (
             !(err instanceof HttpException) ||
