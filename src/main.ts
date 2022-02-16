@@ -11,10 +11,6 @@ import { SentryInterceptor } from './shared/interceptors/sentry.interceptor';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  if (process.env.NODE_ENV === 'development') {
-    app.set('trust proxy', true);
-  }
-
   app.use(helmet());
 
   app.enableCors({
@@ -32,6 +28,8 @@ async function bootstrap() {
   );
 
   if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', true);
+
     Sentry.init({
       release: `${process.env.SENTRY_PROJECT_NAME}@${process.env.npm_package_version}`,
       dsn: process.env.SENTRY_DSN,
