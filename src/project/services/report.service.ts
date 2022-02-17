@@ -10,10 +10,14 @@ import { CreateReportRequestDto } from '../dto/request/create-report.dto';
 import { ModifyReportRequestDto } from '../dto/request/modify-report.dto';
 import { ProjectParamsDto } from '../dto/request/project-params.dto';
 import { GetReportResponseDto } from '../dto/response/get-report.dto';
+import { ProjectService } from './project.service';
 
 @Injectable()
 export class ReportService {
-  constructor(private readonly projectRepository: ProjectRepository) {}
+  constructor(
+    private readonly projectRepository: ProjectRepository,
+    private readonly projectService: ProjectService,
+  ) {}
 
   async createReport(
     param: ProjectParamsDto,
@@ -72,5 +76,19 @@ export class ReportService {
       throw new ForbiddenException();
     this.projectRepository.deleteReport(report.projectId.id);
     return;
+  }
+
+  async submitReport(req: Request, param: ProjectParamsDto) {
+    const report = await this.projectRepository.getReport(param);
+    if (!report) throw new NotFoundException();
+    this.projectService.checkPermission(report.projectId, req);
+    const status = report.projectId.status;
+    if (status.isReportSubmitted) throw new ConflictException();
+
+    await this.projectRepository.updateSubmitted(
+      report.projectId.id,
+      'report',
+      true,
+    );
   }
 }
