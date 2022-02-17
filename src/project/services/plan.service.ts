@@ -10,10 +10,14 @@ import { CreatePlanRequestDto } from '../dto/request/create-plan.dto';
 import { ModifyPlanRequestDto } from '../dto/request/modify-plan.dto';
 import { ProjectParamsDto } from '../dto/request/project-params.dto';
 import { GetPlanResponseDto } from '../dto/response/get-plan.dto';
+import { ProjectService } from './project.service';
 
 @Injectable()
 export class PlanService {
-  constructor(private readonly projectRepository: ProjectRepository) {}
+  constructor(
+    private readonly projectRepository: ProjectRepository,
+    private readonly projectService: ProjectService,
+  ) {}
 
   async createPlan(
     param: ProjectParamsDto,
@@ -86,5 +90,19 @@ export class PlanService {
       throw new ForbiddenException();
     this.projectRepository.deletePlan(plan.projectId.id);
     return;
+  }
+
+  async submitPlan(req: Request, param: ProjectParamsDto): Promise<void> {
+    const plan = await this.projectRepository.getPlan(param);
+    if (!plan) throw new NotFoundException();
+    this.projectService.checkPermission(plan.projectId, req);
+    const status = plan.projectId.status;
+    if (status.isPlanSubmitted) throw new ConflictException();
+
+    await this.projectRepository.updateSubmitted(
+      plan.projectId.id,
+      'plan',
+      true,
+    );
   }
 }

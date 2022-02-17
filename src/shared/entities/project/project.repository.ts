@@ -331,4 +331,15 @@ export class ProjectRepository extends AbstractRepository<Project> {
 
     qb.execute();
   }
+
+  async updateSubmitted(id: number, type: 'plan' | 'report', value: boolean) {
+    const qb = this.createQueryBuilder('status')
+      .update(Status)
+      .where('status.projectId = :id', { id });
+
+    if (type === 'plan') qb.set({ isPlanSubmitted: value });
+    if (type === 'report') qb.set({ isReportSubmitted: value });
+
+    qb.execute();
+  }
 }
