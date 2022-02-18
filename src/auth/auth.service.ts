@@ -17,7 +17,6 @@ import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { LoginResponseDto } from './dto/response/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RegisterAdminRequestDto } from './dto/request/register-admin.dto';
-import { v4 } from 'uuid';
 
 interface GithubResponse {
   email: string;
@@ -57,7 +56,7 @@ export class AuthService {
   }
 
   async githubLogin(req: Request): Promise<void> {
-    const { githubToken } = req.user;
+    const { githubToken, githubId } = req.user;
     const githubResponse = (
       await axios
         .get<GithubResponse[]>(
@@ -75,7 +74,7 @@ export class AuthService {
       (res) => res.verified && res.email.split('@')[1] === 'dsm.hs.kr',
     );
     if (!githubResponse.length) throw new UnauthorizedException();
-    this.cacheManager.set(githubResponse[0].email, 'GITHUB_VERIFIED', {
+    this.cacheManager.set(githubResponse[0].email, githubId, {
       ttl: 1200,
     });
     return;

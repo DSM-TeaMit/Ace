@@ -14,11 +14,10 @@ export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
     });
   }
 
-  async validate(
-    accessToken: string,
-    _refreshToken: string,
-    _profile: Profile,
-  ) {
-    return { githubToken: accessToken };
+  async validate(accessToken: string, _refreshToken: string, profile: Profile) {
+    return {
+      githubToken: accessToken,
+      githubId: (profile._json as Record<any, any>).login as string,
+    };
   }
 }
