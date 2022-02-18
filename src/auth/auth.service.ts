@@ -52,6 +52,7 @@ export class AuthService {
       refreshToken: isUserExist
         ? this.jwtService.sign(payload, { expiresIn: '7d' })
         : undefined,
+      uuid: isUserExist ? user.uuid : undefined,
     };
   }
 
@@ -89,6 +90,7 @@ export class AuthService {
     return {
       accessToken: this.jwtService.sign(payload),
       refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
+      uuid: req.user.userId,
     };
   }
 
