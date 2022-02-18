@@ -59,4 +59,12 @@ export class ReportController {
   async deleteReport(@Req() req: Request, @Param() param: ProjectParamsDto) {
     return this.reportService.deleteReport(req, param);
   }
+
+  @Patch(':uuid/report/submit')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  async submitReport(@Req() req: Request, @Param() param: ProjectParamsDto) {
+    return this.reportService.submitReport(req, param);
+  }
 }

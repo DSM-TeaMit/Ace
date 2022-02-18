@@ -59,4 +59,12 @@ export class PlanController {
   async deletePlan(@Req() req: Request, @Param() param: ProjectParamsDto) {
     return this.planService.deletePlan(req, param);
   }
+
+  @Patch(':uuid/plan/submit')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  async submitPlan(@Req() req: Request, @Param() param: ProjectParamsDto) {
+    return this.planService.submitPlan(req, param);
+  }
 }

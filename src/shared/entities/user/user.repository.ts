@@ -86,9 +86,15 @@ export class UserRepository extends AbstractRepository<User> {
         new Brackets((qb) => {
           qb.where(
             new Brackets((qb) => {
-              qb.where('status.isPlanSubmitted = true').andWhere(
+              qb.where(
                 new Brackets((qb) => {
-                  qb.where('status.isPlanAccepted IS NULL').orWhere(
+                  qb.where('status.isPlanSubmitted = true').andWhere(
+                    'status.isPlanAccepted IS NULL',
+                  );
+                }),
+              ).orWhere(
+                new Brackets((qb) => {
+                  qb.where('status.isPlanSubmitted = false').andWhere(
                     'status.isPlanAccepted = false',
                   );
                 }),
@@ -97,9 +103,15 @@ export class UserRepository extends AbstractRepository<User> {
           );
           qb.orWhere(
             new Brackets((qb) => {
-              qb.where('status.isReportSubmitted = true').andWhere(
+              qb.where(
                 new Brackets((qb) => {
-                  qb.where('status.isReportAccepted IS NULL').orWhere(
+                  qb.where('status.isReportSubmitted = true').andWhere(
+                    'status.isReportAccepted IS NULL',
+                  );
+                }),
+              ).orWhere(
+                new Brackets((qb) => {
+                  qb.where('status.isReportSubmitted = false').andWhere(
                     'status.isReportAccepted = false',
                   );
                 }),

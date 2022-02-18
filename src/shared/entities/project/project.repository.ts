@@ -326,8 +326,25 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .update(Status)
       .where('status.projectId = :id', { id });
 
-    if (type === 'plan') qb.set({ isPlanAccepted: value });
-    if (type === 'report') qb.set({ isReportAccepted: value });
+    if (type === 'plan') {
+      if (!value) qb.set({ isPlanSubmitted: value, isPlanAccepted: value });
+      else qb.set({ isPlanAccepted: value });
+    }
+    if (type === 'report') {
+      if (!value) qb.set({ isReportSubmitted: value, isReportAccepted: value });
+      else qb.set({ isReportAccepted: value });
+    }
+
+    qb.execute();
+  }
+
+  async updateSubmitted(id: number, type: 'plan' | 'report', value: boolean) {
+    const qb = this.createQueryBuilder('status')
+      .update(Status)
+      .where('status.projectId = :id', { id });
+
+    if (type === 'plan') qb.set({ isPlanSubmitted: value });
+    if (type === 'report') qb.set({ isReportSubmitted: value });
 
     qb.execute();
   }
