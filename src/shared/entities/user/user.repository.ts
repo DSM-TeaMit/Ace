@@ -59,9 +59,9 @@ export class UserRepository extends AbstractRepository<User> {
     page: number,
     limit: number,
   ) {
-    const qb = this.createQueryBuilder('pr')
+    const qb = this.manager
+      .createQueryBuilder(Project, 'project')
       .select()
-      .from(Project, 'project')
       .leftJoinAndSelect('project.members', 'members')
       .leftJoinAndSelect('members.userId', 'userId')
       .where('members.userId = :userId', { userId })
@@ -77,9 +77,9 @@ export class UserRepository extends AbstractRepository<User> {
   }
 
   async getPendingProjects(userId?: number) {
-    const qb = this.createQueryBuilder('pr')
+    const qb = this.manager
+      .createQueryBuilder(Project, 'project')
       .select()
-      .from(Project, 'project')
       .leftJoinAndSelect('project.status', 'status')
       .leftJoinAndSelect('project.members', 'members')
       .where(
@@ -132,9 +132,9 @@ export class UserRepository extends AbstractRepository<User> {
     limit: number,
     type: boolean | null,
   ) {
-    return this.createQueryBuilder('pr')
+    return this.manager
+      .createQueryBuilder(Project, 'project')
       .select()
-      .from(Project, 'project')
       .leftJoinAndSelect('project.status', 'status')
       .leftJoinAndSelect('project.members', 'members')
       .where(
