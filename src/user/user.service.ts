@@ -4,7 +4,6 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
-  NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
@@ -33,8 +32,9 @@ export class UserService {
 
   async register(req: Request, payload: RegisterUserRequestDto) {
     if (payload.githubId) {
-      if (!(await this.cacheManager.get(req.user.email)))
-        throw new NotFoundException();
+      const cache = await this.cacheManager.get<string>(req.user.email);
+      if (!cache) throw new UnprocessableEntityException();
+      if (cache !== payload.githubId) throw new ConflictException();
       await this.cacheManager.del(req.user.email);
     }
     if (await this.userRepository.findOne(req.user.email))
@@ -187,10 +187,12 @@ export class UserService {
     req: Request,
     payload: ChangeGithubIdRequestDto,
   ): Promise<void> {
-    const cache = await this.cacheManager.get<string>(payload.githubId);
-    if (!cache) throw new UnprocessableEntityException();
     const user = await this.userRepository.findOneByUuid(req.user.userId);
-    if (cache !== user.email) throw new ForbiddenException();
+    const cache = await this.cacheManager.get<string>(user.email);
+    if (!cache) throw new UnprocessableEntityException();
+    if (cache !== payload.githubId) throw new ConflictException();
+    await this.cacheManager.del(user.email);
+
     await this.userRepository.updateGithubId(user.id, payload.githubId);
     return;
   }
