@@ -33,7 +33,7 @@ export class UserService {
 
   async register(req: Request, payload: RegisterUserRequestDto) {
     if (payload.githubId) {
-      if (await this.cacheManager.get(req.user.email))
+      if (!(await this.cacheManager.get(req.user.email)))
         throw new NotFoundException();
       await this.cacheManager.del(req.user.email);
     }
