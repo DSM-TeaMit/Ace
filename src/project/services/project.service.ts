@@ -63,22 +63,13 @@ export class ProjectService {
       'PROJECT',
     );
     const status = (() => {
-      if (
-        !project.status.isPlanSubmitted ||
-        (project.status.isPlanSubmitted &&
-          project.status.isPlanAccepted === false)
-      )
-        return 'PLANNING';
+      if (!project.status.isPlanSubmitted) return 'PLANNING';
       if (
         project.status.isPlanSubmitted &&
         project.status.isPlanAccepted === null
       )
         return 'PENDING(PLAN)';
-      if (
-        (project.status.isPlanAccepted && !project.status.isReportSubmitted) ||
-        (project.status.isReportSubmitted &&
-          project.status.isReportAccepted === false)
-      )
+      if (project.status.isPlanAccepted && !project.status.isReportSubmitted)
         return 'REPORTING';
       if (
         project.status.isReportSubmitted &&
