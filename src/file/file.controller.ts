@@ -22,7 +22,7 @@ import { FileService } from './file.service';
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
-  @Post(':projectId/image')
+  @Post(':uuid/image')
   @Roles(Role.User)
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
@@ -35,13 +35,13 @@ export class FileController {
     return this.fileService.uploadImage(file, param, req);
   }
 
-  @Get(':projectId/image/:imageName')
+  @Get(':uuid/image/:imageName')
   @UseGuards(JwtAuthGuard)
   getImage(@Param() param: GetImageParamsDto, @Req() req: Request) {
     return this.fileService.getImage(param, req);
   }
 
-  @Post(':projectId/archive')
+  @Post(':uuid/archive')
   @Roles(Role.User)
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
@@ -54,7 +54,7 @@ export class FileController {
     return this.fileService.uploadArchive(file, param, req);
   }
 
-  @Get(':projectId/archive')
+  @Get(':uuid/archive')
   @UseGuards(JwtAuthGuard)
   getArchive(@Param() param: ProjectParamsDto, @Req() req: Request) {
     return this.fileService.getArchive(param, req);
