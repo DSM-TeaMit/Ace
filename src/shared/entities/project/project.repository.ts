@@ -130,6 +130,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
     const qb = this.createQueryBuilder('project')
       .select()
       .leftJoinAndSelect('project.members', 'members')
+      .leftJoinAndSelect('project.writerId', 'writerId')
       .leftJoinAndSelect('members.userId', 'userId')
       .leftJoinAndSelect('project.status', 'status');
     if (uuid) qb.where('project.uuid = :uuid', { uuid });
