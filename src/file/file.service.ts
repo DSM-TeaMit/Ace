@@ -34,8 +34,7 @@ export class FileService {
     this.projectService.checkPermission(project, req);
     const uploadedUrl = await this.uploadSingleFile({
       file,
-      folder: 'report',
-      fileType: 'images',
+      fileType: 'image',
       projectUuid: param.uuid,
       allowedExt: /(jpg)|(png)|(jpeg)|(bmp)/,
     });
@@ -49,7 +48,7 @@ export class FileService {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
 
-    const s3Path = `${param.uuid}/report/images`;
+    const s3Path = `${param.uuid}/image`;
     if (
       !(await this.isExist(
         param.imageName,
@@ -65,7 +64,7 @@ export class FileService {
 
     return await this.downloadFromS3(
       param.imageName,
-      `${process.env.AWS_S3_BUCKET}/${param.uuid}/report/images`,
+      `${process.env.AWS_S3_BUCKET}/${param.uuid}/image`,
     );
   }
 
@@ -82,7 +81,7 @@ export class FileService {
     if (
       await this.isExist(
         'archive_outcomes.zip',
-        `${process.env.AWS_S3_BUCKET}/${param.uuid}/report/archive`,
+        `${process.env.AWS_S3_BUCKET}/${param.uuid}/archive`,
       )
     )
       throw new ConflictException();
@@ -90,7 +89,6 @@ export class FileService {
     await this.uploadSingleFile({
       file,
       fileName: 'archive_outcomes',
-      folder: 'report',
       fileType: 'archive',
       projectUuid: param.uuid,
       allowedExt: /(zip)/,
@@ -104,7 +102,7 @@ export class FileService {
     if (!project) throw new NotFoundException();
     if (!project.status.isReportSubmitted) throw new NotFoundException();
 
-    const s3Path = `${param.uuid}/report/archive`;
+    const s3Path = `${param.uuid}/archive`;
     const s3Filename = 'archive_outcomes.zip';
 
     const fileInfo = await this.isExist(
@@ -114,7 +112,18 @@ export class FileService {
 
     if (!fileInfo) throw new NotFoundException();
 
-    const filename = `[${project.projectType}] ${project.projectName} - ${
+    const projectType = (() => {
+      switch (project.projectType) {
+        case 'PERS':
+          return '개인';
+        case 'TEAM':
+          return '팀';
+        case 'CLUB':
+          return '동아리';
+      }
+    })();
+
+    const filename = `[${projectType}] ${project.projectName} - ${
       project.writerId.studentNo
     } ${project.writerId.name}${extname(s3Filename)}`;
     req.res.set({
@@ -140,11 +149,11 @@ export class FileService {
 
     const bucketS3 = process.env.AWS_S3_BUCKET;
     const filename = options.fileName ?? uuid();
-    const location = `${options.projectUuid}/${options.folder}/${options.fileType}/${filename}${ext}`;
+    const location = `${process.env.BASE_URL}/file/${options.projectUuid}/${options.fileType}/${filename}${ext}`;
     try {
       await this.uploadToS3(
         options.file.buffer,
-        `${bucketS3}/${options.projectUuid}/${options.folder}/${options.fileType}`,
+        `${bucketS3}/${options.projectUuid}/${options.fileType}`,
         filename + ext,
       );
     } catch {
@@ -158,6 +167,7 @@ export class FileService {
     try {
       return await s3.headObject({ Bucket: bucket, Key: filename }).promise();
     } catch (e) {
+      console.log(e);
       if (e.code === 'NotFound') return null;
       else throw new InternalServerErrorException();
     }
