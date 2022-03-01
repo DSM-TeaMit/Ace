@@ -17,6 +17,7 @@ import { Roles } from 'src/shared/decorators/roles.decorator';
 import { Role } from 'src/shared/enums/role.enum';
 import { ChangeGithubIdRequestDto } from './dto/request/change-github-id.dto';
 import {
+  ProfileEachReportRequestQueryDto,
   ProfileRequestDto,
   ProfileRequestQueryDto,
 } from './dto/request/profile.dto';

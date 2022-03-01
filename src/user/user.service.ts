@@ -13,6 +13,7 @@ import { ProjectRepository } from 'src/shared/entities/project/project.repositor
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { ChangeGithubIdRequestDto } from './dto/request/change-github-id.dto';
 import {
+  ProfileEachReportRequestQueryDto,
   ProfileRequestDto,
   ProfileRequestQueryDto,
 } from './dto/request/profile.dto';
@@ -180,6 +181,42 @@ export class UserService {
       accepted: projects[0],
       rejected: projects[1],
       pending: projects[2],
+    };
+  }
+
+  async getEachReports(
+    req: Request,
+    param: ProfileRequestDto,
+    query: ProfileEachReportRequestQueryDto,
+  ): Promise<Partial<ProfileReportsDto>> {
+    const uuid = param.uuid ?? req.user.userId;
+    const isMine = !param.uuid || param.uuid === req.user.userId;
+    if (!isMine) throw new ForbiddenException();
+    const user = await this.userRepository.findOneByUuid(uuid);
+
+    const projects = (
+      await this.userRepository.getReports(
+        user.id,
+        query.page,
+        query.limit,
+        { accepted: true, rejected: false, pending: null }[query.type],
+      )
+    ).map((res) => ({
+      count: res[1],
+      projects: res[0].map((project) => {
+        return {
+          uuid: project.uuid,
+          projectName: project.projectName,
+          type:
+            project.status.isPlanSubmitted && !project.status.isPlanAccepted
+              ? 'PLAN'
+              : 'REPORT',
+        };
+      }),
+    }));
+
+    return {
+      [query.type]: projects[0],
     };
   }
 
