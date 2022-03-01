@@ -69,6 +69,16 @@ export class UserController {
     return this.userService.getReports(req, param, query);
   }
 
+  @Get('profile/reports/each')
+  @UseGuards(JwtAuthGuard)
+  async getEachReports(
+    @Req() req: Request,
+    @Param() param: ProfileRequestDto,
+    @Query() query: ProfileEachReportRequestQueryDto,
+  ) {
+    return this.userService.getEachReports(req, param, query);
+  }
+
   @Put('profile/githubId')
   @UseGuards(JwtAuthGuard)
   async changeGithubId(
@@ -105,5 +115,15 @@ export class UserController {
     @Query() query: ProfileRequestQueryDto,
   ) {
     return this.userService.getReports(req, param, query);
+  }
+
+  @Get('profile/:uuid/reports/each')
+  @UseGuards(JwtAuthGuard)
+  async getEachReportsWithUuid(
+    @Req() req: Request,
+    @Param() param: ProfileRequestDto,
+    @Query() query: ProfileEachReportRequestQueryDto,
+  ) {
+    return this.userService.getEachReports(req, param, query);
   }
 }
