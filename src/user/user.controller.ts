@@ -70,7 +70,7 @@ export class UserController {
     return this.userService.getReports(req, param, query);
   }
 
-  @Get('profile/reports')
+  @Get('profile/reports/each')
   @UseGuards(JwtAuthGuard)
   async getEachReports(
     @Req() req: Request,
@@ -118,7 +118,7 @@ export class UserController {
     return this.userService.getReports(req, param, query);
   }
 
-  @Get('profile/:uuid/reports')
+  @Get('profile/:uuid/reports/each')
   @UseGuards(JwtAuthGuard)
   async getEachReportsWithUuid(
     @Req() req: Request,
