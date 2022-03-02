@@ -10,4 +10,5 @@ interface Comment {
   writerName: string;
   writerSno?: number;
   content: string;
+  thumbnailUrl: string;
 }
