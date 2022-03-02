@@ -42,6 +42,8 @@ export class CommentService {
         writerName: comment.adminId?.name ?? comment.userId?.name,
         writerSno: comment.userId?.studentNo,
         content: comment.content,
+        thumbnailUrl:
+          comment.adminId?.thumbnailUrl ?? comment.userId?.thumbnailUrl,
       })),
     };
   }
