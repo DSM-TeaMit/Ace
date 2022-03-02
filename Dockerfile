@@ -2,6 +2,7 @@ FROM node:lts AS builder
 
 COPY package.json ./
 COPY pnpm-lock.yaml ./
+RUN npm install -g pnpm
 RUN pnpm install
 
 COPY ./src ./src
@@ -21,4 +22,4 @@ COPY package.json ./
 
 EXPOSE 3000
 
-CMD ["pnpm", "start:prod"]
+CMD ["npm", "run",  "start:prod"]
