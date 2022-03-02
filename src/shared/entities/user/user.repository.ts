@@ -166,4 +166,14 @@ export class UserRepository extends AbstractRepository<User> {
       .skip(limit * (page - 1))
       .getManyAndCount();
   }
+
+  async searchUser({ name }: { name: string }) {
+    const qb = this.createQueryBuilder('user')
+      .select()
+      .where('user.deleted = false');
+
+    if (name) qb.andWhere('user.name = :name', { name });
+
+    return qb.getMany();
+  }
 }
