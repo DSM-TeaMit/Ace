@@ -9,7 +9,6 @@ import {
 import { Cache } from 'cache-manager';
 import { Request } from 'express';
 import { Project } from 'src/shared/entities/project/project.entity';
-import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { ChangeGithubIdRequestDto } from './dto/request/change-github-id.dto';
 import {
@@ -18,16 +17,17 @@ import {
   ProfileRequestQueryDto,
 } from './dto/request/profile.dto';
 import { RegisterUserRequestDto } from './dto/request/register-user.dto';
+import { SearchUserRequestQueryDto } from './dto/request/search-user.dto';
 import { ProfileMainResponseDto } from './dto/response/profile-main.dto';
 import { ProfileProjectsDto } from './dto/response/profile-projects.dto';
 import { ProfileReportsDto } from './dto/response/profile-reports.dto';
+import { SearchUserDto } from './dto/response/search-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    private readonly projectRepository: ProjectRepository,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -237,5 +237,14 @@ export class UserService {
   async deleteUser(req: Request): Promise<void> {
     await this.userRepository.deleteUser(req.user.userId);
     return;
+  }
+
+  async searchUser(query: SearchUserRequestQueryDto): Promise<SearchUserDto> {
+    return {
+      students: (await this.userRepository.searchUser(query)).map((user) => ({
+        studentNo: user.studentNo,
+        name: user.name,
+      })),
+    };
   }
 }

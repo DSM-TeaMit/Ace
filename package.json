@@ -97,8 +97,11 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.service.(t|j)s"
     ],
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }

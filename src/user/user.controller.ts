@@ -22,6 +22,7 @@ import {
   ProfileRequestQueryDto,
 } from './dto/request/profile.dto';
 import { RegisterUserRequestDto } from './dto/request/register-user.dto';
+import { SearchUserRequestQueryDto } from './dto/request/search-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -34,6 +35,14 @@ export class UserController {
   @UseGuards(JwtRegistrationGuard)
   async register(@Req() req: Request, @Body() payload: RegisterUserRequestDto) {
     return this.userService.register(req, payload);
+  }
+
+  @Get()
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  async searchUser(@Query() query: SearchUserRequestQueryDto) {
+    return this.userService.searchUser(query);
   }
 
   @Delete()
