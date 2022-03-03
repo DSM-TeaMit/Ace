@@ -17,6 +17,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     const user = await this.adminRepository.findOne(id);
     if (!user || !(await bcrypt.compare(password, user.password)))
       throw new UnauthorizedException();
-    return { userId: user.uuid };
+    return { userId: user.uuid, userInfo: user };
   }
 }
