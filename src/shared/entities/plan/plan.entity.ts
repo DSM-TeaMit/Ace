@@ -22,10 +22,10 @@ export class Plan {
   @Column({ length: 10000 })
   content: string;
 
-  @Column({ length: 7 })
+  @Column({ type: 'date' })
   startDate: string;
 
-  @Column({ length: 7 })
+  @Column({ type: 'date' })
   endDate: string;
 
   @Column()
