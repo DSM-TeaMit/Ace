@@ -4,6 +4,7 @@ declare namespace Express {
     githubToken?: string;
     githubId?: string;
     userId: string;
+    userInfo: Record<string, any>;
     role: 'user' | 'admin';
   }
 }
