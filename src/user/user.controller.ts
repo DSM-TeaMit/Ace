@@ -37,7 +37,7 @@ export class UserController {
     return this.userService.register(req, payload);
   }
 
-  @Get()
+  @Get('search')
   @Roles(Role.User)
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
