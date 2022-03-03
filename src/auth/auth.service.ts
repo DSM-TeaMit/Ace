@@ -17,6 +17,7 @@ import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { LoginResponseDto } from './dto/response/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RegisterAdminRequestDto } from './dto/request/register-admin.dto';
+import { Admin } from 'src/shared/entities/admin/admin.entity';
 
 interface GithubResponse {
   email: string;
@@ -48,11 +49,14 @@ export class AuthService {
     };
     return {
       type: isUserExist ? 'login' : 'registration',
+      uuid: isUserExist ? user.uuid : undefined,
+      studentNo: user?.studentNo,
+      name: user?.name,
+      userType: 'user',
       accessToken: this.jwtService.sign(payload),
       refreshToken: isUserExist
         ? this.jwtService.sign(payload, { expiresIn: '7d' })
         : undefined,
-      uuid: isUserExist ? user.uuid : undefined,
     };
   }
 
@@ -87,10 +91,13 @@ export class AuthService {
       role: 'admin',
       registrationOnly: false,
     };
+    const { userInfo }: { userInfo: Admin } = req.user;
     return {
+      uuid: req.user.userId,
+      name: userInfo.name,
+      userType: 'admin',
       accessToken: this.jwtService.sign(payload),
       refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
-      uuid: req.user.userId,
     };
   }
 
