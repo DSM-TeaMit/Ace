@@ -18,6 +18,7 @@ import { LoginResponseDto } from './dto/response/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RegisterAdminRequestDto } from './dto/request/register-admin.dto';
 import { Admin } from 'src/shared/entities/admin/admin.entity';
+import { RefreshTokenRequestDto } from './dto/request/refresh-token.dto';
 
 interface GithubResponse {
   email: string;
@@ -47,6 +48,11 @@ export class AuthService {
       role: 'user',
       registrationOnly: !isUserExist,
     };
+    const refreshToken = isUserExist
+      ? this.jwtService.sign(payload, { expiresIn: '7d' })
+      : undefined;
+    if (refreshToken)
+      await this.cacheManager.set(refreshToken, user.uuid, { ttl: 604800 });
     return {
       type: isUserExist ? 'login' : 'registration',
       uuid: isUserExist ? user.uuid : undefined,
@@ -54,9 +60,7 @@ export class AuthService {
       name: user?.name,
       userType: 'user',
       accessToken: this.jwtService.sign(payload),
-      refreshToken: isUserExist
-        ? this.jwtService.sign(payload, { expiresIn: '7d' })
-        : undefined,
+      refreshToken,
     };
   }
 
@@ -104,5 +108,44 @@ export class AuthService {
   async registerAdmin(payload: RegisterAdminRequestDto) {
     payload.password = await bcrypt.hash(payload.password, 12);
     return await this.adminRepository.insertOne(payload);
+  }
+
+  async refresh(payload: RefreshTokenRequestDto): Promise<LoginResponseDto> {
+    interface Payload {
+      sub: string;
+      role: string;
+      iat: number;
+      exp: number;
+    }
+
+    const tokenPayload = await (async (): Promise<Payload> => {
+      try {
+        return await this.jwtService.verifyAsync(payload.refreshToken);
+      } catch (e) {
+        throw new UnauthorizedException();
+      }
+    })();
+    const cache = await this.cacheManager.get<string>(payload.refreshToken);
+    const admin = await this.adminRepository.findOne(undefined, cache);
+    const user = await this.userRepository.findOne(undefined, cache);
+    if (cache !== (user?.uuid ?? admin?.uuid))
+      throw new UnauthorizedException();
+
+    const accessToken = this.jwtService.sign({
+      sub: tokenPayload.sub,
+      role: user ? 'user' : 'admin',
+    });
+    const refreshToken = this.jwtService.sign({
+      sub: tokenPayload.sub,
+      role: user ? 'user' : 'admin',
+    });
+    await this.cacheManager.del(payload.refreshToken);
+    await this.cacheManager.set(refreshToken, tokenPayload.sub, {
+      ttl: 604800,
+    });
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }
