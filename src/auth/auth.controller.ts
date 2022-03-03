@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Post,
+  Put,
   Query,
   Redirect,
   Req,
@@ -13,6 +14,7 @@ import { Request } from 'express';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { Role } from 'src/shared/enums/role.enum';
 import { AuthService } from './auth.service';
+import { RefreshTokenRequestDto } from './dto/request/refresh-token.dto';
 import { RegisterAdminRequestDto } from './dto/request/register-admin.dto';
 import { LoginResponseDto } from './dto/response/login.dto';
 import { GithubOauthGuard } from './guards/github-oauth.guard';
@@ -65,5 +67,10 @@ export class AuthController {
   @UseGuards(RolesGuard)
   async registerAdmin(@Body() payload: RegisterAdminRequestDto) {
     return this.authService.registerAdmin(payload);
+  }
+
+  @Put('refresh')
+  async refresh(@Body() payload: RefreshTokenRequestDto) {
+    return this.authService.refresh(payload);
   }
 }
