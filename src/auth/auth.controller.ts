@@ -4,6 +4,8 @@ import {
   Get,
   HttpCode,
   Post,
+  Query,
+  Redirect,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -35,9 +37,14 @@ export class AuthController {
   }
 
   @Get('github')
-  @UseGuards(GithubOauthGuard)
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  async githubAuth() {}
+  @Redirect(undefined, 302)
+  async githubAuth(@Query('redirectUri') redirectUri: string) {
+    return {
+      url: `https://github.com/login/oauth/authorize?response_type=code&redirect_uri=${
+        process.env.GITHUB_OAUTH_REDIRECT_URL
+      }/${redirectUri ?? ''}&scope=user%3Aemail&client_id=12f5bbad8d4b6573db40`,
+    };
+  }
 
   @Get('callback-github')
   @HttpCode(204)
