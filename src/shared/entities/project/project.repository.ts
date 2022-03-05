@@ -1,11 +1,17 @@
 import { CreatePlanRequestDto } from 'src/project/dto/request/create-plan.dto';
 import { CreateProjectRequestDto } from 'src/project/dto/request/create-project.dto';
 import { CreateReportRequestDto } from 'src/project/dto/request/create-report.dto';
+import { FeedRequestDto } from 'src/project/dto/request/feed.dto';
 import { ModifyPlanRequestDto } from 'src/project/dto/request/modify-plan.dto';
 import { ModifyProjectRequestDto } from 'src/project/dto/request/modify-project.dto';
 import { ModifyReportRequestDto } from 'src/project/dto/request/modify-report.dto';
 import { SearchRequestDto } from 'src/project/dto/request/search.dto';
-import { AbstractRepository, EntityRepository, getConnection } from 'typeorm';
+import {
+  AbstractRepository,
+  Brackets,
+  EntityRepository,
+  getConnection,
+} from 'typeorm';
 import { v4 } from 'uuid';
 import { Member } from '../member/member.entity';
 import { Plan } from '../plan/plan.entity';
@@ -344,9 +350,34 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .update(Status)
       .where('status.projectId = :id', { id });
 
-    if (type === 'plan') qb.set({ isPlanSubmitted: value });
-    if (type === 'report') qb.set({ isReportSubmitted: value });
+    if (type === 'plan')
+      qb.set({ isPlanSubmitted: value, planSubmittedAt: new Date() });
+    if (type === 'report')
+      qb.set({ isReportSubmitted: value, reportSubmittedAt: new Date() });
 
     qb.execute();
+  }
+
+  async getPendingProjects(query: Omit<FeedRequestDto, 'order'>) {
+    return this.createQueryBuilder('project')
+      .select()
+      .leftJoinAndSelect('project.status', 'status')
+      .where(
+        new Brackets((qb) => {
+          qb.where('status.isPlanSubmitted = true').andWhere(
+            'status.isPlanAccepted != true',
+          );
+        }),
+      )
+      .orWhere(
+        new Brackets((qb) => {
+          qb.where('staus.isReportSubmitted = true').andWhere(
+            'status.isReportAccepted != true',
+          );
+        }),
+      )
+      .take(query.limit)
+      .skip(query.limit * (query.page - 1))
+      .getManyAndCount();
   }
 }

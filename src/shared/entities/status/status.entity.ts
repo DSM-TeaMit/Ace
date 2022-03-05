@@ -23,7 +23,7 @@ export class Status {
   isReportAccepted: boolean;
 
   @Column({ nullable: true })
-  plabSubmittedAt: Date;
+  planSubmittedAt: Date;
 
   @Column({ nullable: true })
   reportSubmittedAt: Date;
