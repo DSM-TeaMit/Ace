@@ -192,9 +192,36 @@ export class ProjectRepository extends AbstractRepository<Project> {
   async search(query: SearchRequestDto) {
     const qb = this.createQueryBuilder('project')
       .select()
-      .where('project.projectName LIKE "%:keyword%"', {
-        keyword: query.keyword,
+      .where('project.projectName LIKE :keyword', {
+        keyword: `%${query.keyword}%`,
       })
+      .leftJoinAndSelect('project.status', 'status')
+      .andWhere('status.isPlanAccepted = true')
+      .andWhere('status.isReportAccepted = true')
+      .take(query.limit)
+      .skip(query.limit * (query.page - 1));
+    if (query.order === 'popularity')
+      qb.orderBy('project.viewCount', 'DESC').addOrderBy(
+        'project.createdAt',
+        'DESC',
+      );
+    if (query.order === 'recently')
+      qb.orderBy('project.createdAt', 'DESC').addOrderBy(
+        'project.viewCount',
+        'DESC',
+      );
+    return qb.getManyAndCount();
+  }
+
+  async searchByMember(query: SearchRequestDto) {
+    const qb = this.createQueryBuilder('project')
+      .select()
+      .leftJoinAndSelect('project.members', 'members')
+      .leftJoinAndSelect('members.userId', 'userId')
+      .where('userId.name LIKE :keyword', {
+        keyword: `%${query.keyword}%`,
+      })
+      .leftJoinAndSelect('project.status', 'status')
       .andWhere('status.isPlanAccepted = true')
       .andWhere('status.isReportAccepted = true')
       .take(query.limit)
