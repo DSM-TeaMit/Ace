@@ -4,7 +4,10 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { Role } from 'src/shared/enums/role.enum';
 import { FeedRequestDto } from '../dto/request/feed.dto';
-import { SearchRequestDto } from '../dto/request/search.dto';
+import {
+  SearchRequestDto,
+  SearchTypeRequestDto,
+} from '../dto/request/search.dto';
 import { FeedService } from '../services/feed.service';
 
 @Controller('project/feed')
@@ -21,6 +24,12 @@ export class FeedController {
   @UseGuards(JwtAuthGuard)
   async search(@Query() query: SearchRequestDto) {
     return this.feedService.search(query);
+  }
+
+  @Get('search/each')
+  @UseGuards(JwtAuthGuard)
+  async searchEach(@Query() query: SearchTypeRequestDto) {
+    return this.feedService.searchEach(query);
   }
 
   @Get('pending')
