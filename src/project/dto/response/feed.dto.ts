@@ -5,6 +5,7 @@ export interface FeedResponseDto {
 
 interface Project {
   thumbnailUrl: string;
+  uuid: string;
   projectName: string;
   projectType: 'PERS' | 'TEAM' | 'CLUB';
   projectField: string;

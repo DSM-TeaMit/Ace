@@ -4,6 +4,7 @@ export interface PendingProjectDto {
 }
 
 export interface Project {
+  uuid: string;
   projectName: string;
   projectType: 'PERS' | 'TEAM' | 'CLUB';
   reportType: 'PLAN' | 'REPORT';
