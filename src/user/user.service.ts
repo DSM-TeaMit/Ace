@@ -99,7 +99,8 @@ export class UserService {
                 if (project.status.isPlanAccepted === false) return 'DECLINED';
                 else return 'PENDING';
               case 'REPORT':
-                if (project.status.isPlanAccepted === false) return 'DECLINED';
+                if (project.status.isReportAccepted === false)
+                  return 'DECLINED';
                 else return 'PENDING';
             }
           })();
