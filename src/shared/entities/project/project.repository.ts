@@ -6,6 +6,7 @@ import { ModifyPlanRequestDto } from 'src/project/dto/request/modify-plan.dto';
 import { ModifyProjectRequestDto } from 'src/project/dto/request/modify-project.dto';
 import { ModifyReportRequestDto } from 'src/project/dto/request/modify-report.dto';
 import { SearchRequestDto } from 'src/project/dto/request/search.dto';
+import { getRandomEmoji } from 'src/shared/utils/random-emoji';
 import {
   AbstractRepository,
   Brackets,
@@ -44,6 +45,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
             projectName: payload.name,
             projectType: payload.type,
             field: payload.field,
+            emoji: getRandomEmoji(),
             writerId: () => writerId.toString(),
           })
           .execute()
