@@ -9,6 +9,8 @@ export interface Project {
   projectType: 'PERS' | 'TEAM' | 'CLUB';
   reportType: 'PLAN' | 'REPORT';
   submittedAt: Date;
+  thumbnailUrl: string;
+  emoji: string;
   writer: {
     studentNo: number;
     name: string;

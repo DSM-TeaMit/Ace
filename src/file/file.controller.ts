@@ -35,6 +35,19 @@ export class FileController {
     return this.fileService.uploadImage(file, param, req);
   }
 
+  @Post(':uuid/thumbnail')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  uploadThumbnail(
+    @UploadedFile() file: Express.MulterS3.File,
+    @Param() param: ProjectParamsDto,
+    @Req() req: Request,
+  ) {
+    return this.fileService.uploadThumbnail(file, param, req);
+  }
+
   @Get(':uuid/image/:imageName')
   @UseGuards(JwtAuthGuard)
   getImage(@Param() param: GetImageParamsDto, @Req() req: Request) {

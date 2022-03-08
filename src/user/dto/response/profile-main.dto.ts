@@ -14,7 +14,8 @@ export interface PendingProject {
   projectName: string;
   type: string;
   status: string;
-  thumbnailUrl?: string;
+  thumbnailUrl: string;
+  emoji: string;
 }
 
 export interface Project {
@@ -23,6 +24,8 @@ export interface Project {
   projectDescription?: string;
   projectType: string;
   fields: string;
+  thumbnailUrl: string;
+  emoji: string;
   members: Member[];
 }
 

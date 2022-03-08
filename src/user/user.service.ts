@@ -107,6 +107,8 @@ export class UserService {
           return {
             uuid: project.uuid,
             projectName: project.projectName,
+            thumbnailUrl: project.thumbnailUrl,
+            emoji: project.emoji,
             type,
             status,
           };
@@ -127,6 +129,8 @@ export class UserService {
         projectDescription: project.projectDescription,
         projectType: project.projectType,
         fields: project.field,
+        thumbnailUrl: project.thumbnailUrl,
+        emoji: project.emoji,
         members: project.members.map((member) => ({
           uuid: member.userId.uuid,
           name: member.userId.name,
@@ -160,6 +164,8 @@ export class UserService {
         projectDescription: project.projectDescription,
         projectType: project.projectType,
         fields: project.field,
+        thumbnailUrl: project.thumbnailUrl,
+        emoji: project.emoji,
         members: project.members.map((member) => ({
           uuid: member.userId.uuid,
           name: member.userId.name,
@@ -191,6 +197,8 @@ export class UserService {
         return {
           uuid: project.uuid,
           projectName: project.projectName,
+          thumbnailUrl: project.thumbnailUrl,
+          emoji: project.emoji,
           type:
             project.status.isPlanSubmitted && !project.status.isPlanAccepted
               ? 'PLAN'

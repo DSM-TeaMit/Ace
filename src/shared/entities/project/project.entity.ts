@@ -40,6 +40,9 @@ export class Project {
   @Column({ length: 200, nullable: true })
   thumbnailUrl: string;
 
+  @Column({ length: 1, nullable: true })
+  emoji: string;
+
   @Column({ length: 20 })
   field: string;
 

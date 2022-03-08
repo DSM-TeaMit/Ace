@@ -7,6 +7,8 @@ export interface GetProjectResponseDto {
   projectField: string;
   projectStatus: string;
   projectResult: string;
+  thumbnailUrl: string;
+  emoji: string;
   comments: Comment[];
   members: Member[];
 }

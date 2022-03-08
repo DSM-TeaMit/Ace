@@ -41,6 +41,34 @@ export class FileService {
     return uploadedUrl;
   }
 
+  async uploadThumbnail(
+    file: Express.MulterS3.File,
+    param: ProjectParamsDto,
+    req: Request,
+  ): Promise<string> {
+    const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
+    this.projectService.checkPermission(project, req);
+    if (project.thumbnailUrl) {
+      const fileUrlArray = project.thumbnailUrl.split('/');
+      await this.deleteFromS3(
+        fileUrlArray[4],
+        `${process.env.AWS_S3_BUCKET}/${fileUrlArray[2]}/${fileUrlArray[3]}`,
+      );
+    }
+    const uploadedUrl = await this.uploadSingleFile({
+      file,
+      fileType: 'image',
+      projectUuid: param.uuid,
+      allowedExt: /(jpg)|(png)|(jpeg)|(bmp)/,
+    });
+    await this.projectRepository.updateThumbnailUrl({
+      ...param,
+      thumbnailUrl: uploadedUrl,
+    });
+    return uploadedUrl;
+  }
+
   async getImage(
     param: GetImageParamsDto,
     req: Request,
@@ -203,6 +231,19 @@ export class FileService {
         if (err) {
           Logger.error(err);
           reject(err.message);
+        }
+        resolve(data);
+      });
+    });
+  }
+
+  async deleteFromS3(filename: string, bucket: string) {
+    const s3 = this.getS3();
+    return new Promise((resolve, reject) => {
+      s3.deleteObject({ Bucket: bucket, Key: filename }, (err, data) => {
+        if (err) {
+          Logger.error(err);
+          return reject(err.message);
         }
         resolve(data);
       });
