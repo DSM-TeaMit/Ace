@@ -87,6 +87,7 @@ export class ProjectService {
       projectField: project.field,
       projectStatus: status,
       projectResult: project.projectResult,
+      thumbnailUrl: project.thumbnailUrl,
       comments: comments[0].map((comment) => ({
         userUuid: comment.adminId?.uuid ?? comment.userId?.uuid,
         thumbnailUrl:

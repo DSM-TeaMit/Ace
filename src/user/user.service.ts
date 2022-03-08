@@ -105,6 +105,7 @@ export class UserService {
         projectDescription: project.projectDescription,
         projectType: project.projectType,
         fields: project.field,
+        thumbnailUrl: project.thumbnailUrl,
         members: project.members.map((member) => ({
           uuid: member.userId.uuid,
           name: member.userId.name,
@@ -138,6 +139,7 @@ export class UserService {
         projectDescription: project.projectDescription,
         projectType: project.projectType,
         fields: project.field,
+        thumbnailUrl: project.thumbnailUrl,
         members: project.members.map((member) => ({
           uuid: member.userId.uuid,
           name: member.userId.name,

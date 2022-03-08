@@ -102,6 +102,7 @@ export class FeedService {
           projectType: project.projectType,
           reportType: isPlanOrReport.toUpperCase() as 'PLAN' | 'REPORT',
           submittedAt: project.status[`${isPlanOrReport}SubmittedAt`],
+          thumbnailUrl: project.thumbnailUrl,
           writer: {
             studentNo: project.writerId.studentNo,
             name: project.writerId.name,

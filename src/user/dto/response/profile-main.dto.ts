@@ -23,6 +23,7 @@ export interface Project {
   projectDescription?: string;
   projectType: string;
   fields: string;
+  thumbnailUrl: string;
   members: Member[];
 }
 
