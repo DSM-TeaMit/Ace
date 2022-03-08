@@ -132,6 +132,24 @@ export class ProjectRepository extends AbstractRepository<Project> {
     }
   }
 
+  async updateThumbnailUrl({
+    uuid,
+    id,
+    thumbnailUrl,
+  }: {
+    uuid?: string;
+    id?: string;
+    thumbnailUrl: string;
+  }) {
+    const qb = this.createQueryBuilder('project')
+      .update()
+      .set({ thumbnailUrl });
+    if (uuid) qb.where('project.uuid = :uuid', { uuid });
+    if (id) qb.where('project.id = :id', { id });
+
+    return qb.execute();
+  }
+
   async findOne({ uuid, id }: { uuid?: string; id?: string }) {
     const qb = this.createQueryBuilder('project')
       .select()
