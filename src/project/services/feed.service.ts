@@ -25,6 +25,7 @@ export class FeedService {
       count: projects[1],
       projects: projects[0].map((project) => ({
         thumbnailUrl: project.thumbnailUrl,
+        emoji: project.emoji,
         projectName: project.projectName,
         projectType: project.projectType,
         projectField: project.field,
@@ -44,6 +45,7 @@ export class FeedService {
         count: projects[0][1],
         projects: projects[0][0].map((project) => ({
           thumbnailUrl: project.thumbnailUrl,
+          emoji: project.emoji,
           projectName: project.projectName,
           projectType: project.projectType,
           projectField: project.field,
@@ -54,6 +56,7 @@ export class FeedService {
         count: projects[1][1],
         projects: projects[1][0].map((project) => ({
           thumbnailUrl: project.thumbnailUrl,
+          emoji: project.emoji,
           projectName: project.projectName,
           projectType: project.projectType,
           projectField: project.field,
@@ -103,6 +106,7 @@ export class FeedService {
           reportType: isPlanOrReport.toUpperCase() as 'PLAN' | 'REPORT',
           submittedAt: project.status[`${isPlanOrReport}SubmittedAt`],
           thumbnailUrl: project.thumbnailUrl,
+          emoji: project.emoji,
           writer: {
             studentNo: project.writerId.studentNo,
             name: project.writerId.name,
