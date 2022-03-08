@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { Request } from 'express';
+import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
 import { Project } from 'src/shared/entities/project/project.entity';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { ChangeGithubIdRequestDto } from './dto/request/change-github-id.dto';
@@ -18,6 +19,7 @@ import {
 } from './dto/request/profile.dto';
 import { RegisterUserRequestDto } from './dto/request/register-user.dto';
 import { SearchUserRequestQueryDto } from './dto/request/search-user.dto';
+import { HeaderInfoResponseDto } from './dto/response/header-info.dto';
 import { ProfileMainResponseDto } from './dto/response/profile-main.dto';
 import { ProfileProjectsDto } from './dto/response/profile-projects.dto';
 import { ProfileReportsDto } from './dto/response/profile-reports.dto';
@@ -26,6 +28,7 @@ import { SearchUserDto } from './dto/response/search-user.dto';
 @Injectable()
 export class UserService {
   constructor(
+    private readonly adminRepository: AdminRepository,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     private readonly userRepository: UserRepository,
@@ -45,6 +48,24 @@ export class UserService {
       email: req.user.email,
     });
     return;
+  }
+
+  async getHeaderInfo(req: Request): Promise<HeaderInfoResponseDto> {
+    const user =
+      req.user.role === 'user'
+        ? await this.userRepository.findOneByUuid(req.user.userId)
+        : undefined;
+    const admin =
+      req.user.role === 'admin'
+        ? await this.adminRepository.findOne(undefined, req.user.userId)
+        : undefined;
+    return {
+      thumbnailUrl: user?.thumbnailUrl ?? undefined,
+      emoji: admin?.thumbnailUrl,
+      studentNo: user?.studentNo,
+      name: user?.name ?? admin?.name,
+      type: req.user.role,
+    };
   }
 
   async getProfile(
@@ -78,7 +99,8 @@ export class UserService {
                 if (project.status.isPlanAccepted === false) return 'DECLINED';
                 else return 'PENDING';
               case 'REPORT':
-                if (project.status.isPlanAccepted === false) return 'DECLINED';
+                if (project.status.isReportAccepted === false)
+                  return 'DECLINED';
                 else return 'PENDING';
             }
           })();

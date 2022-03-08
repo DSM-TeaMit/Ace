@@ -53,6 +53,12 @@ export class UserController {
     return this.userService.deleteUser(req);
   }
 
+  @Get('header')
+  @UseGuards(JwtAuthGuard)
+  async getHeaderInfo(@Req() req: Request) {
+    return this.userService.getHeaderInfo(req);
+  }
+
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   async getProfile(@Req() req: Request, @Param() payload: ProfileRequestDto) {

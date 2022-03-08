@@ -1,6 +1,7 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as redisStore from 'cache-manager-redis-store';
+import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { UserController } from './user.controller';
@@ -14,7 +15,11 @@ import { UserService } from './user.service';
       port: process.env.REDIS_PORT,
       ttl: 604800,
     }),
-    TypeOrmModule.forFeature([ProjectRepository, UserRepository]),
+    TypeOrmModule.forFeature([
+      AdminRepository,
+      ProjectRepository,
+      UserRepository,
+    ]),
   ],
   controllers: [UserController],
   providers: [UserService],

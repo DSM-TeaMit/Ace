@@ -24,6 +24,7 @@ export class FeedService {
     return {
       count: projects[1],
       projects: projects[0].map((project) => ({
+        uuid: project.uuid,
         thumbnailUrl: project.thumbnailUrl,
         emoji: project.emoji,
         projectName: project.projectName,
@@ -44,6 +45,7 @@ export class FeedService {
       projectName: {
         count: projects[0][1],
         projects: projects[0][0].map((project) => ({
+          uuid: project.uuid,
           thumbnailUrl: project.thumbnailUrl,
           emoji: project.emoji,
           projectName: project.projectName,
@@ -55,6 +57,7 @@ export class FeedService {
       memberName: {
         count: projects[1][1],
         projects: projects[1][0].map((project) => ({
+          uuid: project.uuid,
           thumbnailUrl: project.thumbnailUrl,
           emoji: project.emoji,
           projectName: project.projectName,
@@ -77,6 +80,7 @@ export class FeedService {
       [query.searchBy]: {
         count: projects[1],
         projects: projects[0].map((project) => ({
+          uuid: project.uuid,
           thumbnailUrl: project.thumbnailUrl,
           projectName: project.projectName,
           projectType: project.projectType,
@@ -101,6 +105,7 @@ export class FeedService {
             ? 'plan'
             : 'report';
         return {
+          uuid: project.uuid,
           projectName: project.projectName,
           projectType: project.projectType,
           reportType: isPlanOrReport.toUpperCase() as 'PLAN' | 'REPORT',

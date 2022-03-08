@@ -418,7 +418,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       )
       .orWhere(
         new Brackets((qb) => {
-          qb.where('staus.isReportSubmitted = true').andWhere(
+          qb.where('status.isReportSubmitted = true').andWhere(
             'status.isReportAccepted != true',
           );
         }),
