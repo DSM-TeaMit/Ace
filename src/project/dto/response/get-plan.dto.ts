@@ -1,5 +1,6 @@
 export interface GetPlanResponseDto {
   projectName: string;
+  projectType: 'PERS' | 'TEAM' | 'CLUB';
   startDate: string;
   endDate: string;
   writer: Omit<Member, 'role'>;
