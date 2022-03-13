@@ -35,6 +35,7 @@ export class PlanService {
     if (!plan) throw new NotFoundException();
     return {
       projectName: plan.projectId.projectName,
+      projectType: plan.projectId.projectType,
       startDate: plan.startDate,
       endDate: plan.endDate,
       writer: {
