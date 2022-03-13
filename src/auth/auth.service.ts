@@ -46,6 +46,7 @@ export class AuthService {
       sub: user?.uuid || req.user.email,
       role: 'user',
       registrationOnly: !isUserExist,
+      picture: isUserExist ? req.user.picture : undefined,
     };
     const refreshToken = isUserExist
       ? this.jwtService.sign(payload, { expiresIn: '7d' })
