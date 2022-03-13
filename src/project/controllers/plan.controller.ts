@@ -36,8 +36,8 @@ export class PlanController {
 
   @Get(':uuid/plan')
   @UseGuards(JwtAuthGuard)
-  async getPlan(@Param() param: ProjectParamsDto) {
-    return this.planService.getPlan(param);
+  async getPlan(@Req() req: Request, @Param() param: ProjectParamsDto) {
+    return this.planService.getPlan(req, param);
   }
 
   @Patch(':uuid/plan')

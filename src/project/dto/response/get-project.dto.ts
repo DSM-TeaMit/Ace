@@ -9,6 +9,7 @@ export interface GetProjectResponseDto {
   projectResult: string;
   thumbnailUrl: string;
   emoji: string;
+  requestorType: 'USER_NON_EDITABLE' | 'USER_EDITABLE' | 'ADMIN';
   comments: Comment[];
   members: Member[];
 }

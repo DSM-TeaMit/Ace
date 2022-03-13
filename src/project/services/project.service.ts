@@ -56,7 +56,10 @@ export class ProjectService {
     };
   }
 
-  async getProject(param: ProjectParamsDto): Promise<GetProjectResponseDto> {
+  async getProject(
+    req: Request,
+    param: ProjectParamsDto,
+  ): Promise<GetProjectResponseDto> {
     const project = await this.projectRepository.findOne(param);
     const comments = await this.commentRepository.findMany(
       project.id,
@@ -89,6 +92,7 @@ export class ProjectService {
       projectResult: project.projectResult,
       thumbnailUrl: project.thumbnailUrl,
       emoji: project.emoji,
+      requestorType: this.getRequestorType(project, req),
       comments: comments[0].map((comment) => ({
         userUuid: comment.adminId?.uuid ?? comment.userId?.uuid,
         thumbnailUrl:
@@ -191,6 +195,18 @@ export class ProjectService {
     }
 
     this.projectRepository.updateConfirmed(projectId, query.type, query.value);
+  }
+
+  getRequestorType(project: Project, req: Request) {
+    if (req.user.role === 'admin') return 'ADMIN';
+    else {
+      try {
+        this.checkPermission(project, req);
+        return 'USER_EDITABLE';
+      } catch {
+        return 'USER_NON_EDITABLE';
+      }
+    }
   }
 
   checkPermission(project: Project, req: Request) {

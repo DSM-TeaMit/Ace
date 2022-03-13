@@ -35,8 +35,8 @@ export class ProjectController {
 
   @Get(':uuid')
   @UseGuards(JwtAuthGuard)
-  getProject(@Param() param: ProjectParamsDto) {
-    return this.projectService.getProject(param);
+  getProject(@Req() req: Request, @Param() param: ProjectParamsDto) {
+    return this.projectService.getProject(req, param);
   }
 
   @Patch(':uuid')
