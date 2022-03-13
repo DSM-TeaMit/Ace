@@ -1,5 +1,4 @@
 declare namespace Express {
-  import { Admin } from 'src/shared/entities/admin/admin.entity';
   export interface User {
     email?: string;
     githubToken?: string;
