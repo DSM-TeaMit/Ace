@@ -21,6 +21,9 @@ export class Admin {
   @Column({ length: 200, nullable: true })
   thumbnailUrl: string;
 
+  @Column({ length: 1, nullable: true })
+  emoji: string;
+
   @OneToMany(() => Comment, (comment) => comment.adminId)
   comments: Comment[];
 }
