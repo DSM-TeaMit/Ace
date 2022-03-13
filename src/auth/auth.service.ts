@@ -38,8 +38,7 @@ export class AuthService {
   ) {}
 
   async googleLogin(req: Request): Promise<LoginResponseDto> {
-    if (req.user.email.split('@')[1] !== 'dsm.hs.kr')
-      throw new ForbiddenException();
+    if (req.user.hd !== 'dsm.hs.kr') throw new ForbiddenException();
     const user = await this.userRepository.findOne(req.user.email);
     if (user?.deleted) throw new UnprocessableEntityException();
     const isUserExist = Boolean(user);
@@ -47,6 +46,7 @@ export class AuthService {
       sub: user?.uuid || req.user.email,
       role: 'user',
       registrationOnly: !isUserExist,
+      picture: isUserExist ? req.user.picture : undefined,
     };
     const refreshToken = isUserExist
       ? this.jwtService.sign(payload, { expiresIn: '7d' })

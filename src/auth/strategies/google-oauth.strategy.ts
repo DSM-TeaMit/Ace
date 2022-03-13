@@ -20,9 +20,12 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
     profile: Profile,
   ) {
     const { name, emails } = profile;
+    const { picture, hd } = profile._json;
     return {
       name: name,
       email: emails[0].value,
+      picture,
+      hd,
     };
   }
 }

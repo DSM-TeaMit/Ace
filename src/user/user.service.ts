@@ -46,6 +46,7 @@ export class UserService {
     await this.userRepository.insert({
       ...payload,
       email: req.user.email,
+      thumbnailUrl: req.user.picture,
     });
     return;
   }
