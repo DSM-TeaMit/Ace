@@ -1,4 +1,5 @@
 import { RegisterAdminRequestDto } from 'src/auth/dto/request/register-admin.dto';
+import { getRandomEmoji } from 'src/shared/utils/random-emoji';
 import { AbstractRepository, EntityRepository } from 'typeorm';
 import { v4 } from 'uuid';
 import { Admin } from './admin.entity';
@@ -21,6 +22,7 @@ export class AdminRepository extends AbstractRepository<Admin> {
         uuid: v4(),
         password,
         name,
+        emoji: getRandomEmoji(),
       })
       .execute();
   }
