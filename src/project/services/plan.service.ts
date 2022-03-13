@@ -30,7 +30,10 @@ export class PlanService {
     this.projectRepository.createPlan(project.id, payload);
   }
 
-  async getPlan(param: ProjectParamsDto): Promise<GetPlanResponseDto> {
+  async getPlan(
+    req: Request,
+    param: ProjectParamsDto,
+  ): Promise<GetPlanResponseDto> {
     const plan = await this.projectRepository.getPlan(param);
     if (!plan) throw new NotFoundException();
     return {
@@ -38,6 +41,7 @@ export class PlanService {
       projectType: plan.projectId.projectType,
       startDate: plan.startDate,
       endDate: plan.endDate,
+      requestorType: this.projectService.getRequestorType(plan.projectId, req),
       writer: {
         studentNo: plan.projectId.writerId.studentNo,
         name: plan.projectId.writerId.name,

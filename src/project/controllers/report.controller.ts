@@ -36,8 +36,8 @@ export class ReportController {
 
   @Get(':uuid/report')
   @UseGuards(JwtAuthGuard)
-  async getReport(@Param() param: ProjectParamsDto) {
-    return this.reportService.getReport(param);
+  async getReport(@Req() req: Request, @Param() param: ProjectParamsDto) {
+    return this.reportService.getReport(req, param);
   }
 
   @Patch(':uuid/report')
