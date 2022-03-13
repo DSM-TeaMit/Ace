@@ -13,7 +13,10 @@ export class AdminRepository extends AbstractRepository<Admin> {
     return qb.getOne();
   }
 
-  async insertOne({ id, password, name }: RegisterAdminRequestDto) {
+  async insertOne(
+    admin: Admin,
+    { id, password, name }: RegisterAdminRequestDto,
+  ) {
     return this.createQueryBuilder('admin')
       .insert()
       .into<Admin>('admin')
@@ -23,6 +26,7 @@ export class AdminRepository extends AbstractRepository<Admin> {
         password,
         name,
         emoji: getRandomEmoji(),
+        parentAccount: admin,
       })
       .execute();
   }
