@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import { RegisterAdminRequestDto } from 'src/auth/dto/request/register-admin.dto';
 import { getRandomEmoji } from 'src/shared/utils/random-emoji';
 import { AbstractRepository, EntityRepository } from 'typeorm';
@@ -29,5 +30,12 @@ export class AdminRepository extends AbstractRepository<Admin> {
         parentAccount: admin,
       })
       .execute();
+  }
+
+  async getChildAccounts(id: number): Promise<[Admin[], number]> {
+    return this.createQueryBuilder('admin')
+      .select()
+      .where('admin.parentAccount = :id', { id })
+      .getManyAndCount();
   }
 }
