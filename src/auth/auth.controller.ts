@@ -63,8 +63,8 @@ export class AuthController {
 
   @Post('register-admin')
   @Roles(Role.Admin)
-  @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
   async registerAdmin(
     @Req() req: Request,
     @Body() payload: RegisterAdminRequestDto,
