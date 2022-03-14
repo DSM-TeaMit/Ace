@@ -7,6 +7,22 @@ import {
   ValidateNested,
 } from 'class-validator';
 
+class Inclusion {
+  @IsBoolean()
+  report: boolean;
+
+  @IsBoolean()
+  code: boolean;
+
+  @IsBoolean()
+  outcome: boolean;
+
+  @IsString()
+  @Length(1, 15)
+  @IsOptional()
+  others?: string;
+}
+
 export class CreatePlanRequestDto {
   @IsString()
   @Length(10)
@@ -27,20 +43,4 @@ export class CreatePlanRequestDto {
   @ValidateNested()
   @Type(() => Inclusion)
   includes: Inclusion;
-}
-
-class Inclusion {
-  @IsBoolean()
-  report: boolean;
-
-  @IsBoolean()
-  code: boolean;
-
-  @IsBoolean()
-  outcome: boolean;
-
-  @IsString()
-  @Length(1, 15)
-  @IsOptional()
-  others?: string;
 }
