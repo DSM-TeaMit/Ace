@@ -17,7 +17,10 @@ import { Roles } from 'src/shared/decorators/roles.decorator';
 import { Role } from 'src/shared/enums/role.enum';
 import { ConfirmProjectQueryDto } from '../dto/request/confirm-project.dto';
 import { CreateProjectRequestDto } from '../dto/request/create-project.dto';
-import { ModifyProjectRequestDto } from '../dto/request/modify-project.dto';
+import {
+  ModifyMemberRequestDto,
+  ModifyProjectRequestDto,
+} from '../dto/request/modify-project.dto';
 import { ProjectParamsDto } from '../dto/request/project-params.dto';
 import { ProjectService } from '../services/project.service';
 
@@ -49,6 +52,18 @@ export class ProjectController {
     @Body() payload: ModifyProjectRequestDto,
   ) {
     return this.projectService.modifyProject(req, param, payload);
+  }
+
+  @Patch(':uuid/member')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  modifyMember(
+    @Req() req: Request,
+    @Param() param: ProjectParamsDto,
+    @Body() payload: ModifyMemberRequestDto,
+  ) {
+    return this.projectService.modifyMember(req, param, payload);
   }
 
   @Delete(':uuid')
