@@ -13,7 +13,10 @@ import { User } from 'src/shared/entities/user/user.entity';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { ConfirmProjectQueryDto } from '../dto/request/confirm-project.dto';
 import { CreateProjectRequestDto } from '../dto/request/create-project.dto';
-import { ModifyProjectRequestDto } from '../dto/request/modify-project.dto';
+import {
+  ModifyMemberRequestDto,
+  ModifyProjectRequestDto,
+} from '../dto/request/modify-project.dto';
 import { ProjectParamsDto } from '../dto/request/project-params.dto';
 import { CreateProjectResponseDto } from '../dto/response/create-project.dto';
 import { GetProjectResponseDto } from '../dto/response/get-project.dto';
@@ -115,14 +118,19 @@ export class ProjectService {
     payload: ModifyProjectRequestDto,
   ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
-    if (
-      !(
-        project.members
-          ?.map((member) => member.userId.uuid)
-          .includes(req.user.userId) ?? true
-      )
-    )
-      throw new ForbiddenException();
+    this.checkPermission(project, req);
+    await this.projectRepository.modifyProject(project.id, payload);
+
+    return;
+  }
+
+  async modifyMember(
+    req: Request,
+    param: ProjectParamsDto,
+    payload: ModifyMemberRequestDto,
+  ): Promise<void> {
+    const project = await this.projectRepository.findOne(param);
+    this.checkPermission(project, req);
     if (
       !(
         payload.members
@@ -143,8 +151,7 @@ export class ProjectService {
         role: member.role,
       });
     }
-
-    await this.projectRepository.modifyProject(param.uuid, payload, members);
+    await this.projectRepository.modifyMember(project.id, members);
 
     return;
   }
