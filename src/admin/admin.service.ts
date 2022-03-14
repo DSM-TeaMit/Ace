@@ -19,6 +19,7 @@ export class AdminService {
         uuid: admin.uuid,
         uid: admin.uid,
         name: admin.name,
+        emoji: admin.emoji,
       })),
     };
   }
