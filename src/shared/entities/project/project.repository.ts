@@ -12,6 +12,7 @@ import {
   Brackets,
   EntityRepository,
   getConnection,
+  UpdateResult,
 } from 'typeorm';
 import { v4 } from 'uuid';
 import { Member } from '../member/member.entity';
@@ -83,29 +84,31 @@ export class ProjectRepository extends AbstractRepository<Project> {
   }
 
   async modifyProject(
-    uuid: string,
+    projectId: number,
     payload: ModifyProjectRequestDto,
+  ): Promise<UpdateResult> {
+    return this.createQueryBuilder('project')
+      .update(Project)
+      .set({
+        projectName: payload.name,
+        projectDescription: payload.description,
+        field: payload.field,
+      })
+      .where('project.id = :projectId', { projectId })
+      .execute();
+  }
+
+  async modifyMember(
+    projectId: number,
     members: {
       id: number;
       role: string;
     }[],
-  ): Promise<string | undefined> {
+  ): Promise<void> {
     const queryRunner = getConnection().createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const projectId: number = (
-        await queryRunner.manager
-          .createQueryBuilder()
-          .update(Project)
-          .set({
-            projectName: payload.name,
-            projectType: payload.type,
-            field: payload.field,
-          })
-          .where('project.uuid = :uuid', { uuid })
-          .execute()
-      ).generatedMaps[0].id;
       await queryRunner.manager
         .createQueryBuilder()
         .delete()
@@ -124,9 +127,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
           })),
         )
         .execute();
-
       await queryRunner.commitTransaction();
-      return uuid;
     } catch (e) {
       if (queryRunner.isTransactionActive) {
         await queryRunner.rollbackTransaction();
