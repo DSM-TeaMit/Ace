@@ -122,24 +122,4 @@ export class UserController {
   ) {
     return this.userService.getProjects(req, param, query);
   }
-
-  @Get('profile/:uuid/reports')
-  @UseGuards(JwtAuthGuard)
-  async getReportsWithUuid(
-    @Req() req: Request,
-    @Param() param: ProfileRequestDto,
-    @Query() query: ProfileRequestQueryDto,
-  ) {
-    return this.userService.getReports(req, param, query);
-  }
-
-  @Get('profile/:uuid/reports/each')
-  @UseGuards(JwtAuthGuard)
-  async getEachReportsWithUuid(
-    @Req() req: Request,
-    @Param() param: ProfileRequestDto,
-    @Query() query: ProfileEachReportRequestQueryDto,
-  ) {
-    return this.userService.getEachReports(req, param, query);
-  }
 }
