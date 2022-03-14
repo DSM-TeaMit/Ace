@@ -20,7 +20,7 @@ export function IsStudentNo(validationOptions?: ValidationOptions) {
             str.length === 4 &&
             /[1-3]/.test(str.at(0)) &&
             /[1-4]/.test(str.at(1)) &&
-            /(([0-1]|2(?=[0-1]))[0-9])/.test(str.substring(2))
+            /((0(?=[1-9])|1|2(?=[0-1]))[0-9])/.test(str.substring(2))
           );
         },
       },
