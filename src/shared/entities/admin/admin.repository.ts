@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import { RegisterAdminRequestDto } from 'src/auth/dto/request/register-admin.dto';
 import { getRandomEmoji } from 'src/shared/utils/random-emoji';
 import { AbstractRepository, EntityRepository } from 'typeorm';
@@ -13,7 +14,10 @@ export class AdminRepository extends AbstractRepository<Admin> {
     return qb.getOne();
   }
 
-  async insertOne({ id, password, name }: RegisterAdminRequestDto) {
+  async insertOne(
+    admin: Admin,
+    { id, password, name }: RegisterAdminRequestDto,
+  ) {
     return this.createQueryBuilder('admin')
       .insert()
       .into<Admin>('admin')
@@ -23,7 +27,15 @@ export class AdminRepository extends AbstractRepository<Admin> {
         password,
         name,
         emoji: getRandomEmoji(),
+        parentAccount: admin,
       })
       .execute();
+  }
+
+  async getChildAccounts(id: number): Promise<[Admin[], number]> {
+    return this.createQueryBuilder('admin')
+      .select()
+      .where('admin.parentAccount = :id', { id })
+      .getManyAndCount();
   }
 }

@@ -105,9 +105,13 @@ export class AuthService {
     };
   }
 
-  async registerAdmin(payload: RegisterAdminRequestDto) {
+  async registerAdmin(req: Request, payload: RegisterAdminRequestDto) {
     payload.password = await bcrypt.hash(payload.password, 12);
-    return await this.adminRepository.insertOne(payload);
+    const admin = await this.adminRepository.findOne(
+      undefined,
+      req.user.userId,
+    );
+    return await this.adminRepository.insertOne(admin, payload);
   }
 
   async refresh(payload: RefreshTokenRequestDto): Promise<LoginResponseDto> {

@@ -63,10 +63,13 @@ export class AuthController {
 
   @Post('register-admin')
   @Roles(Role.Admin)
-  @UseGuards(JwtAuthGuard)
   @UseGuards(RolesGuard)
-  async registerAdmin(@Body() payload: RegisterAdminRequestDto) {
-    return this.authService.registerAdmin(payload);
+  @UseGuards(JwtAuthGuard)
+  async registerAdmin(
+    @Req() req: Request,
+    @Body() payload: RegisterAdminRequestDto,
+  ) {
+    return this.authService.registerAdmin(req, payload);
   }
 
   @Put('refresh')

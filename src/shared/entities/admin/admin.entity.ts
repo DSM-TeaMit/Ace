@@ -1,4 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Comment } from '../comment/comment.entity';
 
 @Entity()
@@ -23,6 +30,12 @@ export class Admin {
 
   @Column({ length: 1, nullable: true })
   emoji: string;
+
+  @ManyToOne(() => Admin, (admin) => admin.childAccounts)
+  parentAccount: Admin;
+
+  @OneToMany(() => Admin, (admin) => admin.parentAccount)
+  childAccounts: Admin[];
 
   @OneToMany(() => Comment, (comment) => comment.adminId)
   comments: Comment[];

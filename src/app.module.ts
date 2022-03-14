@@ -10,6 +10,7 @@ import { Project } from './shared/entities/project/project.entity';
 import { Report } from './shared/entities/report/report.entity';
 import { Status } from './shared/entities/status/status.entity';
 import { User } from './shared/entities/user/user.entity';
+import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { FileModule } from './file/file.module';
 import { ProjectModule } from './project/project.module';
@@ -23,6 +24,7 @@ import { CommentModule } from './comment/comment.module';
       entities: [Admin, Comment, Member, Plan, Project, Report, Status, User],
       namingStrategy: new SnakeNamingStrategy(),
     }),
+    AdminModule,
     AuthModule,
     FileModule,
     ProjectModule,
