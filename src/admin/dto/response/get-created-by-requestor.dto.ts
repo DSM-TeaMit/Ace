@@ -7,4 +7,5 @@ interface Account {
   uuid: string;
   uid: string;
   name: string;
+  emoji: string;
 }
