@@ -14,7 +14,7 @@ export function IsStudentNo(validationOptions?: ValidationOptions) {
       options: validationOptions,
       validator: {
         validate(value: number, args: ValidationArguments) {
-          const str = value.toString();
+          const str = value?.toString();
           return (
             typeof value === 'number' &&
             str.length === 4 &&
