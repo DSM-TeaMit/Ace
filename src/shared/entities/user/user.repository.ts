@@ -1,6 +1,7 @@
 import { AbstractRepository, Brackets, EntityRepository } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { v4 } from 'uuid';
+import { Member } from '../member/member.entity';
 import { Project } from '../project/project.entity';
 import { User } from './user.entity';
 

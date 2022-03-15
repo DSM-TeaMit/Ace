@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import { RegisterAdminRequestDto } from 'src/auth/dto/request/register-admin.dto';
 import { getRandomEmoji } from 'src/shared/utils/random-emoji';
 import { AbstractRepository, EntityRepository } from 'typeorm';
