@@ -282,8 +282,9 @@ export class ProjectRepository extends AbstractRepository<Project> {
   }
 
   async getPlan({ projectId, uuid }: { projectId?: number; uuid?: string }) {
-    const qb = this.createQueryBuilder('pr')
-      .select()
+    const qb = this.manager
+      .createQueryBuilder()
+      .select('plan')
       .from(Plan, 'plan')
       .leftJoinAndSelect('plan.projectId', 'project')
       .leftJoinAndSelect('project.writerId', 'writer')
@@ -340,8 +341,9 @@ export class ProjectRepository extends AbstractRepository<Project> {
   }
 
   async getReport({ projectId, uuid }: { projectId?: number; uuid?: string }) {
-    const qb = this.createQueryBuilder('pr')
-      .select()
+    const qb = this.manager
+      .createQueryBuilder()
+      .select('report')
       .from(Report, 'report')
       .leftJoinAndSelect('report.projectId', 'project')
       .leftJoinAndSelect('project.writerId', 'writer')
