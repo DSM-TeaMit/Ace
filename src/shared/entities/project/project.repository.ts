@@ -264,7 +264,8 @@ export class ProjectRepository extends AbstractRepository<Project> {
     projectId: number,
     payload: CreatePlanRequestDto,
   ): Promise<void> {
-    this.createQueryBuilder('project')
+    this.manager
+      .createQueryBuilder()
       .insert()
       .into(Plan)
       .values({
@@ -302,7 +303,8 @@ export class ProjectRepository extends AbstractRepository<Project> {
   }
 
   async modifyPlan(id: number, payload: ModifyPlanRequestDto) {
-    this.createQueryBuilder('plan')
+    this.manager
+      .createQueryBuilder()
       .update(Plan)
       .set({
         goal: payload.goal,
@@ -314,12 +316,13 @@ export class ProjectRepository extends AbstractRepository<Project> {
         includeOutcome: payload.includes.outcome,
         includeOthers: payload.includes.others,
       })
-      .where('plan.projectId = :id', { id })
+      .where('projectId = :id', { id })
       .execute();
   }
 
   async deletePlan(id: number) {
-    this.createQueryBuilder('pr')
+    this.manager
+      .createQueryBuilder()
       .delete()
       .from(Plan, 'plan')
       .where('plan.projectId = :id', { id })
@@ -330,7 +333,8 @@ export class ProjectRepository extends AbstractRepository<Project> {
     projectId: number,
     payload: CreateReportRequestDto,
   ): Promise<void> {
-    this.createQueryBuilder('project')
+    this.manager
+      .createQueryBuilder()
       .insert()
       .into(Report)
       .values({
@@ -361,27 +365,30 @@ export class ProjectRepository extends AbstractRepository<Project> {
   }
 
   async modifyReport(id: number, payload: ModifyReportRequestDto) {
-    this.createQueryBuilder('plan')
+    this.manager
+      .createQueryBuilder()
       .update(Report)
       .set({
         ...payload,
       })
-      .where('plan.projectId = :id', { id })
+      .where('projectId = :id', { id })
       .execute();
   }
 
   async deleteReport(id: number) {
-    this.createQueryBuilder('pr')
+    this.manager
+      .createQueryBuilder()
       .delete()
       .from(Report, 'report')
-      .where('report.projectId = :id', { id })
+      .where('projectId = :id', { id })
       .execute();
   }
 
   async updateConfirmed(id: number, type: 'plan' | 'report', value: boolean) {
-    const qb = this.createQueryBuilder('status')
+    const qb = this.manager
+      .createQueryBuilder()
       .update(Status)
-      .where('status.projectId = :id', { id });
+      .where('projectId = :id', { id });
 
     if (type === 'plan') {
       if (!value) qb.set({ isPlanSubmitted: value, isPlanAccepted: value });
@@ -396,9 +403,10 @@ export class ProjectRepository extends AbstractRepository<Project> {
   }
 
   async updateSubmitted(id: number, type: 'plan' | 'report', value: boolean) {
-    const qb = this.createQueryBuilder('status')
+    const qb = this.manager
+      .createQueryBuilder()
       .update(Status)
-      .where('status.projectId = :id', { id });
+      .where('projectId = :id', { id });
 
     if (type === 'plan')
       qb.set({ isPlanSubmitted: value, planSubmittedAt: new Date() });
