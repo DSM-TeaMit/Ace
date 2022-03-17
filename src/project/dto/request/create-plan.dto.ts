@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsDateString,
   IsOptional,
   IsString,
   Length,
@@ -24,20 +25,20 @@ class Inclusion {
 }
 
 export class CreatePlanRequestDto {
-  @IsString()
-  @Length(10)
+  @IsDateString()
+  @Length(10, 10)
   startDate: string;
 
-  @IsString()
-  @Length(10)
+  @IsDateString()
+  @Length(10, 10)
   endDate: string;
 
   @IsString()
-  @Length(10)
+  @Length(0, 4000)
   goal: string;
 
   @IsString()
-  @Length(10)
+  @Length(0, 10000)
   content: string;
 
   @ValidateNested()
