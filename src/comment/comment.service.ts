@@ -74,8 +74,8 @@ export class CommentService {
       payload.type.toUpperCase() as 'PROJECT' | 'PLAN' | 'REPORT',
       {
         uuid: v4(),
-        adminId: () => adminId,
-        userId: () => userId,
+        adminId: () => adminId ?? null,
+        userId: () => userId ?? null,
         content: payload.content,
       },
     );
