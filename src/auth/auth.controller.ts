@@ -44,7 +44,9 @@ export class AuthController {
     return {
       url: `https://github.com/login/oauth/authorize?response_type=code&redirect_uri=${
         process.env.GITHUB_OAUTH_REDIRECT_URL
-      }/${redirectUri ?? ''}&scope=user%3Aemail&client_id=12f5bbad8d4b6573db40`,
+      }${redirectUri ? '/' + redirectUri : ''}&scope=user%3Aemail&client_id=${
+        process.env.GITHUB_OAUTH_CLIENT_ID
+      }`,
     };
   }
 
