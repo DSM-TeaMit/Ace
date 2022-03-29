@@ -4,6 +4,7 @@ export interface GetPlanResponseDto {
   startDate: string;
   endDate: string;
   requestorType: 'USER_NON_EDITABLE' | 'USER_EDITABLE' | 'ADMIN';
+  status: 'NOT_SUBMITTED' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
   writer: Omit<Member, 'role'>;
   members: Member[];
   goal: string;
