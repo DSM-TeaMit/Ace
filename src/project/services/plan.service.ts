@@ -27,7 +27,8 @@ export class PlanService {
       throw new ConflictException();
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
-    this.projectRepository.createPlan(project.id, payload);
+    await this.projectRepository.createPlan(project.id, payload);
+    return;
   }
 
   async getPlan(
