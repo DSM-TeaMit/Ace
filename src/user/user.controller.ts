@@ -60,12 +60,16 @@ export class UserController {
   }
 
   @Get('profile')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   async getProfile(@Req() req: Request, @Param() payload: ProfileRequestDto) {
     return this.userService.getProfile(req, payload);
   }
 
   @Get('profile/projects')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   async getProjects(
     @Req() req: Request,
@@ -76,6 +80,8 @@ export class UserController {
   }
 
   @Get('profile/reports')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   async getReports(
     @Req() req: Request,
@@ -86,6 +92,8 @@ export class UserController {
   }
 
   @Get('profile/reports/each')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   async getEachReports(
     @Req() req: Request,
@@ -96,6 +104,8 @@ export class UserController {
   }
 
   @Put('profile/githubId')
+  @Roles(Role.User)
+  @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   async changeGithubId(
     @Req() req: Request,
