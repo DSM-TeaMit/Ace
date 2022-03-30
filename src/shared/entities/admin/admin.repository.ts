@@ -1,6 +1,6 @@
 import { RegisterAdminRequestDto } from 'src/auth/dto/request/register-admin.dto';
 import { getRandomEmoji } from 'src/shared/utils/random-emoji';
-import { AbstractRepository, EntityRepository } from 'typeorm';
+import { AbstractRepository, DeleteResult, EntityRepository } from 'typeorm';
 import { v4 } from 'uuid';
 import { Admin } from './admin.entity';
 
@@ -48,5 +48,12 @@ export class AdminRepository extends AbstractRepository<Admin> {
       .select()
       .where('admin.parentAccount = :id', { id })
       .getManyAndCount();
+  }
+
+  async deleteAccount(id: number): Promise<DeleteResult> {
+    return this.createQueryBuilder('admin')
+      .delete()
+      .where('admin.id = :id', { id })
+      .execute();
   }
 }
