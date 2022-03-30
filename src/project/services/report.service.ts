@@ -58,8 +58,8 @@ export class ReportService {
     param: ProjectParamsDto,
     payload: ModifyReportRequestDto,
   ): Promise<void> {
-    const project = await this.projectRepository.findOne(param);
-    if (!project) throw new NotFoundException();
+    const report = await this.projectRepository.getReport(param);
+    if (!report) throw new NotFoundException();
     if (
       !report.projectId.status.isReportSubmitted &&
       !report.projectId.status.isReportAccepted
