@@ -27,7 +27,8 @@ export class PlanService {
       throw new ConflictException();
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
-    this.projectRepository.createPlan(project.id, payload);
+    await this.projectRepository.createPlan(project.id, payload);
+    return;
   }
 
   async getPlan(
@@ -42,6 +43,7 @@ export class PlanService {
       startDate: plan.startDate,
       endDate: plan.endDate,
       requestorType: this.projectService.getRequestorType(plan.projectId, req),
+      status: this.projectService.getDocumentStatus(plan.projectId, 'plan'),
       writer: {
         studentNo: plan.projectId.writerId.studentNo,
         name: plan.projectId.writerId.name,
