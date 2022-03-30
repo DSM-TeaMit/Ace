@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { ProjectService } from './services/project.service';
 import { ProjectController } from './controllers/project.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import * as redisStore from 'cache-manager-redis-store';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { CommentRepository } from 'src/shared/entities/comment/comment.repository';
@@ -19,6 +20,12 @@ import { ReportService } from './services/report.service';
       ProjectRepository,
       UserRepository,
     ]),
+    CacheModule.register({
+      store: redisStore,
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+      ttl: 86400,
+    }),
   ],
   providers: [FeedService, PlanService, ProjectService, ReportService],
   controllers: [
