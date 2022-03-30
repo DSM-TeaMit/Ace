@@ -58,7 +58,7 @@ export class UserService {
         : undefined;
     const admin =
       req.user.role === 'admin'
-        ? await this.adminRepository.findOne(undefined, req.user.userId)
+        ? await this.adminRepository.findOne({ uuid: req.user.userId })
         : undefined;
     return {
       thumbnailUrl: user?.thumbnailUrl ?? undefined,

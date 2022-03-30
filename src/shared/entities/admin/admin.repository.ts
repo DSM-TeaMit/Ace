@@ -1,15 +1,27 @@
 import { RegisterAdminRequestDto } from 'src/auth/dto/request/register-admin.dto';
 import { getRandomEmoji } from 'src/shared/utils/random-emoji';
-import { AbstractRepository, EntityRepository } from 'typeorm';
+import { AbstractRepository, DeleteResult, EntityRepository } from 'typeorm';
 import { v4 } from 'uuid';
 import { Admin } from './admin.entity';
 
 @EntityRepository(Admin)
 export class AdminRepository extends AbstractRepository<Admin> {
-  async findOne(uid?: string, uuid?: string): Promise<Admin> {
+  async findOne({
+    uid,
+    uuid,
+    joinParent,
+  }: {
+    uid?: string;
+    uuid?: string;
+    joinParent?: boolean;
+  }): Promise<Admin> {
     const qb = this.createQueryBuilder('admin').select();
-    if (uid) qb.where('uid = :uid', { uid });
-    if (uuid) qb.where('uuid = :uuid', { uuid });
+
+    if (joinParent)
+      qb.leftJoinAndSelect('admin.parentAccount', 'parentAccount');
+    if (uid) qb.where('admin.uid = :uid', { uid });
+    if (uuid) qb.where('admin.uuid = :uuid', { uuid });
+
     return qb.getOne();
   }
 
@@ -36,5 +48,12 @@ export class AdminRepository extends AbstractRepository<Admin> {
       .select()
       .where('admin.parentAccount = :id', { id })
       .getManyAndCount();
+  }
+
+  async deleteAccount(id: number): Promise<DeleteResult> {
+    return this.createQueryBuilder('admin')
+      .delete()
+      .where('admin.id = :id', { id })
+      .execute();
   }
 }
