@@ -1,13 +1,17 @@
 import {
+  CACHE_MANAGER,
   ConflictException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import { Request } from 'express';
 import { Project } from 'src/shared/entities/project/project.entity';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
+import { Status } from 'src/shared/entities/status/status.entity';
 import { User } from 'src/shared/entities/user/user.entity';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { ConfirmProjectQueryDto } from '../dto/request/confirm-project.dto';
@@ -23,6 +27,8 @@ import { GetProjectResponseDto } from '../dto/response/get-project.dto';
 @Injectable()
 export class ProjectService {
   constructor(
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
     private readonly projectRepository: ProjectRepository,
     private readonly userRepository: UserRepository,
   ) {}
@@ -62,22 +68,15 @@ export class ProjectService {
     param: ProjectParamsDto,
   ): Promise<GetProjectResponseDto> {
     const project = await this.projectRepository.findOne(param);
-    const status = (() => {
-      if (!project.status.isPlanSubmitted) return 'PLANNING';
-      if (
-        project.status.isPlanSubmitted &&
-        project.status.isPlanAccepted === null
-      )
-        return 'PENDING(PLAN)';
-      if (project.status.isPlanAccepted && !project.status.isReportSubmitted)
-        return 'REPORTING';
-      if (
-        project.status.isReportSubmitted &&
-        project.status.isReportAccepted === null
-      )
-        return 'PENDING(REPORT)';
-      if (project.status.isReportAccepted) return 'DONE';
-    })();
+    if (!project) throw new NotFoundException();
+    if (!(await this.cacheManager.get(req.user.userId))) {
+      await this.projectRepository.increaseViewCount(
+        project.id,
+        project.viewCount,
+      );
+      await this.cacheManager.set(req.user.userId, 'VIEWCOUNT_CACHE');
+    }
+    const status = this.mapProjectStatus(project.status);
     return {
       uuid: project.uuid,
       projectName: project.projectName,
@@ -98,6 +97,16 @@ export class ProjectService {
         thumbnailUrl: member.userId.thumbnailUrl,
       })),
     };
+  }
+
+  mapProjectStatus(status: Status) {
+    if (!status.isPlanSubmitted) return 'PLANNING';
+    if (status.isPlanSubmitted && status.isPlanAccepted === null)
+      return 'PENDING(PLAN)';
+    if (status.isPlanAccepted && !status.isReportSubmitted) return 'REPORTING';
+    if (status.isReportSubmitted && status.isReportAccepted === null)
+      return 'PENDING(REPORT)';
+    if (status.isReportAccepted) return 'DONE';
   }
 
   async modifyProject(
