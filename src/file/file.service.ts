@@ -111,8 +111,12 @@ export class FileService {
         'archive_outcomes.zip',
         `${process.env.AWS_S3_BUCKET}/${param.uuid}/archive`,
       )
-    )
-      throw new ConflictException();
+    ) {
+      await this.deleteFromS3(
+        'archive_outcomes.zip',
+        `${process.env.AWS_S3_BUCKET}/${param.uuid}/archive`,
+      );
+    }
 
     await this.uploadSingleFile({
       file,
