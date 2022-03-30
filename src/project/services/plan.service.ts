@@ -72,14 +72,11 @@ export class PlanService {
     const plan = await this.projectRepository.getPlan(param);
     if (!plan) throw new NotFoundException();
     if (
-      !(
-        project.members
-          ?.map((member) => member.userId.uuid)
-          .includes(req.user.userId) ?? true
-      )
+      !plan.projectId.status.isPlanSubmitted &&
+      !plan.projectId.status.isPlanAccepted
     )
-      throw new ForbiddenException();
-    await this.projectRepository.modifyPlan(project.id, payload);
+      await this.projectRepository.setAccepted(plan.projectId.id, 'plan', null);
+    await this.projectRepository.modifyPlan(plan.projectId.id, payload);
 
     return;
   }

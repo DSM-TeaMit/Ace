@@ -61,14 +61,15 @@ export class ReportService {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
     if (
-      !(
-        project.members
-          ?.map((member) => member.userId.uuid)
-          .includes(req.user.userId) ?? true
-      )
+      !report.projectId.status.isReportSubmitted &&
+      !report.projectId.status.isReportAccepted
     )
-      throw new ForbiddenException();
-    await this.projectRepository.modifyReport(project.id, payload);
+      await this.projectRepository.setAccepted(
+        report.projectId.id,
+        'report',
+        null,
+      );
+    await this.projectRepository.modifyReport(report.projectId.id, payload);
 
     return;
   }
