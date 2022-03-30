@@ -37,6 +37,7 @@ export class ReportService {
     const report = await this.projectRepository.getReport(param);
     if (!report) throw new NotFoundException();
     return {
+      projectName: report.projectId.projectName,
       projectType: report.projectId.projectType,
       requestorType: this.projectService.getRequestorType(
         report.projectId,
