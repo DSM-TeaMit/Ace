@@ -20,6 +20,6 @@ export class ProfileRequestQueryDto {
 }
 
 export class ProfileEachReportRequestQueryDto extends ProfileRequestQueryDto {
-  @IsEnum(['accepted', 'pending', 'rejected'])
-  type: 'accepted' | 'pending' | 'rejected';
+  @IsEnum(['accepted', 'pending', 'rejected', 'writing'])
+  type: 'accepted' | 'pending' | 'rejected' | 'writing';
 }

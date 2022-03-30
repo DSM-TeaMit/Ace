@@ -145,7 +145,8 @@ export class UserRepository extends AbstractRepository<User> {
     userId: number,
     page: number,
     limit: number,
-    type: boolean | null,
+    submitted: boolean | null,
+    accepted: boolean | null,
   ) {
     return this.manager
       .createQueryBuilder(Project, 'project')
@@ -156,21 +157,31 @@ export class UserRepository extends AbstractRepository<User> {
         new Brackets((qb) => {
           qb.where(
             new Brackets((qb) => {
-              qb.where('status.isPlanSubmitted = true').andWhere(
-                type !== null
-                  ? 'status.isPlanAccepted = :type'
+              qb.where(
+                submitted !== null
+                  ? 'status.isPlanSubmitted = :submitted'
+                  : 'status.isPlanSubmitted IS NULL',
+                { submitted },
+              ).andWhere(
+                accepted !== null
+                  ? 'status.isPlanAccepted = :accepted'
                   : 'status.isPlanAccepted IS NULL',
-                { type },
+                { accepted },
               );
             }),
           );
           qb.orWhere(
             new Brackets((qb) => {
-              qb.where('status.isReportSubmitted = true').andWhere(
-                type !== null
-                  ? 'status.isReportAccepted = :type'
+              qb.where(
+                submitted !== null
+                  ? 'status.isReportSubmitted = :submitted'
+                  : 'status.isReportSubmitted IS NULL',
+                { submitted },
+              ).andWhere(
+                accepted !== null
+                  ? 'status.isReportAccepted = :accepted'
                   : 'status.isReportAccepted IS NULL',
-                { type },
+                { accepted },
               );
             }),
           );
