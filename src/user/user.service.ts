@@ -188,9 +188,27 @@ export class UserService {
 
     const projects = (
       await Promise.all([
-        this.userRepository.getReports(user.id, query.page, query.limit, true),
-        this.userRepository.getReports(user.id, query.page, query.limit, false),
-        this.userRepository.getReports(user.id, query.page, query.limit, null),
+        this.userRepository.getReports(
+          user.id,
+          query.page,
+          query.limit,
+          true,
+          true,
+        ),
+        this.userRepository.getReports(
+          user.id,
+          query.page,
+          query.limit,
+          false,
+          false,
+        ),
+        this.userRepository.getReports(
+          user.id,
+          query.page,
+          query.limit,
+          true,
+          null,
+        ),
       ])
     ).map((res) => ({
       count: res[1],
@@ -230,6 +248,7 @@ export class UserService {
         user.id,
         query.page,
         query.limit,
+        { accepted: true, rejected: false, pending: true }[query.type],
         { accepted: true, rejected: false, pending: null }[query.type],
       )
     ).map((res) => ({
