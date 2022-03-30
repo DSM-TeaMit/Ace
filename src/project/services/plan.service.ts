@@ -71,6 +71,9 @@ export class PlanService {
   ): Promise<void> {
     const plan = await this.projectRepository.getPlan(param);
     if (!plan) throw new NotFoundException();
+    this.projectService.checkPermission(plan.projectId, req);
+    if (plan.projectId.status.isPlanAccepted) throw new ConflictException();
+
     if (
       !plan.projectId.status.isPlanSubmitted &&
       !plan.projectId.status.isPlanAccepted

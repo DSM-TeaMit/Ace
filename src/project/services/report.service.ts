@@ -60,6 +60,9 @@ export class ReportService {
   ): Promise<void> {
     const report = await this.projectRepository.getReport(param);
     if (!report) throw new NotFoundException();
+    this.projectService.checkPermission(report.projectId, req);
+    if (report.projectId.status.isReportAccepted) throw new ConflictException();
+
     if (
       !report.projectId.status.isReportSubmitted &&
       !report.projectId.status.isReportAccepted
