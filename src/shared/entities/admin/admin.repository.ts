@@ -6,7 +6,13 @@ import { Admin } from './admin.entity';
 
 @EntityRepository(Admin)
 export class AdminRepository extends AbstractRepository<Admin> {
-  async findOne(uid?: string, uuid?: string): Promise<Admin> {
+  async findOne({
+    uid,
+    uuid,
+  }: {
+    uid?: string;
+    uuid?: string;
+  }): Promise<Admin> {
     const qb = this.createQueryBuilder('admin').select();
     if (uid) qb.where('uid = :uid', { uid });
     if (uuid) qb.where('uuid = :uuid', { uuid });

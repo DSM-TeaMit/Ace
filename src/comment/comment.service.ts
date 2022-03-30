@@ -65,7 +65,7 @@ export class CommentService {
     const adminId =
       req.user.role === 'admin'
         ? (
-            await this.adminRepository.findOne(undefined, req.user.userId)
+            await this.adminRepository.findOne({ uuid: req.user.userId })
           ).id.toString()
         : undefined;
     const userId =

@@ -110,10 +110,9 @@ export class AuthService {
     payload: RegisterAdminRequestDto,
   ): Promise<void> {
     payload.password = await bcrypt.hash(payload.password, 12);
-    const admin = await this.adminRepository.findOne(
-      undefined,
-      req.user.userId,
-    );
+    const admin = await this.adminRepository.findOne({
+      uuid: req.user.userId,
+    });
     await this.adminRepository.insertOne(admin, payload);
     return;
   }
@@ -134,7 +133,7 @@ export class AuthService {
       }
     })();
     const cache = await this.cacheManager.get<string>(payload.refreshToken);
-    const admin = await this.adminRepository.findOne(undefined, cache);
+    const admin = await this.adminRepository.findOne({ uuid: cache });
     const user = await this.userRepository.findOne(undefined, cache);
     if (cache !== (user?.uuid ?? admin?.uuid))
       throw new UnauthorizedException();

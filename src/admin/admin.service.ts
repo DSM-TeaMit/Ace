@@ -8,10 +8,9 @@ export class AdminService {
   constructor(private readonly adminRepository: AdminRepository) {}
 
   async getCreatedByRequestor(req: Request): Promise<GetCreatedByRequestorDto> {
-    const requestor = await this.adminRepository.findOne(
-      undefined,
-      req.user.userId,
-    );
+    const requestor = await this.adminRepository.findOne({
+      uuid: req.user.userId,
+    });
     const accounts = await this.adminRepository.getChildAccounts(requestor.id);
     return {
       count: accounts[1],

@@ -14,7 +14,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(id: string, password: string) {
-    const user = await this.adminRepository.findOne(id);
+    const user = await this.adminRepository.findOne({ uid: id });
     if (!user || !(await bcrypt.compare(password, user.password)))
       throw new UnauthorizedException();
     return { userId: user.uuid, userInfo: user };
