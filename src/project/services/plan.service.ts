@@ -19,12 +19,20 @@ export class PlanService {
     private readonly projectService: ProjectService,
   ) {}
 
-  async createPlan(
+  async createOrModifyPlan(
+    req: Request,
     param: ProjectParamsDto,
     payload: CreatePlanRequestDto,
   ): Promise<void> {
     if (await this.projectRepository.getPlan(param))
-      throw new ConflictException();
+      this.modifyPlan(req, param, payload);
+    else this.createPlan(param, payload);
+  }
+
+  async createPlan(
+    param: ProjectParamsDto,
+    payload: CreatePlanRequestDto,
+  ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
     await this.projectRepository.createPlan(project.id, payload);

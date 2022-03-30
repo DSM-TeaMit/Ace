@@ -27,10 +27,11 @@ export class PlanController {
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   async createPlan(
+    @Req() req: Request,
     @Param() param: ProjectParamsDto,
     @Body() payload: CreatePlanRequestDto,
   ) {
-    return this.planService.createPlan(param, payload);
+    return this.planService.createOrModifyPlan(req, param, payload);
   }
 
   @Get(':uuid/plan')
