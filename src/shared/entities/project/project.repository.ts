@@ -454,4 +454,12 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .skip(query.limit * (query.page - 1))
       .getManyAndCount();
   }
+
+  async increaseViewCount(id: number, count: number) {
+    return this.createQueryBuilder('project')
+      .update()
+      .set({ viewCount: count + 1 })
+      .where('project.id = :id', { id })
+      .execute();
+  }
 }
