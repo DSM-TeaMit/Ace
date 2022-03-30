@@ -11,6 +11,7 @@ import { Cache } from 'cache-manager';
 import { Request } from 'express';
 import { Project } from 'src/shared/entities/project/project.entity';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
+import { Status } from 'src/shared/entities/status/status.entity';
 import { User } from 'src/shared/entities/user/user.entity';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { ConfirmProjectQueryDto } from '../dto/request/confirm-project.dto';
@@ -75,6 +76,7 @@ export class ProjectService {
       );
       await this.cacheManager.set(req.user.userId, 'VIEWCOUNT_CACHE');
     }
+    const status = this.mapProjectStatus(project.status);
     return {
       uuid: project.uuid,
       projectName: project.projectName,
@@ -95,6 +97,16 @@ export class ProjectService {
         thumbnailUrl: member.userId.thumbnailUrl,
       })),
     };
+  }
+
+  mapProjectStatus(status: Status) {
+    if (!status.isPlanSubmitted) return 'PLANNING';
+    if (status.isPlanSubmitted && status.isPlanAccepted === null)
+      return 'PENDING(PLAN)';
+    if (status.isPlanAccepted && !status.isReportSubmitted) return 'REPORTING';
+    if (status.isReportSubmitted && status.isReportAccepted === null)
+      return 'PENDING(REPORT)';
+    if (status.isReportAccepted) return 'DONE';
   }
 
   async modifyProject(
