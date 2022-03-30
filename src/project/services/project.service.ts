@@ -6,7 +6,6 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { CommentRepository } from 'src/shared/entities/comment/comment.repository';
 import { Project } from 'src/shared/entities/project/project.entity';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { User } from 'src/shared/entities/user/user.entity';
@@ -24,7 +23,6 @@ import { GetProjectResponseDto } from '../dto/response/get-project.dto';
 @Injectable()
 export class ProjectService {
   constructor(
-    private readonly commentRepository: CommentRepository,
     private readonly projectRepository: ProjectRepository,
     private readonly userRepository: UserRepository,
   ) {}
@@ -64,10 +62,6 @@ export class ProjectService {
     param: ProjectParamsDto,
   ): Promise<GetProjectResponseDto> {
     const project = await this.projectRepository.findOne(param);
-    const comments = await this.commentRepository.findMany(
-      project.id,
-      'PROJECT',
-    );
     const status = (() => {
       if (!project.status.isPlanSubmitted) return 'PLANNING';
       if (
@@ -96,12 +90,6 @@ export class ProjectService {
       thumbnailUrl: project.thumbnailUrl,
       emoji: project.emoji,
       requestorType: this.getRequestorType(project, req),
-      comments: comments[0].map((comment) => ({
-        userUuid: comment.adminId?.uuid ?? comment.userId?.uuid,
-        thumbnailUrl:
-          comment.adminId?.thumbnailUrl ?? comment.userId?.thumbnailUrl,
-        content: comment.content,
-      })),
       members: project.members.map((member) => ({
         uuid: member.userId.uuid,
         studentNo: member.userId.studentNo,

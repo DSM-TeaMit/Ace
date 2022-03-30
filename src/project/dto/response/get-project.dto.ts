@@ -10,14 +10,7 @@ export interface GetProjectResponseDto {
   thumbnailUrl: string;
   emoji: string;
   requestorType: 'USER_NON_EDITABLE' | 'USER_EDITABLE' | 'ADMIN';
-  comments: Comment[];
   members: Member[];
-}
-
-interface Comment {
-  userUuid: string;
-  thumbnailUrl: string;
-  content: string;
 }
 
 interface Member {
