@@ -58,17 +58,21 @@ export class ReportService {
     param: ProjectParamsDto,
     payload: ModifyReportRequestDto,
   ): Promise<void> {
-    const project = await this.projectRepository.findOne(param);
-    if (!project) throw new NotFoundException();
+    const report = await this.projectRepository.getReport(param);
+    if (!report) throw new NotFoundException();
+    this.projectService.checkPermission(report.projectId, req);
+    if (report.projectId.status.isReportAccepted) throw new ConflictException();
+
     if (
-      !(
-        project.members
-          ?.map((member) => member.userId.uuid)
-          .includes(req.user.userId) ?? true
-      )
+      !report.projectId.status.isReportSubmitted &&
+      !report.projectId.status.isReportAccepted
     )
-      throw new ForbiddenException();
-    await this.projectRepository.modifyReport(project.id, payload);
+      await this.projectRepository.setAccepted(
+        report.projectId.id,
+        'report',
+        null,
+      );
+    await this.projectRepository.modifyReport(report.projectId.id, payload);
 
     return;
   }

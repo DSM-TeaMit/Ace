@@ -416,6 +416,22 @@ export class ProjectRepository extends AbstractRepository<Project> {
     qb.execute();
   }
 
+  async setAccepted(
+    id: number,
+    type: 'plan' | 'report',
+    value: boolean | null,
+  ) {
+    const qb = this.manager
+      .createQueryBuilder()
+      .update(Status)
+      .where('projectId = :id', { id });
+
+    if (type === 'plan') qb.set({ isPlanAccepted: value });
+    if (type === 'report') qb.set({ isReportAccepted: value });
+
+    qb.execute();
+  }
+
   async getPendingProjects(query: Omit<FeedRequestDto, 'order'>) {
     return this.createQueryBuilder('project')
       .select()

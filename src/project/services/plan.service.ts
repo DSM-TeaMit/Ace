@@ -69,17 +69,17 @@ export class PlanService {
     param: ProjectParamsDto,
     payload: ModifyPlanRequestDto,
   ): Promise<void> {
-    const project = await this.projectRepository.findOne(param);
-    if (!project) throw new NotFoundException();
+    const plan = await this.projectRepository.getPlan(param);
+    if (!plan) throw new NotFoundException();
+    this.projectService.checkPermission(plan.projectId, req);
+    if (plan.projectId.status.isPlanAccepted) throw new ConflictException();
+
     if (
-      !(
-        project.members
-          ?.map((member) => member.userId.uuid)
-          .includes(req.user.userId) ?? true
-      )
+      !plan.projectId.status.isPlanSubmitted &&
+      !plan.projectId.status.isPlanAccepted
     )
-      throw new ForbiddenException();
-    await this.projectRepository.modifyPlan(project.id, payload);
+      await this.projectRepository.setAccepted(plan.projectId.id, 'plan', null);
+    await this.projectRepository.modifyPlan(plan.projectId.id, payload);
 
     return;
   }
