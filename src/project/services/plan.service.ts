@@ -69,8 +69,8 @@ export class PlanService {
     param: ProjectParamsDto,
     payload: ModifyPlanRequestDto,
   ): Promise<void> {
-    const project = await this.projectRepository.findOne(param);
-    if (!project) throw new NotFoundException();
+    const plan = await this.projectRepository.getPlan(param);
+    if (!plan) throw new NotFoundException();
     if (
       !(
         project.members
