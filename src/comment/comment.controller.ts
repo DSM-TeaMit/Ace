@@ -23,10 +23,11 @@ export class CommentController {
   @Get(':uuid')
   @UseGuards(JwtAuthGuard)
   getComments(
+    @Req() req: Request,
     @Param() param: ProjectParamsDto,
     @Query() query: CommentQueryDto,
   ) {
-    return this.commentService.getComments(param, query);
+    return this.commentService.getComments(req, param, query);
   }
 
   @Post(':uuid')
