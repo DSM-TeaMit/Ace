@@ -43,6 +43,7 @@ export class PlanService {
       startDate: plan.startDate,
       endDate: plan.endDate,
       requestorType: this.projectService.getRequestorType(plan.projectId, req),
+      status: this.projectService.getDocumentStatus(plan.projectId, 'plan'),
       writer: {
         studentNo: plan.projectId.writerId.studentNo,
         name: plan.projectId.writerId.name,

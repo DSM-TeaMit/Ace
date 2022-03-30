@@ -42,6 +42,7 @@ export class ReportService {
         report.projectId,
         req,
       ),
+      status: this.projectService.getDocumentStatus(report.projectId, 'report'),
       subject: report.subject,
       writer: {
         studentNo: report.projectId.writerId.studentNo,

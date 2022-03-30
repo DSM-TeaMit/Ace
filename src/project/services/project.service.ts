@@ -226,4 +226,37 @@ export class ProjectService {
     )
       throw new ForbiddenException();
   }
+
+  getDocumentStatus(project: Project, type: 'plan' | 'report') {
+    if (type === 'plan') {
+      if (
+        !project.status.isPlanSubmitted &&
+        project.status.isPlanAccepted === null
+      )
+        return 'NOT_SUBMITTED';
+      if (
+        project.status.isPlanSubmitted &&
+        project.status.isPlanAccepted === null
+      )
+        return 'PENDING';
+      if (project.status.isPlanAccepted) return 'ACCEPTED';
+      if (!project.status.isPlanSubmitted && !project.status.isPlanAccepted)
+        return 'REJECTED';
+    }
+    if (type === 'report') {
+      if (
+        !project.status.isReportSubmitted &&
+        project.status.isReportAccepted === null
+      )
+        return 'NOT_SUBMITTED';
+      if (
+        project.status.isReportSubmitted &&
+        project.status.isReportAccepted === null
+      )
+        return 'PENDING';
+      if (project.status.isReportAccepted) return 'ACCEPTED';
+      if (!project.status.isReportSubmitted && !project.status.isReportAccepted)
+        return 'REJECTED';
+    }
+  }
 }
