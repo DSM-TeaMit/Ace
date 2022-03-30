@@ -111,8 +111,12 @@ export class FileService {
         'archive_outcomes.zip',
         `${process.env.AWS_S3_BUCKET}/${param.uuid}/archive`,
       )
-    )
-      throw new ConflictException();
+    ) {
+      await this.deleteFromS3(
+        'archive_outcomes.zip',
+        `${process.env.AWS_S3_BUCKET}/${param.uuid}/archive`,
+      );
+    }
 
     await this.uploadSingleFile({
       file,
@@ -164,6 +168,23 @@ export class FileService {
       s3Filename,
       `${process.env.AWS_S3_BUCKET}/${s3Path}`,
     );
+  }
+
+  async checkArchiveExists(param: ProjectParamsDto) {
+    if (
+      await this.isExist(
+        'archive_outcomes.zip',
+        `${process.env.AWS_S3_BUCKET}/${param.uuid}/archive`,
+      )
+    ) {
+      return {
+        isExist: true,
+      };
+    } else {
+      return {
+        isExist: false,
+      };
+    }
   }
 
   async uploadSingleFile(options: UploadFileOptions): Promise<string> {
