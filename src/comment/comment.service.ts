@@ -24,6 +24,7 @@ export class CommentService {
   ) {}
 
   async getComments(
+    req: Request,
     param: ProjectParamsDto,
     query: CommentQueryDto,
   ): Promise<GetCommentResponseDto> {
@@ -41,9 +42,14 @@ export class CommentService {
         writerType: comment.adminId ? 'admin' : 'user',
         writerName: comment.adminId?.name ?? comment.userId?.name,
         writerSno: comment.userId?.studentNo,
+        isMine:
+          (comment.adminId?.uuid ?? comment.userId?.uuid) === req.user.userId,
         content: comment.content,
         thumbnailUrl:
-          comment.adminId?.thumbnailUrl ?? comment.userId?.thumbnailUrl,
+          comment.adminId?.thumbnailUrl ??
+          comment.userId?.thumbnailUrl ??
+          undefined,
+        emoji: comment.adminId?.emoji,
       })),
     };
   }

@@ -9,6 +9,8 @@ interface Comment {
   writerType: 'user' | 'admin';
   writerName: string;
   writerSno?: number;
+  isMine: boolean;
   content: string;
-  thumbnailUrl: string;
+  thumbnailUrl?: string;
+  emoji?: string;
 }
