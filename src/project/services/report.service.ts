@@ -19,6 +19,16 @@ export class ReportService {
     private readonly projectService: ProjectService,
   ) {}
 
+  async createOrModifyReport(
+    req: Request,
+    param: ProjectParamsDto,
+    payload: CreateReportRequestDto,
+  ): Promise<void> {
+    if (await this.projectRepository.getReport(param))
+      this.modifyReport(req, param, payload);
+    else this.createReport(param, payload);
+  }
+
   async createReport(
     param: ProjectParamsDto,
     payload: CreateReportRequestDto,

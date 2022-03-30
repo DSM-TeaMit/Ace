@@ -27,10 +27,11 @@ export class ReportController {
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   async createReport(
+    @Req() req: Request,
     @Param() param: ProjectParamsDto,
     @Body() payload: CreateReportRequestDto,
   ) {
-    return this.reportService.createReport(param, payload);
+    return this.reportService.createOrModifyReport(req, param, payload);
   }
 
   @Get(':uuid/report')
