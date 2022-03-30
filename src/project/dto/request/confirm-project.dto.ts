@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import { IsBoolean, IsEnum } from 'class-validator';
 
 export class ConfirmProjectQueryDto {
@@ -6,6 +6,12 @@ export class ConfirmProjectQueryDto {
   type: 'plan' | 'report';
 
   @IsBoolean()
-  @Type(() => Boolean)
+  @Transform(({ value }) =>
+    new Map([
+      ['undefined', undefined],
+      ['true', true],
+      ['false', false],
+    ]).get(value),
+  )
   value: boolean;
 }
