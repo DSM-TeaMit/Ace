@@ -46,7 +46,9 @@ export class CommentService {
           (comment.adminId?.uuid ?? comment.userId?.uuid) === req.user.userId,
         content: comment.content,
         thumbnailUrl:
-          comment.adminId?.thumbnailUrl ?? comment.userId?.thumbnailUrl,
+          comment.adminId?.thumbnailUrl ??
+          comment.userId?.thumbnailUrl ??
+          undefined,
       })),
     };
   }
