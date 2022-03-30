@@ -49,6 +49,7 @@ export class CommentService {
           comment.adminId?.thumbnailUrl ??
           comment.userId?.thumbnailUrl ??
           undefined,
+        emoji: comment.adminId?.emoji,
       })),
     };
   }

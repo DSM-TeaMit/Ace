@@ -12,4 +12,5 @@ interface Comment {
   isMine: boolean;
   content: string;
   thumbnailUrl?: string;
+  emoji?: string;
 }
