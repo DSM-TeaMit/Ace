@@ -170,6 +170,23 @@ export class FileService {
     );
   }
 
+  async checkArchiveExists(param: ProjectParamsDto) {
+    if (
+      await this.isExist(
+        'archive_outcomes.zip',
+        `${process.env.AWS_S3_BUCKET}/${param.uuid}/archive`,
+      )
+    ) {
+      return {
+        isExist: true,
+      };
+    } else {
+      return {
+        isExist: false,
+      };
+    }
+  }
+
   async uploadSingleFile(options: UploadFileOptions): Promise<string> {
     const ext = extname(options.file.originalname).toLowerCase();
     const regex = options.allowedExt;
