@@ -67,7 +67,7 @@ export class FileController {
     return this.fileService.uploadArchive(file, param, req);
   }
 
-  @Get(':uuid/archive')
+  @Get(':uuid/archive/download')
   @UseGuards(JwtAuthGuard)
   getArchive(@Param() param: ProjectParamsDto, @Req() req: Request) {
     return this.fileService.getArchive(param, req);
