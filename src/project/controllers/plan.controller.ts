@@ -15,7 +15,6 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { Role } from 'src/shared/enums/role.enum';
 import { CreatePlanRequestDto } from '../dto/request/create-plan.dto';
-import { ModifyPlanRequestDto } from '../dto/request/modify-plan.dto';
 import { ProjectParamsDto } from '../dto/request/project-params.dto';
 import { PlanService } from '../services/plan.service';
 
@@ -38,18 +37,6 @@ export class PlanController {
   @UseGuards(JwtAuthGuard)
   async getPlan(@Req() req: Request, @Param() param: ProjectParamsDto) {
     return this.planService.getPlan(req, param);
-  }
-
-  @Patch(':uuid/plan')
-  @Roles(Role.User)
-  @UseGuards(RolesGuard)
-  @UseGuards(JwtAuthGuard)
-  async modifyPlan(
-    @Req() req: Request,
-    @Param() param: ProjectParamsDto,
-    @Body() payload: ModifyPlanRequestDto,
-  ) {
-    return this.planService.modifyPlan(req, param, payload);
   }
 
   @Delete(':uuid/plan')
