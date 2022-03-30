@@ -209,6 +209,13 @@ export class UserService {
           true,
           null,
         ),
+        this.userRepository.getReports(
+          user.id,
+          query.page,
+          query.limit,
+          false,
+          null,
+        ),
       ])
     ).map((res) => ({
       count: res[1],
@@ -230,6 +237,7 @@ export class UserService {
       accepted: projects[0],
       rejected: projects[1],
       pending: projects[2],
+      writing: projects[3],
     };
   }
 
@@ -248,8 +256,12 @@ export class UserService {
         user.id,
         query.page,
         query.limit,
-        { accepted: true, rejected: false, pending: true }[query.type],
-        { accepted: true, rejected: false, pending: null }[query.type],
+        { accepted: true, rejected: false, pending: true, writing: false }[
+          query.type
+        ],
+        { accepted: true, rejected: false, pending: null, writing: null }[
+          query.type
+        ],
       )
     ).map((res) => ({
       count: res[1],

@@ -1,7 +1,13 @@
 import { PendingProject } from './profile-main.dto';
 
+interface ProjectBlock {
+  count: number;
+  projects: Omit<PendingProject, 'status'>[];
+}
+
 export interface ProfileReportsDto {
-  accepted: { count: number; projects: Omit<PendingProject, 'status'>[] };
-  rejected: { count: number; projects: Omit<PendingProject, 'status'>[] };
-  pending: { count: number; projects: Omit<PendingProject, 'status'>[] };
+  accepted: ProjectBlock;
+  rejected: ProjectBlock;
+  pending: ProjectBlock;
+  writing: ProjectBlock;
 }
