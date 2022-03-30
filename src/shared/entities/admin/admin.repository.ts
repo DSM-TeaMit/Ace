@@ -9,13 +9,19 @@ export class AdminRepository extends AbstractRepository<Admin> {
   async findOne({
     uid,
     uuid,
+    joinParent,
   }: {
     uid?: string;
     uuid?: string;
+    joinParent?: boolean;
   }): Promise<Admin> {
     const qb = this.createQueryBuilder('admin').select();
-    if (uid) qb.where('uid = :uid', { uid });
-    if (uuid) qb.where('uuid = :uuid', { uuid });
+
+    if (joinParent)
+      qb.leftJoinAndSelect('admin.parentAccount', 'parentAccount');
+    if (uid) qb.where('admin.uid = :uid', { uid });
+    if (uuid) qb.where('admin.uuid = :uuid', { uuid });
+
     return qb.getOne();
   }
 
