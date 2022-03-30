@@ -15,7 +15,6 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { Role } from 'src/shared/enums/role.enum';
 import { CreateReportRequestDto } from '../dto/request/create-report.dto';
-import { ModifyReportRequestDto } from '../dto/request/modify-report.dto';
 import { ProjectParamsDto } from '../dto/request/project-params.dto';
 import { ReportService } from '../services/report.service';
 
@@ -28,28 +27,17 @@ export class ReportController {
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   async createReport(
+    @Req() req: Request,
     @Param() param: ProjectParamsDto,
     @Body() payload: CreateReportRequestDto,
   ) {
-    return this.reportService.createReport(param, payload);
+    return this.reportService.createOrModifyReport(req, param, payload);
   }
 
   @Get(':uuid/report')
   @UseGuards(JwtAuthGuard)
   async getReport(@Req() req: Request, @Param() param: ProjectParamsDto) {
     return this.reportService.getReport(req, param);
-  }
-
-  @Patch(':uuid/report')
-  @Roles(Role.User)
-  @UseGuards(RolesGuard)
-  @UseGuards(JwtAuthGuard)
-  async modifyReport(
-    @Req() req: Request,
-    @Param() param: ProjectParamsDto,
-    @Body() payload: ModifyReportRequestDto,
-  ) {
-    return this.reportService.modifyReport(req, param, payload);
   }
 
   @Delete(':uuid/report')
