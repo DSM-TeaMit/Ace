@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
@@ -76,6 +77,7 @@ export class UserService {
     const uuid = payload.uuid ?? req.user.userId;
     const isMine = !payload.uuid || payload.uuid === req.user.userId;
     const user = await this.userRepository.findOneByUuid(uuid);
+    if (!user) throw new NotFoundException();
 
     const projects = await this.userRepository.getProjectsOfUser(
       user.id,
@@ -149,6 +151,7 @@ export class UserService {
     const uuid = param.uuid ?? req.user.userId;
     const isMine = !param.uuid || param.uuid === req.user.userId;
     const user = await this.userRepository.findOneByUuid(uuid);
+    if (!user) throw new NotFoundException();
 
     const projects = await this.userRepository.getProjectsOfUser(
       user.id,
