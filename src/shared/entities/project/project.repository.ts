@@ -409,9 +409,17 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .where('projectId = :id', { id });
 
     if (type === 'plan')
-      qb.set({ isPlanSubmitted: value, planSubmittedAt: new Date() });
+      qb.set({
+        isPlanSubmitted: value,
+        isPlanAccepted: null,
+        planSubmittedAt: new Date(),
+      });
     if (type === 'report')
-      qb.set({ isReportSubmitted: value, reportSubmittedAt: new Date() });
+      qb.set({
+        isReportSubmitted: value,
+        isPlanAccepted: null,
+        reportSubmittedAt: new Date(),
+      });
 
     qb.execute();
   }
@@ -436,17 +444,18 @@ export class ProjectRepository extends AbstractRepository<Project> {
     return this.createQueryBuilder('project')
       .select()
       .leftJoinAndSelect('project.status', 'status')
+      .leftJoinAndSelect('project.writerId', 'writerId')
       .where(
         new Brackets((qb) => {
           qb.where('status.isPlanSubmitted = true').andWhere(
-            'status.isPlanAccepted != true',
+            'status.isPlanAccepted IS NULL',
           );
         }),
       )
       .orWhere(
         new Brackets((qb) => {
           qb.where('status.isReportSubmitted = true').andWhere(
-            'status.isReportAccepted != true',
+            'status.isReportAccepted IS NULL',
           );
         }),
       )
