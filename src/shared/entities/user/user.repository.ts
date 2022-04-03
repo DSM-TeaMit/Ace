@@ -69,26 +69,30 @@ export class UserRepository extends AbstractRepository<User> {
 
     const qb = this.manager
       .createQueryBuilder(Project, 'project')
-      .select(['project.id'])
+      .select('project')
       .where(`EXISTS (${subquery.getQuery()})`, { userId })
       .orderBy('project.createdAt', 'DESC')
       .take(limit)
       .skip((page - 1) * limit);
     if (!isMine)
       qb.leftJoinAndSelect('project.status', 'status').andWhere(
-        'report.isReportAccepted = true',
+        'status.isReportAccepted = true',
       );
+    const projects = await qb.getManyAndCount();
+    if (!projects[1]) return [[], 0];
 
-    return this.manager
-      .createQueryBuilder(Project, 'project')
-      .select()
+    const res = this.manager
+      .createQueryBuilder()
+      .select('project')
+      .from(Project, 'project')
       .leftJoinAndSelect('project.members', 'members')
       .leftJoinAndSelect('members.userId', 'userId')
-      .where('project.id IN (:...ids)', {
-        ids: (await qb.getMany()).map((project) => project.id),
-      })
       .orderBy('project.createdAt', 'DESC')
-      .getManyAndCount();
+      .where('project.id IN (:...ids)', {
+        ids: projects[0].map((project) => project.id),
+      });
+
+    return [await res.getMany(), projects[1]];
   }
 
   async getPendingProjects(userId?: number) {
