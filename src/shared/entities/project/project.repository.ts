@@ -409,9 +409,17 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .where('projectId = :id', { id });
 
     if (type === 'plan')
-      qb.set({ isPlanSubmitted: value, planSubmittedAt: new Date() });
+      qb.set({
+        isPlanSubmitted: value,
+        isPlanAccepted: null,
+        planSubmittedAt: new Date(),
+      });
     if (type === 'report')
-      qb.set({ isReportSubmitted: value, reportSubmittedAt: new Date() });
+      qb.set({
+        isReportSubmitted: value,
+        isPlanAccepted: null,
+        reportSubmittedAt: new Date(),
+      });
 
     qb.execute();
   }
