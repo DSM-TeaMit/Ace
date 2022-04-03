@@ -436,6 +436,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
     return this.createQueryBuilder('project')
       .select()
       .leftJoinAndSelect('project.status', 'status')
+      .leftJoinAndSelect('project.writerId', 'writerId')
       .where(
         new Brackets((qb) => {
           qb.where('status.isPlanSubmitted = true').andWhere(
