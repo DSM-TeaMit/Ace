@@ -59,7 +59,7 @@ export class UserRepository extends AbstractRepository<User> {
     isMine: boolean,
     page: number,
     limit: number,
-  ) {
+  ): Promise<[Project[], number]> {
     const subquery = this.manager
       .createQueryBuilder()
       .select('1')
