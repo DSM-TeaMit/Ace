@@ -254,34 +254,32 @@ export class UserService {
     if (!isMine) throw new ForbiddenException();
     const user = await this.userRepository.findOneByUuid(uuid);
 
-    const projects = (
-      await this.userRepository.getReports(
-        user.id,
-        query.page,
-        query.limit,
-        { accepted: true, rejected: false, pending: true, writing: false }[
-          query.type
-        ],
-        { accepted: true, rejected: false, pending: null, writing: null }[
-          query.type
-        ],
-      )
-    ).map((res) => ({
-      count: res[1],
-      projects: res[0].map((project) => {
-        return {
-          uuid: project.uuid,
-          projectName: project.projectName,
-          type:
-            project.status.isPlanSubmitted && !project.status.isPlanAccepted
-              ? 'PLAN'
-              : 'REPORT',
-        };
-      }),
-    }));
+    const projects = await this.userRepository.getReports(
+      user.id,
+      query.page,
+      query.limit,
+      { accepted: true, rejected: false, pending: true, writing: false }[
+        query.type
+      ],
+      { accepted: true, rejected: false, pending: null, writing: null }[
+        query.type
+      ],
+    );
 
     return {
-      [query.type]: projects[0],
+      [query.type]: {
+        count: projects[1],
+        projects: projects[0].map((project) => {
+          return {
+            uuid: project.uuid,
+            projectName: project.projectName,
+            type:
+              project.status.isPlanSubmitted && !project.status.isPlanAccepted
+                ? 'PLAN'
+                : 'REPORT',
+          };
+        }),
+      },
     };
   }
 
