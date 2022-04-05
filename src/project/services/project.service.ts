@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   CACHE_MANAGER,
   ConflictException,
   ForbiddenException,
@@ -38,7 +39,9 @@ export class ProjectService {
     payload: CreateProjectRequestDto,
   ): Promise<CreateProjectResponseDto> {
     if (!payload.members.map((member) => member.uuid).includes(req.user.userId))
-      throw new ForbiddenException();
+      throw new UnprocessableEntityException();
+    if (payload.type === 'PERS' && payload.members.length > 1)
+      throw new BadRequestException();
     const members: {
       id: number;
       role: string;
@@ -46,7 +49,7 @@ export class ProjectService {
     let writer: User = undefined;
     for await (const member of payload.members) {
       const user = await this.userRepository.findOneByUuid(member.uuid);
-      if (!user) throw new UnprocessableEntityException();
+      if (!user) throw new NotFoundException();
       if (member.uuid === req.user.userId) writer = user;
       members.push({
         id: user.id,
@@ -136,13 +139,16 @@ export class ProjectService {
       )
     )
       throw new UnprocessableEntityException();
+
+    if (project.projectType === 'PERS' && payload.members.length > 1)
+      throw new BadRequestException();
     const members: {
       id: number;
       role: string;
     }[] = [];
     for await (const member of payload.members) {
       const user = await this.userRepository.findOneByUuid(member.uuid);
-      if (!user) throw new UnprocessableEntityException();
+      if (!user) throw new NotFoundException();
       members.push({
         id: user.id,
         role: member.role,
