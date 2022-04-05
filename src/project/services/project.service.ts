@@ -38,7 +38,7 @@ export class ProjectService {
     payload: CreateProjectRequestDto,
   ): Promise<CreateProjectResponseDto> {
     if (!payload.members.map((member) => member.uuid).includes(req.user.userId))
-      throw new ForbiddenException();
+      throw new UnprocessableEntityException();
     const members: {
       id: number;
       role: string;
@@ -46,7 +46,7 @@ export class ProjectService {
     let writer: User = undefined;
     for await (const member of payload.members) {
       const user = await this.userRepository.findOneByUuid(member.uuid);
-      if (!user) throw new UnprocessableEntityException();
+      if (!user) throw new NotFoundException();
       if (member.uuid === req.user.userId) writer = user;
       members.push({
         id: user.id,
@@ -142,7 +142,7 @@ export class ProjectService {
     }[] = [];
     for await (const member of payload.members) {
       const user = await this.userRepository.findOneByUuid(member.uuid);
-      if (!user) throw new UnprocessableEntityException();
+      if (!user) throw new NotFoundException();
       members.push({
         id: user.id,
         role: member.role,
