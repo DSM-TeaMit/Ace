@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   CACHE_MANAGER,
   ConflictException,
   ForbiddenException,
@@ -39,6 +40,8 @@ export class ProjectService {
   ): Promise<CreateProjectResponseDto> {
     if (!payload.members.map((member) => member.uuid).includes(req.user.userId))
       throw new UnprocessableEntityException();
+    if (payload.type === 'PERS' && payload.members.length > 1)
+      throw new BadRequestException();
     const members: {
       id: number;
       role: string;
@@ -136,6 +139,9 @@ export class ProjectService {
       )
     )
       throw new UnprocessableEntityException();
+
+    if (project.projectType === 'PERS' && payload.members.length > 1)
+      throw new BadRequestException();
     const members: {
       id: number;
       role: string;
