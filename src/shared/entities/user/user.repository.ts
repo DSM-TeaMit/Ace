@@ -1,6 +1,7 @@
 import { AbstractRepository, Brackets, EntityRepository } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { v4 } from 'uuid';
+import { cloneDeep } from 'lodash';
 import { Member } from '../member/member.entity';
 import { Project } from '../project/project.entity';
 import { User } from './user.entity';
@@ -151,50 +152,93 @@ export class UserRepository extends AbstractRepository<User> {
     limit: number,
     submitted: boolean | null,
     accepted: boolean | null,
-  ) {
-    return this.manager
-      .createQueryBuilder(Project, 'project')
-      .select()
-      .leftJoinAndSelect('project.status', 'status')
-      .leftJoinAndSelect('project.members', 'members')
-      .where(
+  ): Promise<
+    [
+      {
+        uuid: string;
+        projectname: string;
+        thumbnailurl?: string;
+        emoji: string;
+        type: 'plan' | 'report';
+        submittedAt: Date;
+      }[],
+      number,
+    ]
+  > {
+    const queryBuilderBase = this.manager
+      .createQueryBuilder()
+      .select([
+        'project.id AS id',
+        'project.uuid AS uuid',
+        'project.projectName AS projectName',
+        'project.thumbnailUrl AS thumbnailUrl',
+        'project.emoji AS emoji',
+      ])
+      .from(Project, 'project')
+      .leftJoin('project.status', 'status')
+      .leftJoin('project.members', 'members')
+      .where('members.userId = :userId', { userId })
+      .take(limit)
+      .skip(limit * (page - 1));
+
+    const planQuery = cloneDeep(queryBuilderBase)
+      .addSelect(["'plan' AS type", 'status.planSubmittedAt AS submittedAt'])
+      .andWhere(
         new Brackets((qb) => {
           qb.where(
-            new Brackets((qb) => {
-              qb.where(
-                submitted !== null
-                  ? 'status.isPlanSubmitted = :submitted'
-                  : 'status.isPlanSubmitted IS NULL',
-                { submitted },
-              ).andWhere(
-                accepted !== null
-                  ? 'status.isPlanAccepted = :accepted'
-                  : 'status.isPlanAccepted IS NULL',
-                { accepted },
-              );
-            }),
-          );
-          qb.orWhere(
-            new Brackets((qb) => {
-              qb.where(
-                submitted !== null
-                  ? 'status.isReportSubmitted = :submitted'
-                  : 'status.isReportSubmitted IS NULL',
-                { submitted },
-              ).andWhere(
-                accepted !== null
-                  ? 'status.isReportAccepted = :accepted'
-                  : 'status.isReportAccepted IS NULL',
-                { accepted },
-              );
-            }),
+            submitted !== null
+              ? 'status.isPlanSubmitted = :submitted'
+              : 'status.isPlanSubmitted IS NULL',
+            { submitted },
+          ).andWhere(
+            accepted !== null
+              ? 'status.isPlanAccepted = :accepted'
+              : 'status.isPlanAccepted IS NULL',
+            { accepted },
           );
         }),
       )
-      .andWhere('members.userId = :userId', { userId })
-      .take(limit)
-      .skip(limit * (page - 1))
-      .getManyAndCount();
+      .getQueryAndParameters();
+
+    const reportQuery = cloneDeep(queryBuilderBase)
+      .addSelect([
+        "'report' AS type",
+        'status.reportSubmittedAt AS submittedAt',
+      ])
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where(
+            submitted !== null
+              ? 'status.isReportSubmitted = :submitted'
+              : 'status.isReportSubmitted IS NULL',
+            { submitted },
+          ).andWhere(
+            accepted !== null
+              ? 'status.isReportAccepted = :accepted'
+              : 'status.isReportAccepted IS NULL',
+            { accepted },
+          );
+        }),
+      )
+      .getQueryAndParameters();
+
+    const parameters = [...planQuery[1], limit];
+    if (page > 1) parameters.push([limit * (page - 1)]);
+    const res = await Promise.all([
+      this.manager.query(
+        `((${planQuery[0]}) UNION (${
+          reportQuery[0]
+        })) ORDER BY submittedAt DESC, id DESC LIMIT $${
+          planQuery[1].length + 1
+        } ${page > 1 ? `OFFSET $${planQuery[1].length + 2}` : ''}`,
+        parameters,
+      ),
+      this.manager.query(
+        `SELECT COUNT(*) FROM ((${planQuery[0]}) UNION (${reportQuery[0]})) A`,
+        planQuery[1],
+      ),
+    ]);
+    return [res[0], +res[1][0].count];
   }
 
   async searchUser({ name }: { name: string }) {
