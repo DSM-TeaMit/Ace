@@ -225,13 +225,10 @@ export class UserService {
       projects: res[0].map((project) => {
         return {
           uuid: project.uuid,
-          projectName: project.projectName,
-          thumbnailUrl: project.thumbnailUrl,
+          projectName: project.projectname,
+          thumbnailUrl: project.thumbnailurl,
           emoji: project.emoji,
-          type:
-            project.status.isPlanSubmitted && !project.status.isPlanAccepted
-              ? 'PLAN'
-              : 'REPORT',
+          type: project.type,
         };
       }),
     }));
@@ -272,11 +269,10 @@ export class UserService {
         projects: projects[0].map((project) => {
           return {
             uuid: project.uuid,
-            projectName: project.projectName,
-            type:
-              project.status.isPlanSubmitted && !project.status.isPlanAccepted
-                ? 'PLAN'
-                : 'REPORT',
+            projectName: project.projectname,
+            thumbnailUrl: project.thumbnailurl,
+            emoji: project.emoji,
+            type: project.type,
           };
         }),
       },
