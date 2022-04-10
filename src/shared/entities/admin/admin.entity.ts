@@ -41,6 +41,6 @@ export class Admin {
   @OneToMany(() => Admin, (admin) => admin.parentAccount)
   childAccounts: Admin[];
 
-  @OneToMany(() => Comment, (comment) => comment.adminId)
+  @OneToMany(() => Comment, (comment) => comment.admin)
   comments: Comment[];
 }

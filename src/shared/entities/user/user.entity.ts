@@ -42,6 +42,6 @@ export class User {
   @OneToMany(() => Member, (member) => member.userId)
   members: Member[];
 
-  @OneToMany(() => Comment, (comment) => comment.userId)
+  @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 }

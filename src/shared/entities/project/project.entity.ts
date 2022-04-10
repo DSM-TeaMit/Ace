@@ -54,7 +54,7 @@ export class Project {
   @ManyToOne(() => User, (user) => user.projects, { nullable: false })
   writerId: User;
 
-  @OneToMany(() => Comment, (comment) => comment.projectId)
+  @OneToMany(() => Comment, (comment) => comment.project)
   comments: Comment[];
 
   @OneToMany(() => Member, (member) => member.projectId)

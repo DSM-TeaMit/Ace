@@ -38,18 +38,17 @@ export class CommentService {
       count: comments[1],
       comments: comments[0].map((comment) => ({
         uuid: comment.uuid,
-        writerId: comment.adminId?.uuid ?? comment.userId?.uuid,
-        writerType: comment.adminId ? 'admin' : 'user',
-        writerName: comment.adminId?.name ?? comment.userId?.name,
-        writerSno: comment.userId?.studentNo,
-        isMine:
-          (comment.adminId?.uuid ?? comment.userId?.uuid) === req.user.userId,
+        writerId: comment.admin?.uuid ?? comment.user?.uuid,
+        writerType: comment.admin ? 'admin' : 'user',
+        writerName: comment.admin?.name ?? comment.user?.name,
+        writerSno: comment.user?.studentNo,
+        isMine: (comment.admin?.uuid ?? comment.user?.uuid) === req.user.userId,
         content: comment.content,
         thumbnailUrl:
-          comment.adminId?.thumbnailUrl ??
-          comment.userId?.thumbnailUrl ??
+          comment.admin?.thumbnailUrl ??
+          comment.user?.thumbnailUrl ??
           undefined,
-        emoji: comment.adminId?.emoji,
+        emoji: comment.admin?.emoji,
       })),
     };
   }
@@ -80,8 +79,8 @@ export class CommentService {
       payload.type.toUpperCase() as 'PROJECT' | 'PLAN' | 'REPORT',
       {
         uuid: v4(),
-        adminId: () => adminId ?? null,
-        userId: () => userId ?? null,
+        admin: () => adminId ?? null,
+        user: () => userId ?? null,
         content: payload.content,
       },
     );
@@ -91,7 +90,7 @@ export class CommentService {
   async deleteComment(param: ProjectParamsDto, req: Request): Promise<void> {
     const comment = await this.commentRepository.findOne(param.uuid);
     if (!comment) throw new NotFoundException();
-    if ((comment.adminId?.uuid ?? comment.userId?.uuid) !== req.user.userId)
+    if ((comment.admin?.uuid ?? comment.user?.uuid) !== req.user.userId)
       throw new ForbiddenException();
 
     await this.commentRepository.delete(param.uuid);
