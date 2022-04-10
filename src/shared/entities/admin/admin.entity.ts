@@ -30,6 +30,9 @@ export class Admin {
   @Column({ length: 1, nullable: true })
   emoji: string;
 
+  @Column({ default: false })
+  deleted: boolean;
+
   @ManyToOne(() => Admin, (admin) => admin.childAccounts)
   parentAccount: Admin;
 
