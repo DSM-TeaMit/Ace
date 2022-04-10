@@ -60,7 +60,7 @@ export class Project {
   @OneToMany(() => Member, (member) => member.project)
   members: Member[];
 
-  @OneToOne(() => Plan, (plan) => plan.projectId)
+  @OneToOne(() => Plan, (plan) => plan.project)
   plan: Plan;
 
   @OneToOne(() => Report, (report) => report.projectId)

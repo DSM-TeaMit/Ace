@@ -186,11 +186,11 @@ export class ProjectService {
         const plan = await this.projectRepository.getPlan(param);
         if (!plan) throw new NotFoundException();
         if (
-          !plan.projectId.status.isPlanSubmitted ||
-          plan.projectId.status.isPlanAccepted
+          !plan.project.status.isPlanSubmitted ||
+          plan.project.status.isPlanAccepted
         )
           throw new ConflictException();
-        projectId = plan.projectId.id;
+        projectId = plan.project.id;
         break;
       case 'report':
         const report = await this.projectRepository.getReport(param);

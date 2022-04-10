@@ -46,17 +46,17 @@ export class PlanService {
     const plan = await this.projectRepository.getPlan(param);
     if (!plan) throw new NotFoundException();
     return {
-      projectName: plan.projectId.projectName,
-      projectType: plan.projectId.projectType,
+      projectName: plan.project.projectName,
+      projectType: plan.project.projectType,
       startDate: plan.startDate,
       endDate: plan.endDate,
-      requestorType: this.projectService.getRequestorType(plan.projectId, req),
-      status: this.projectService.getDocumentStatus(plan.projectId, 'plan'),
+      requestorType: this.projectService.getRequestorType(plan.project, req),
+      status: this.projectService.getDocumentStatus(plan.project, 'plan'),
       writer: {
-        studentNo: plan.projectId.writerId.studentNo,
-        name: plan.projectId.writerId.name,
+        studentNo: plan.project.writerId.studentNo,
+        name: plan.project.writerId.name,
       },
-      members: plan.projectId.members.map((member) => ({
+      members: plan.project.members.map((member) => ({
         studentNo: member.user.studentNo,
         name: member.user.name,
         role: member.role,
@@ -79,19 +79,19 @@ export class PlanService {
   ): Promise<void> {
     const plan = await this.projectRepository.getPlan(param);
     if (!plan) throw new NotFoundException();
-    this.projectService.checkPermission(plan.projectId, req);
+    this.projectService.checkPermission(plan.project, req);
     if (
-      plan.projectId.status.isPlanSubmitted ||
-      plan.projectId.status.isPlanAccepted
+      plan.project.status.isPlanSubmitted ||
+      plan.project.status.isPlanAccepted
     )
       throw new ConflictException();
 
     if (
-      !plan.projectId.status.isPlanSubmitted &&
-      !plan.projectId.status.isPlanAccepted
+      !plan.project.status.isPlanSubmitted &&
+      !plan.project.status.isPlanAccepted
     )
-      await this.projectRepository.setAccepted(plan.projectId.id, 'plan', null);
-    await this.projectRepository.modifyPlan(plan.projectId.id, payload);
+      await this.projectRepository.setAccepted(plan.project.id, 'plan', null);
+    await this.projectRepository.modifyPlan(plan.project.id, payload);
 
     return;
   }
@@ -101,27 +101,23 @@ export class PlanService {
     if (!plan) throw new NotFoundException();
     if (
       !(
-        plan.projectId.members
+        plan.project.members
           ?.map((member) => member.user.uuid)
           .includes(req.user.userId) ?? true
       )
     )
       throw new ForbiddenException();
-    this.projectRepository.deletePlan(plan.projectId.id);
+    this.projectRepository.deletePlan(plan.project.id);
     return;
   }
 
   async submitPlan(req: Request, param: ProjectParamsDto): Promise<void> {
     const plan = await this.projectRepository.getPlan(param);
     if (!plan) throw new NotFoundException();
-    this.projectService.checkPermission(plan.projectId, req);
-    const status = plan.projectId.status;
+    this.projectService.checkPermission(plan.project, req);
+    const status = plan.project.status;
     if (status.isPlanSubmitted) throw new ConflictException();
 
-    await this.projectRepository.updateSubmitted(
-      plan.projectId.id,
-      'plan',
-      true,
-    );
+    await this.projectRepository.updateSubmitted(plan.project.id, 'plan', true);
   }
 }

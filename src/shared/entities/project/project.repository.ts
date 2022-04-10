@@ -281,7 +281,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .insert()
       .into(Plan)
       .values({
-        projectId: () => projectId.toString(),
+        project: () => projectId.toString(),
         goal: payload.goal,
         content: payload.content,
         startDate: payload.startDate,
@@ -299,13 +299,13 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .createQueryBuilder()
       .select('plan')
       .from(Plan, 'plan')
-      .leftJoinAndSelect('plan.projectId', 'project')
+      .leftJoinAndSelect('plan.project', 'project')
       .leftJoinAndSelect('project.writerId', 'writer')
       .leftJoinAndSelect('project.members', 'member')
       .leftJoinAndSelect('project.status', 'status')
       .leftJoinAndSelect('member.user', 'user');
 
-    if (projectId) qb.where('plan.projectId = :projectId', { projectId });
+    if (projectId) qb.where('plan.project = :projectId', { projectId });
     if (uuid)
       qb.where('project.uuid = :uuid', {
         uuid,
@@ -337,7 +337,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .createQueryBuilder()
       .delete()
       .from(Plan, 'plan')
-      .where('plan.projectId = :id', { id })
+      .where('plan.project = :id', { id })
       .execute();
   }
 
