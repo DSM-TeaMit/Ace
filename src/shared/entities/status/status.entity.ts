@@ -8,7 +8,7 @@ export class Status {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  projectId: Project;
+  project: Project;
 
   @Column()
   isPlanSubmitted: boolean;

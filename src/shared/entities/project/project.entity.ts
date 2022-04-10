@@ -66,6 +66,6 @@ export class Project {
   @OneToOne(() => Report, (report) => report.project)
   report: Report;
 
-  @OneToOne(() => Status, (status) => status.projectId)
+  @OneToOne(() => Status, (status) => status.project)
   status: Status;
 }

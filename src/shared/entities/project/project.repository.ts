@@ -68,7 +68,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
         .insert()
         .into(Status)
         .values({
-          projectId: () => projectId.toString(),
+          project: () => projectId.toString(),
           isPlanSubmitted: false,
           isReportSubmitted: false,
         })
