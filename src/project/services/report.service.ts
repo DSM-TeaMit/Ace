@@ -97,7 +97,7 @@ export class ReportService {
     if (
       !(
         report.projectId.members
-          ?.map((member) => member.userId.uuid)
+          ?.map((member) => member.user.uuid)
           .includes(req.user.userId) ?? true
       )
     )

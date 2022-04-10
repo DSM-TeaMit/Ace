@@ -135,9 +135,9 @@ export class UserService {
         thumbnailUrl: project.thumbnailUrl,
         emoji: project.emoji,
         members: project.members.map((member) => ({
-          uuid: member.userId.uuid,
-          name: member.userId.name,
-          thumbnailUrl: member.userId.thumbnailUrl,
+          uuid: member.user.uuid,
+          name: member.user.name,
+          thumbnailUrl: member.user.thumbnailUrl,
         })),
       })),
     };
@@ -171,9 +171,9 @@ export class UserService {
         thumbnailUrl: project.thumbnailUrl,
         emoji: project.emoji,
         members: project.members.map((member) => ({
-          uuid: member.userId.uuid,
-          name: member.userId.name,
-          thumbnailUrl: member.userId.thumbnailUrl,
+          uuid: member.user.uuid,
+          name: member.user.name,
+          thumbnailUrl: member.user.thumbnailUrl,
         })),
       })),
     };

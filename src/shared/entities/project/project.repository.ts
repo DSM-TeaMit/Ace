@@ -158,7 +158,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .select()
       .leftJoinAndSelect('project.members', 'members')
       .leftJoinAndSelect('project.writerId', 'writerId')
-      .leftJoinAndSelect('members.userId', 'userId')
+      .leftJoinAndSelect('members.user', 'user')
       .leftJoinAndSelect('project.status', 'status');
     if (uuid) qb.where('project.uuid = :uuid', { uuid });
     if (id) qb.where('project.id = :id', { id });
@@ -241,7 +241,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       queryBuilderBase
         .addSelect(['userId.name'])
         .leftJoin('project.members', 'members')
-        .leftJoin('members.userId', 'userId')
+        .leftJoin('members.user', 'user')
         .where('userId.name LIKE :keyword', {
           keyword: `%${query.keyword}%`,
         })
@@ -303,7 +303,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .leftJoinAndSelect('project.writerId', 'writer')
       .leftJoinAndSelect('project.members', 'member')
       .leftJoinAndSelect('project.status', 'status')
-      .leftJoinAndSelect('member.userId', 'user');
+      .leftJoinAndSelect('member.user', 'user');
 
     if (projectId) qb.where('plan.projectId = :projectId', { projectId });
     if (uuid)
@@ -365,7 +365,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .leftJoinAndSelect('project.writerId', 'writer')
       .leftJoinAndSelect('project.members', 'member')
       .leftJoinAndSelect('project.status', 'status')
-      .leftJoinAndSelect('member.userId', 'user');
+      .leftJoinAndSelect('member.user', 'user');
 
     if (projectId) qb.where('report.projectId = :projectId', { projectId });
     if (uuid)

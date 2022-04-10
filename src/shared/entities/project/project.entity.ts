@@ -57,7 +57,7 @@ export class Project {
   @OneToMany(() => Comment, (comment) => comment.project)
   comments: Comment[];
 
-  @OneToMany(() => Member, (member) => member.projectId)
+  @OneToMany(() => Member, (member) => member.project)
   members: Member[];
 
   @OneToOne(() => Plan, (plan) => plan.projectId)

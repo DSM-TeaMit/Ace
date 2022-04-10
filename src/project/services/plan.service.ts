@@ -57,8 +57,8 @@ export class PlanService {
         name: plan.projectId.writerId.name,
       },
       members: plan.projectId.members.map((member) => ({
-        studentNo: member.userId.studentNo,
-        name: member.userId.name,
+        studentNo: member.user.studentNo,
+        name: member.user.name,
         role: member.role,
       })),
       goal: plan.goal,
@@ -102,7 +102,7 @@ export class PlanService {
     if (
       !(
         plan.projectId.members
-          ?.map((member) => member.userId.uuid)
+          ?.map((member) => member.user.uuid)
           .includes(req.user.userId) ?? true
       )
     )

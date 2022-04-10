@@ -93,11 +93,11 @@ export class ProjectService {
       emoji: project.emoji,
       requestorType: this.getRequestorType(project, req),
       members: project.members.map((member) => ({
-        uuid: member.userId.uuid,
-        studentNo: member.userId.studentNo,
-        name: member.userId.name,
+        uuid: member.user.uuid,
+        studentNo: member.user.studentNo,
+        name: member.user.name,
         role: member.role,
-        thumbnailUrl: member.userId.thumbnailUrl,
+        thumbnailUrl: member.user.thumbnailUrl,
       })),
     };
   }
@@ -164,7 +164,7 @@ export class ProjectService {
     if (
       !(
         project.members
-          ?.map((member) => member.userId.uuid)
+          ?.map((member) => member.user.uuid)
           .includes(req.user.userId) ?? true
       )
     )
@@ -223,7 +223,7 @@ export class ProjectService {
     if (
       !(
         project.members
-          ?.map((member) => member.userId.uuid)
+          ?.map((member) => member.user.uuid)
           .includes(req.user.userId) ?? true
       )
     )

@@ -39,7 +39,7 @@ export class User {
   @OneToMany(() => Project, (project) => project.writerId)
   projects: Project[];
 
-  @OneToMany(() => Member, (member) => member.userId)
+  @OneToMany(() => Member, (member) => member.user)
   members: Member[];
 
   @OneToMany(() => Comment, (comment) => comment.user)
