@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Project } from 'src/shared/entities/project/project.entity';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { FeedRequestDto } from '../dto/request/feed.dto';
 import {
@@ -37,8 +36,8 @@ export class FeedService {
 
   async search(query: SearchRequestDto): Promise<FeedSearchResponseDto> {
     const projects = await Promise.all([
-      this.projectRepository.search(query),
-      this.projectRepository.searchByMember(query),
+      this.projectRepository.search({ ...query, searchBy: 'projectName' }),
+      this.projectRepository.search({ ...query, searchBy: 'memberName' }),
     ]);
 
     return {
@@ -72,9 +71,7 @@ export class FeedService {
   async searchEach(
     query: SearchTypeRequestDto,
   ): Promise<Partial<FeedSearchResponseDto>> {
-    const projects: [Project[], number] = await this.projectRepository[
-      { projectName: 'search', memberName: 'searchByMember' }[query.searchBy]
-    ](query);
+    const projects = await this.projectRepository.search(query);
 
     return {
       [query.searchBy]: {

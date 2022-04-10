@@ -5,7 +5,7 @@ import { FeedRequestDto } from 'src/project/dto/request/feed.dto';
 import { ModifyPlanRequestDto } from 'src/project/dto/request/modify-plan.dto';
 import { ModifyProjectRequestDto } from 'src/project/dto/request/modify-project.dto';
 import { ModifyReportRequestDto } from 'src/project/dto/request/modify-report.dto';
-import { SearchRequestDto } from 'src/project/dto/request/search.dto';
+import { SearchTypeRequestDto } from 'src/project/dto/request/search.dto';
 import { getRandomEmoji } from 'src/shared/utils/random-emoji';
 import {
   AbstractRepository,
@@ -210,54 +210,66 @@ export class ProjectRepository extends AbstractRepository<Project> {
     return qb.getManyAndCount();
   }
 
-  async search(query: SearchRequestDto) {
-    const qb = this.createQueryBuilder('project')
-      .select()
-      .where('project.projectName LIKE :keyword', {
-        keyword: `%${query.keyword}%`,
-      })
-      .leftJoinAndSelect('project.status', 'status')
+  async search(query: SearchTypeRequestDto): Promise<[Project[], number]> {
+    const queryBuilderBase = this.createQueryBuilder('project')
+      .select([
+        'project.uuid',
+        'project.thumbnailUrl',
+        'project.emoji',
+        'project.projectName',
+        'project.projectType',
+        'project.field',
+        'project.viewCount',
+        'status.isPlanAccepted',
+        'status.isReportAccepted',
+        'project.viewCount',
+        'project.createdAt',
+      ])
+      .leftJoin('project.status', 'status')
       .andWhere('status.isPlanAccepted = true')
       .andWhere('status.isReportAccepted = true')
-      .take(query.limit)
-      .skip(query.limit * (query.page - 1));
-    if (query.order === 'popularity')
-      qb.orderBy('project.viewCount', 'DESC').addOrderBy(
-        'project.createdAt',
-        'DESC',
-      );
-    if (query.order === 'recently')
-      qb.orderBy('project.createdAt', 'DESC').addOrderBy(
-        'project.viewCount',
-        'DESC',
-      );
-    return qb.getManyAndCount();
-  }
+      .addOrderBy('project.viewCount', 'DESC')
+      .addOrderBy('project.createdAt', 'DESC');
 
-  async searchByMember(query: SearchRequestDto) {
-    const qb = this.createQueryBuilder('project')
-      .select()
-      .leftJoinAndSelect('project.members', 'members')
-      .leftJoinAndSelect('members.userId', 'userId')
-      .where('userId.name LIKE :keyword', {
-        keyword: `%${query.keyword}%`,
-      })
-      .leftJoinAndSelect('project.status', 'status')
-      .andWhere('status.isPlanAccepted = true')
-      .andWhere('status.isReportAccepted = true')
-      .take(query.limit)
-      .skip(query.limit * (query.page - 1));
-    if (query.order === 'popularity')
-      qb.orderBy('project.viewCount', 'DESC').addOrderBy(
-        'project.createdAt',
-        'DESC',
-      );
-    if (query.order === 'recently')
-      qb.orderBy('project.createdAt', 'DESC').addOrderBy(
-        'project.viewCount',
-        'DESC',
-      );
-    return qb.getManyAndCount();
+    if (query.searchBy === 'projectName')
+      queryBuilderBase
+        .where('project.projectName LIKE :keyword', {
+          keyword: `%${query.keyword}%`,
+        })
+        .orderBy(`SIMILARITY(project.projectName, '${query.keyword}')`, 'DESC');
+    if (query.searchBy === 'memberName')
+      queryBuilderBase
+        .addSelect(['userId.name'])
+        .leftJoin('project.members', 'members')
+        .leftJoin('members.userId', 'userId')
+        .where('userId.name LIKE :keyword', {
+          keyword: `%${query.keyword}%`,
+        })
+        .orderBy(`SIMILARITY(userId.name, '${query.keyword}')`, 'DESC');
+
+    const [searchQuery, parameters] = queryBuilderBase.getQueryAndParameters();
+    const res = await Promise.all([
+      this.manager.query(
+        `${searchQuery} LIMIT $${parameters.length + 1} ${
+          query.page > 1 ? `OFFSET ${query.limit * (query.page - 1)}` : ''
+        }`,
+        [...parameters, query.limit],
+      ),
+      this.manager.query(`SELECT COUNT(A) FROM (${searchQuery}) A`, parameters),
+    ]);
+    console.log(res);
+    return [
+      res[0].map((project) => ({
+        uuid: project.project_uuid,
+        thumbnailUrl: project.project_thumbnail_url,
+        emoji: project.project_emoji,
+        projectName: project.project_project_name,
+        projectType: project.project_project_type,
+        projectField: project.project_project_field,
+        viewCount: project.project_view_count,
+      })),
+      +res[1][0].count,
+    ];
   }
 
   async createPlan(

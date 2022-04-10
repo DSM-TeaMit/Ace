@@ -1,7 +1,8 @@
+import { OmitType } from '@nestjs/mapped-types';
 import { IsEnum, IsString, Length } from 'class-validator';
 import { FeedRequestDto } from './feed.dto';
 
-export class SearchRequestDto extends FeedRequestDto {
+export class SearchRequestDto extends OmitType(FeedRequestDto, ['order']) {
   @IsString()
   @Length(1)
   keyword: string;
