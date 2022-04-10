@@ -57,8 +57,8 @@ export class ProjectRepository extends AbstractRepository<Project> {
         .into(Member)
         .values(
           members.map((member) => ({
-            projectId: () => projectId.toString(),
-            userId: () => member.id.toString(),
+            project: () => projectId.toString(),
+            user: () => member.id.toString(),
             role: member.role,
           })),
         )
@@ -113,7 +113,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
         .createQueryBuilder()
         .delete()
         .from(Member)
-        .where('projectId = :projectId', { projectId })
+        .where('member.project = :projectId', { projectId })
         .execute();
       await queryRunner.manager
         .createQueryBuilder()
@@ -121,8 +121,8 @@ export class ProjectRepository extends AbstractRepository<Project> {
         .into(Member)
         .values(
           members.map((member) => ({
-            projectId: () => projectId.toString(),
-            userId: () => member.id.toString(),
+            project: () => projectId.toString(),
+            user: () => member.id.toString(),
             role: member.role,
           })),
         )
@@ -328,7 +328,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
         includeOutcome: payload.includes.outcome,
         includeOthers: payload.includes.others,
       })
-      .where('projectId = :id', { id })
+      .where('project = :id', { id })
       .execute();
   }
 
@@ -350,7 +350,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .insert()
       .into(Report)
       .values({
-        projectId: () => projectId.toString(),
+        project: () => projectId.toString(),
         ...payload,
       })
       .execute();
@@ -361,13 +361,13 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .createQueryBuilder()
       .select('report')
       .from(Report, 'report')
-      .leftJoinAndSelect('report.projectId', 'project')
+      .leftJoinAndSelect('report.project', 'project')
       .leftJoinAndSelect('project.writer', 'writer')
       .leftJoinAndSelect('project.members', 'member')
       .leftJoinAndSelect('project.status', 'status')
       .leftJoinAndSelect('member.user', 'user');
 
-    if (projectId) qb.where('report.projectId = :projectId', { projectId });
+    if (projectId) qb.where('report.project = :projectId', { projectId });
     if (uuid)
       qb.where('project.uuid = :uuid', {
         uuid,
@@ -383,7 +383,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .set({
         ...payload,
       })
-      .where('projectId = :id', { id })
+      .where('project = :id', { id })
       .execute();
   }
 
@@ -392,7 +392,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .createQueryBuilder()
       .delete()
       .from(Report, 'report')
-      .where('projectId = :id', { id })
+      .where('project = :id', { id })
       .execute();
   }
 
@@ -400,7 +400,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
     const qb = this.manager
       .createQueryBuilder()
       .update(Status)
-      .where('projectId = :id', { id });
+      .where('project = :id', { id });
 
     if (type === 'plan') {
       if (!value) qb.set({ isPlanSubmitted: value, isPlanAccepted: value });
@@ -418,7 +418,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
     const qb = this.manager
       .createQueryBuilder()
       .update(Status)
-      .where('projectId = :id', { id });
+      .where('project = :id', { id });
 
     if (type === 'plan')
       qb.set({
@@ -444,7 +444,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
     const qb = this.manager
       .createQueryBuilder()
       .update(Status)
-      .where('projectId = :id', { id });
+      .where('project = :id', { id });
 
     if (type === 'plan') qb.set({ isPlanAccepted: value });
     if (type === 'report') qb.set({ isReportAccepted: value });

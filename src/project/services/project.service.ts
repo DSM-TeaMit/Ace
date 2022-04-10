@@ -118,6 +118,7 @@ export class ProjectService {
     payload: ModifyProjectRequestDto,
   ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
     this.checkPermission(project, req);
     await this.projectRepository.modifyProject(project.id, payload);
 
@@ -130,6 +131,7 @@ export class ProjectService {
     payload: ModifyMemberRequestDto,
   ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
     this.checkPermission(project, req);
     if (
       !(
@@ -161,6 +163,7 @@ export class ProjectService {
 
   async deleteProject(req: Request, param: ProjectParamsDto): Promise<void> {
     const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
     if (
       !(
         project.members
@@ -196,11 +199,11 @@ export class ProjectService {
         const report = await this.projectRepository.getReport(param);
         if (!report) throw new NotFoundException();
         if (
-          !report.projectId.status.isReportSubmitted ||
-          report.projectId.status.isReportAccepted
+          !report.project.status.isReportSubmitted ||
+          report.project.status.isReportAccepted
         )
           throw new ConflictException();
-        projectId = report.projectId.id;
+        projectId = report.project.id;
         break;
     }
 

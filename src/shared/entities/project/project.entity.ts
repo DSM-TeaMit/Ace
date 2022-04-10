@@ -63,7 +63,7 @@ export class Project {
   @OneToOne(() => Plan, (plan) => plan.project)
   plan: Plan;
 
-  @OneToOne(() => Report, (report) => report.projectId)
+  @OneToOne(() => Report, (report) => report.project)
   report: Report;
 
   @OneToOne(() => Status, (status) => status.projectId)
