@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -20,6 +21,7 @@ export class Project {
   id: number;
 
   @Column({ length: 36 })
+  @Index()
   uuid: string;
 
   @Column({ length: 45 })
