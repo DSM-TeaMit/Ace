@@ -156,7 +156,7 @@ export class UserRepository extends AbstractRepository<User> {
     [
       {
         uuid: string;
-        projectname: string;
+        name: string;
         thumbnailurl?: string;
         emoji: string;
         type: 'plan' | 'report';
@@ -170,7 +170,7 @@ export class UserRepository extends AbstractRepository<User> {
       .select([
         'project.id AS id',
         'project.uuid AS uuid',
-        'project.projectName AS projectName',
+        'project.name AS projectName',
         'project.thumbnailUrl AS thumbnailUrl',
         'project.emoji AS emoji',
       ])

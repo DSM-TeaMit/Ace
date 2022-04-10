@@ -43,11 +43,11 @@ export class ProjectRepository extends AbstractRepository<Project> {
           .into(Project)
           .values({
             uuid: uuid,
-            projectName: payload.name,
-            projectType: payload.type,
+            name: payload.name,
+            type: payload.type,
             field: payload.field,
             emoji: getRandomEmoji(),
-            writerId: () => writerId.toString(),
+            writer: () => writerId.toString(),
           })
           .execute()
       ).identifiers[0].id;
@@ -90,8 +90,8 @@ export class ProjectRepository extends AbstractRepository<Project> {
     return this.createQueryBuilder('project')
       .update(Project)
       .set({
-        projectName: payload.name,
-        projectDescription: payload.description,
+        name: payload.name,
+        description: payload.description,
         field: payload.field,
       })
       .where('project.id = :projectId', { projectId })
@@ -157,7 +157,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
     const qb = this.createQueryBuilder('project')
       .select()
       .leftJoinAndSelect('project.members', 'members')
-      .leftJoinAndSelect('project.writerId', 'writerId')
+      .leftJoinAndSelect('project.writer', 'writer')
       .leftJoinAndSelect('members.user', 'user')
       .leftJoinAndSelect('project.status', 'status');
     if (uuid) qb.where('project.uuid = :uuid', { uuid });
@@ -216,8 +216,8 @@ export class ProjectRepository extends AbstractRepository<Project> {
         'project.uuid',
         'project.thumbnailUrl',
         'project.emoji',
-        'project.projectName',
-        'project.projectType',
+        'project.name',
+        'project.type',
         'project.field',
         'project.viewCount',
         'status.isPlanAccepted',
@@ -233,19 +233,19 @@ export class ProjectRepository extends AbstractRepository<Project> {
 
     if (query.searchBy === 'projectName')
       queryBuilderBase
-        .where('project.projectName LIKE :keyword', {
+        .where('project.name LIKE :keyword', {
           keyword: `%${query.keyword}%`,
         })
-        .orderBy(`SIMILARITY(project.projectName, '${query.keyword}')`, 'DESC');
+        .orderBy(`SIMILARITY(project.name, '${query.keyword}')`, 'DESC');
     if (query.searchBy === 'memberName')
       queryBuilderBase
-        .addSelect(['userId.name'])
+        .addSelect(['user.name'])
         .leftJoin('project.members', 'members')
         .leftJoin('members.user', 'user')
-        .where('userId.name LIKE :keyword', {
+        .where('user.name LIKE :keyword', {
           keyword: `%${query.keyword}%`,
         })
-        .orderBy(`SIMILARITY(userId.name, '${query.keyword}')`, 'DESC');
+        .orderBy(`SIMILARITY(user.name, '${query.keyword}')`, 'DESC');
 
     const [searchQuery, parameters] = queryBuilderBase.getQueryAndParameters();
     const res = await Promise.all([
@@ -263,9 +263,9 @@ export class ProjectRepository extends AbstractRepository<Project> {
         uuid: project.project_uuid,
         thumbnailUrl: project.project_thumbnail_url,
         emoji: project.project_emoji,
-        projectName: project.project_project_name,
-        projectType: project.project_project_type,
-        projectField: project.project_project_field,
+        projectName: project.project_name,
+        projectType: project.project_type,
+        projectField: project.project_field,
         viewCount: project.project_view_count,
       })),
       +res[1][0].count,
@@ -300,7 +300,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .select('plan')
       .from(Plan, 'plan')
       .leftJoinAndSelect('plan.project', 'project')
-      .leftJoinAndSelect('project.writerId', 'writer')
+      .leftJoinAndSelect('project.writer', 'writer')
       .leftJoinAndSelect('project.members', 'member')
       .leftJoinAndSelect('project.status', 'status')
       .leftJoinAndSelect('member.user', 'user');
@@ -362,7 +362,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       .select('report')
       .from(Report, 'report')
       .leftJoinAndSelect('report.projectId', 'project')
-      .leftJoinAndSelect('project.writerId', 'writer')
+      .leftJoinAndSelect('project.writer', 'writer')
       .leftJoinAndSelect('project.members', 'member')
       .leftJoinAndSelect('project.status', 'status')
       .leftJoinAndSelect('member.user', 'user');
@@ -456,7 +456,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
     return this.createQueryBuilder('project')
       .select()
       .leftJoinAndSelect('project.status', 'status')
-      .leftJoinAndSelect('project.writerId', 'writerId')
+      .leftJoinAndSelect('project.writer', 'writer')
       .where(
         new Brackets((qb) => {
           qb.where('status.isPlanSubmitted = true').andWhere(

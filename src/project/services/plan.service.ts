@@ -46,15 +46,15 @@ export class PlanService {
     const plan = await this.projectRepository.getPlan(param);
     if (!plan) throw new NotFoundException();
     return {
-      projectName: plan.project.projectName,
-      projectType: plan.project.projectType,
+      projectName: plan.project.name,
+      projectType: plan.project.type,
       startDate: plan.startDate,
       endDate: plan.endDate,
       requestorType: this.projectService.getRequestorType(plan.project, req),
       status: this.projectService.getDocumentStatus(plan.project, 'plan'),
       writer: {
-        studentNo: plan.project.writerId.studentNo,
-        name: plan.project.writerId.name,
+        studentNo: plan.project.writer.studentNo,
+        name: plan.project.writer.name,
       },
       members: plan.project.members.map((member) => ({
         studentNo: member.user.studentNo,

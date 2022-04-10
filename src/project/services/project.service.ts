@@ -82,13 +82,13 @@ export class ProjectService {
     const status = this.mapProjectStatus(project.status);
     return {
       uuid: project.uuid,
-      projectName: project.projectName,
-      projectDescription: project.projectDescription,
+      projectName: project.name,
+      projectDescription: project.description,
       projectView: project.viewCount,
-      projectType: project.projectType,
+      projectType: project.type,
       projectField: project.field,
       projectStatus: status,
-      projectResult: project.projectResult,
+      projectResult: project.result,
       thumbnailUrl: project.thumbnailUrl,
       emoji: project.emoji,
       requestorType: this.getRequestorType(project, req),
@@ -140,7 +140,7 @@ export class ProjectService {
     )
       throw new UnprocessableEntityException();
 
-    if (project.projectType === 'PERS' && payload.members.length > 1)
+    if (project.type === 'PERS' && payload.members.length > 1)
       throw new BadRequestException();
     const members: {
       id: number;

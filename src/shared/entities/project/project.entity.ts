@@ -25,16 +25,16 @@ export class Project {
   uuid: string;
 
   @Column({ length: 45 })
-  projectName: string;
+  name: string;
 
   @Column({ length: 250, nullable: true })
-  projectDescription?: string;
+  description?: string;
 
   @Column({ length: 250, nullable: true })
-  projectResult?: string;
+  result?: string;
 
   @Column({ type: 'enum', enum: ['PERS', 'TEAM', 'CLUB'] })
-  projectType: 'PERS' | 'TEAM' | 'CLUB';
+  type: 'PERS' | 'TEAM' | 'CLUB';
 
   @Column({ default: 0 })
   viewCount: number;
@@ -52,7 +52,7 @@ export class Project {
   createdAt: Date;
 
   @ManyToOne(() => User, (user) => user.projects, { nullable: false })
-  writerId: User;
+  writer: User;
 
   @OneToMany(() => Comment, (comment) => comment.project)
   comments: Comment[];

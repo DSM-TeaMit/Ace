@@ -36,7 +36,7 @@ export class User {
   @Column({ default: false })
   deleted: boolean;
 
-  @OneToMany(() => Project, (project) => project.writerId)
+  @OneToMany(() => Project, (project) => project.writer)
   projects: Project[];
 
   @OneToMany(() => Member, (member) => member.user)
