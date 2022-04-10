@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -13,6 +14,7 @@ export class Admin {
   id: number;
 
   @Column({ length: 36 })
+  @Index({ where: '"deleted" != true' })
   uuid: string;
 
   @Column({ length: 16 })
