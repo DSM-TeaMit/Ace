@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -20,19 +21,20 @@ export class Project {
   id: number;
 
   @Column({ length: 36 })
+  @Index()
   uuid: string;
 
   @Column({ length: 45 })
-  projectName: string;
+  name: string;
 
   @Column({ length: 250, nullable: true })
-  projectDescription?: string;
+  description?: string;
 
   @Column({ length: 250, nullable: true })
-  projectResult?: string;
+  result?: string;
 
   @Column({ type: 'enum', enum: ['PERS', 'TEAM', 'CLUB'] })
-  projectType: 'PERS' | 'TEAM' | 'CLUB';
+  type: 'PERS' | 'TEAM' | 'CLUB';
 
   @Column({ default: 0 })
   viewCount: number;
@@ -50,20 +52,20 @@ export class Project {
   createdAt: Date;
 
   @ManyToOne(() => User, (user) => user.projects, { nullable: false })
-  writerId: User;
+  writer: User;
 
-  @OneToMany(() => Comment, (comment) => comment.projectId)
+  @OneToMany(() => Comment, (comment) => comment.project)
   comments: Comment[];
 
-  @OneToMany(() => Member, (member) => member.projectId)
+  @OneToMany(() => Member, (member) => member.project)
   members: Member[];
 
-  @OneToOne(() => Plan, (plan) => plan.projectId)
+  @OneToOne(() => Plan, (plan) => plan.project)
   plan: Plan;
 
-  @OneToOne(() => Report, (report) => report.projectId)
+  @OneToOne(() => Report, (report) => report.project)
   report: Report;
 
-  @OneToOne(() => Status, (status) => status.projectId)
+  @OneToOne(() => Status, (status) => status.project)
   status: Status;
 }

@@ -14,7 +14,7 @@ export class Plan {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  projectId: Project;
+  project: Project;
 
   @Column({ length: 4000 })
   goal: string;

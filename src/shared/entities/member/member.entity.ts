@@ -8,10 +8,10 @@ export class Member {
     primary: true,
     onDelete: 'CASCADE',
   })
-  projectId: Project;
+  project: Project;
 
   @ManyToOne(() => User, (user) => user.members, { primary: true })
-  userId: User;
+  user: User;
 
   @Column({ length: 20 })
   role: string;

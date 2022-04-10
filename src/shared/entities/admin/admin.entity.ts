@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -13,6 +14,7 @@ export class Admin {
   id: number;
 
   @Column({ length: 36 })
+  @Index({ where: '"deleted" != true' })
   uuid: string;
 
   @Column({ length: 16 })
@@ -30,12 +32,15 @@ export class Admin {
   @Column({ length: 1, nullable: true })
   emoji: string;
 
+  @Column({ default: false })
+  deleted: boolean;
+
   @ManyToOne(() => Admin, (admin) => admin.childAccounts)
   parentAccount: Admin;
 
   @OneToMany(() => Admin, (admin) => admin.parentAccount)
   childAccounts: Admin[];
 
-  @OneToMany(() => Comment, (comment) => comment.adminId)
+  @OneToMany(() => Comment, (comment) => comment.admin)
   comments: Comment[];
 }

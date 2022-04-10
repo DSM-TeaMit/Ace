@@ -7,9 +7,9 @@ export class CommentRepository extends AbstractRepository<Comment> {
   async findMany(projectId: number, type: 'PROJECT' | 'PLAN' | 'REPORT') {
     return this.createQueryBuilder('comment')
       .select()
-      .leftJoinAndSelect('comment.adminId', 'adminId')
-      .leftJoinAndSelect('comment.userId', 'userId')
-      .where('comment.projectId = :projectId', { projectId })
+      .leftJoinAndSelect('comment.admin', 'admin')
+      .leftJoinAndSelect('comment.user', 'user')
+      .where('comment.project = :projectId', { projectId })
       .andWhere('comment.type = :type', { type })
       .getManyAndCount();
   }
@@ -23,7 +23,7 @@ export class CommentRepository extends AbstractRepository<Comment> {
       .insert()
       .values({
         ...payload,
-        projectId: () => projectId.toString(),
+        project: () => projectId.toString(),
         type,
       })
       .execute();
@@ -33,8 +33,8 @@ export class CommentRepository extends AbstractRepository<Comment> {
     return this.createQueryBuilder('comment')
       .select()
       .where('comment.uuid = :uuid', { uuid })
-      .leftJoinAndSelect('comment.adminId', 'admin')
-      .leftJoinAndSelect('comment.userId', 'user')
+      .leftJoinAndSelect('comment.admin', 'admin')
+      .leftJoinAndSelect('comment.user', 'user')
       .getOne();
   }
 

@@ -65,8 +65,8 @@ export class UserRepository extends AbstractRepository<User> {
       .createQueryBuilder()
       .select('1')
       .from(Member, 'member')
-      .where('project.id = member.projectId')
-      .andWhere('member.userId = :userId');
+      .where('project.id = member.project')
+      .andWhere('member.user = :userId');
 
     const qb = this.manager
       .createQueryBuilder(Project, 'project')
@@ -87,7 +87,7 @@ export class UserRepository extends AbstractRepository<User> {
       .select('project')
       .from(Project, 'project')
       .leftJoinAndSelect('project.members', 'members')
-      .leftJoinAndSelect('members.userId', 'userId')
+      .leftJoinAndSelect('members.user', 'user')
       .orderBy('project.createdAt', 'DESC')
       .where('project.id IN (:...ids)', {
         ids: projects[0].map((project) => project.id),
@@ -141,7 +141,7 @@ export class UserRepository extends AbstractRepository<User> {
         }),
       )
       .take(4);
-    if (userId) qb.andWhere('members.userId = :userId', { userId });
+    if (userId) qb.andWhere('members.user = :userId', { userId });
 
     return qb.getManyAndCount();
   }
@@ -156,7 +156,7 @@ export class UserRepository extends AbstractRepository<User> {
     [
       {
         uuid: string;
-        projectname: string;
+        name: string;
         thumbnailurl?: string;
         emoji: string;
         type: 'plan' | 'report';
@@ -170,14 +170,14 @@ export class UserRepository extends AbstractRepository<User> {
       .select([
         'project.id AS id',
         'project.uuid AS uuid',
-        'project.projectName AS projectName',
+        'project.name AS projectName',
         'project.thumbnailUrl AS thumbnailUrl',
         'project.emoji AS emoji',
       ])
       .from(Project, 'project')
       .leftJoin('project.status', 'status')
       .leftJoin('project.members', 'members')
-      .where('members.userId = :userId', { userId })
+      .where('members.user = :userId', { userId })
       .take(limit)
       .skip(limit * (page - 1));
 

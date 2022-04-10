@@ -18,16 +18,16 @@ export class Comment {
     nullable: false,
     onDelete: 'CASCADE',
   })
-  projectId: Project;
+  project: Project;
 
   @Column({ length: 36 })
   uuid: string;
 
   @ManyToOne(() => Admin, (admin) => admin.comments, { nullable: true })
-  adminId: Admin;
+  admin: Admin;
 
   @ManyToOne(() => User, (user) => user.comments, { nullable: true })
-  userId: User;
+  user: User;
 
   @Column({ type: 'enum', enum: ['PROJECT', 'PLAN', 'REPORT'] })
   type: 'PROJECT' | 'PLAN' | 'REPORT';

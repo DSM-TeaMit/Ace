@@ -1,4 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Comment } from '../comment/comment.entity';
 import { Member } from '../member/member.entity';
 import { Project } from '../project/project.entity';
@@ -9,6 +15,7 @@ export class User {
   id: number;
 
   @Column({ length: 36 })
+  @Index({ where: '"deleted" = false' })
   uuid: string;
 
   @Column({ length: 40, unique: true })
@@ -29,12 +36,12 @@ export class User {
   @Column({ default: false })
   deleted: boolean;
 
-  @OneToMany(() => Project, (project) => project.writerId)
+  @OneToMany(() => Project, (project) => project.writer)
   projects: Project[];
 
-  @OneToMany(() => Member, (member) => member.userId)
+  @OneToMany(() => Member, (member) => member.user)
   members: Member[];
 
-  @OneToMany(() => Comment, (comment) => comment.userId)
+  @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 }

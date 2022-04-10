@@ -109,7 +109,7 @@ export class UserService {
           })();
           return {
             uuid: project.uuid,
-            projectName: project.projectName,
+            projectName: project.name,
             thumbnailUrl: project.thumbnailUrl,
             emoji: project.emoji,
             type,
@@ -128,16 +128,16 @@ export class UserService {
       projectCount: projects[1],
       projects: projects[0].map((project) => ({
         uuid: project.uuid,
-        projectName: project.projectName,
-        projectDescription: project.projectDescription,
-        projectType: project.projectType,
+        projectName: project.name,
+        projectDescription: project.description,
+        projectType: project.type,
         fields: project.field,
         thumbnailUrl: project.thumbnailUrl,
         emoji: project.emoji,
         members: project.members.map((member) => ({
-          uuid: member.userId.uuid,
-          name: member.userId.name,
-          thumbnailUrl: member.userId.thumbnailUrl,
+          uuid: member.user.uuid,
+          name: member.user.name,
+          thumbnailUrl: member.user.thumbnailUrl,
         })),
       })),
     };
@@ -164,16 +164,16 @@ export class UserService {
       count: projects[1],
       projects: projects[0].map((project) => ({
         uuid: project.uuid,
-        projectName: project.projectName,
-        projectDescription: project.projectDescription,
-        projectType: project.projectType,
+        projectName: project.name,
+        projectDescription: project.description,
+        projectType: project.type,
         fields: project.field,
         thumbnailUrl: project.thumbnailUrl,
         emoji: project.emoji,
         members: project.members.map((member) => ({
-          uuid: member.userId.uuid,
-          name: member.userId.name,
-          thumbnailUrl: member.userId.thumbnailUrl,
+          uuid: member.user.uuid,
+          name: member.user.name,
+          thumbnailUrl: member.user.thumbnailUrl,
         })),
       })),
     };
@@ -225,7 +225,7 @@ export class UserService {
       projects: res[0].map((project) => {
         return {
           uuid: project.uuid,
-          projectName: project.projectname,
+          projectName: project.name,
           thumbnailUrl: project.thumbnailurl,
           emoji: project.emoji,
           type: project.type,
@@ -269,7 +269,7 @@ export class UserService {
         projects: projects[0].map((project) => {
           return {
             uuid: project.uuid,
-            projectName: project.projectname,
+            projectName: project.name,
             thumbnailUrl: project.thumbnailurl,
             emoji: project.emoji,
             type: project.type,

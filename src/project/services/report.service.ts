@@ -47,17 +47,14 @@ export class ReportService {
     const report = await this.projectRepository.getReport(param);
     if (!report) throw new NotFoundException();
     return {
-      projectName: report.projectId.projectName,
-      projectType: report.projectId.projectType,
-      requestorType: this.projectService.getRequestorType(
-        report.projectId,
-        req,
-      ),
-      status: this.projectService.getDocumentStatus(report.projectId, 'report'),
+      projectName: report.project.name,
+      projectType: report.project.type,
+      requestorType: this.projectService.getRequestorType(report.project, req),
+      status: this.projectService.getDocumentStatus(report.project, 'report'),
       subject: report.subject,
       writer: {
-        studentNo: report.projectId.writerId.studentNo,
-        name: report.projectId.writerId.name,
+        studentNo: report.project.writer.studentNo,
+        name: report.project.writer.name,
       },
       content: report.content,
     };
@@ -70,23 +67,23 @@ export class ReportService {
   ): Promise<void> {
     const report = await this.projectRepository.getReport(param);
     if (!report) throw new NotFoundException();
-    this.projectService.checkPermission(report.projectId, req);
+    this.projectService.checkPermission(report.project, req);
     if (
-      report.projectId.status.isReportSubmitted ||
-      report.projectId.status.isReportAccepted
+      report.project.status.isReportSubmitted ||
+      report.project.status.isReportAccepted
     )
       throw new ConflictException();
 
     if (
-      !report.projectId.status.isReportSubmitted &&
-      !report.projectId.status.isReportAccepted
+      !report.project.status.isReportSubmitted &&
+      !report.project.status.isReportAccepted
     )
       await this.projectRepository.setAccepted(
-        report.projectId.id,
+        report.project.id,
         'report',
         null,
       );
-    await this.projectRepository.modifyReport(report.projectId.id, payload);
+    await this.projectRepository.modifyReport(report.project.id, payload);
 
     return;
   }
@@ -96,25 +93,25 @@ export class ReportService {
     if (!report) throw new NotFoundException();
     if (
       !(
-        report.projectId.members
-          ?.map((member) => member.userId.uuid)
+        report.project.members
+          ?.map((member) => member.user.uuid)
           .includes(req.user.userId) ?? true
       )
     )
       throw new ForbiddenException();
-    this.projectRepository.deleteReport(report.projectId.id);
+    this.projectRepository.deleteReport(report.project.id);
     return;
   }
 
   async submitReport(req: Request, param: ProjectParamsDto) {
     const report = await this.projectRepository.getReport(param);
     if (!report) throw new NotFoundException();
-    this.projectService.checkPermission(report.projectId, req);
-    const status = report.projectId.status;
+    this.projectService.checkPermission(report.project, req);
+    const status = report.project.status;
     if (status.isReportSubmitted) throw new ConflictException();
 
     await this.projectRepository.updateSubmitted(
-      report.projectId.id,
+      report.project.id,
       'report',
       true,
     );

@@ -14,7 +14,7 @@ export class Report {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  projectId: Project;
+  project: Project;
 
   @Column({ length: 40 })
   subject: string;

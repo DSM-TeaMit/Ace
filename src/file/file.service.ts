@@ -145,7 +145,7 @@ export class FileService {
     if (!fileInfo) throw new NotFoundException();
 
     const projectType = (() => {
-      switch (project.projectType) {
+      switch (project.type) {
         case 'PERS':
           return '개인';
         case 'TEAM':
@@ -155,9 +155,9 @@ export class FileService {
       }
     })();
 
-    const filename = `[${projectType}] ${project.projectName} - ${
-      project.writerId.studentNo
-    } ${project.writerId.name}${extname(s3Filename)}`;
+    const filename = `[${projectType}] ${project.name} - ${
+      project.writer.studentNo
+    } ${project.writer.name}${extname(s3Filename)}`;
     req.res.set({
       'Content-Type': 'application/octet-stream; charset=utf-8',
       'Content-Disposition': `'attachment; filename="${encodeURI(filename)}"`,

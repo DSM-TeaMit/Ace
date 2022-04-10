@@ -82,22 +82,22 @@ export class ProjectService {
     const status = this.mapProjectStatus(project.status);
     return {
       uuid: project.uuid,
-      projectName: project.projectName,
-      projectDescription: project.projectDescription,
+      projectName: project.name,
+      projectDescription: project.description,
       projectView: project.viewCount,
-      projectType: project.projectType,
+      projectType: project.type,
       projectField: project.field,
       projectStatus: status,
-      projectResult: project.projectResult,
+      projectResult: project.result,
       thumbnailUrl: project.thumbnailUrl,
       emoji: project.emoji,
       requestorType: this.getRequestorType(project, req),
       members: project.members.map((member) => ({
-        uuid: member.userId.uuid,
-        studentNo: member.userId.studentNo,
-        name: member.userId.name,
+        uuid: member.user.uuid,
+        studentNo: member.user.studentNo,
+        name: member.user.name,
         role: member.role,
-        thumbnailUrl: member.userId.thumbnailUrl,
+        thumbnailUrl: member.user.thumbnailUrl,
       })),
     };
   }
@@ -118,6 +118,7 @@ export class ProjectService {
     payload: ModifyProjectRequestDto,
   ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
     this.checkPermission(project, req);
     await this.projectRepository.modifyProject(project.id, payload);
 
@@ -130,6 +131,7 @@ export class ProjectService {
     payload: ModifyMemberRequestDto,
   ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
     this.checkPermission(project, req);
     if (
       !(
@@ -140,7 +142,7 @@ export class ProjectService {
     )
       throw new UnprocessableEntityException();
 
-    if (project.projectType === 'PERS' && payload.members.length > 1)
+    if (project.type === 'PERS' && payload.members.length > 1)
       throw new BadRequestException();
     const members: {
       id: number;
@@ -161,10 +163,11 @@ export class ProjectService {
 
   async deleteProject(req: Request, param: ProjectParamsDto): Promise<void> {
     const project = await this.projectRepository.findOne(param);
+    if (!project) throw new NotFoundException();
     if (
       !(
         project.members
-          ?.map((member) => member.userId.uuid)
+          ?.map((member) => member.user.uuid)
           .includes(req.user.userId) ?? true
       )
     )
@@ -186,21 +189,21 @@ export class ProjectService {
         const plan = await this.projectRepository.getPlan(param);
         if (!plan) throw new NotFoundException();
         if (
-          !plan.projectId.status.isPlanSubmitted ||
-          plan.projectId.status.isPlanAccepted
+          !plan.project.status.isPlanSubmitted ||
+          plan.project.status.isPlanAccepted
         )
           throw new ConflictException();
-        projectId = plan.projectId.id;
+        projectId = plan.project.id;
         break;
       case 'report':
         const report = await this.projectRepository.getReport(param);
         if (!report) throw new NotFoundException();
         if (
-          !report.projectId.status.isReportSubmitted ||
-          report.projectId.status.isReportAccepted
+          !report.project.status.isReportSubmitted ||
+          report.project.status.isReportAccepted
         )
           throw new ConflictException();
-        projectId = report.projectId.id;
+        projectId = report.project.id;
         break;
     }
 
@@ -223,7 +226,7 @@ export class ProjectService {
     if (
       !(
         project.members
-          ?.map((member) => member.userId.uuid)
+          ?.map((member) => member.user.uuid)
           .includes(req.user.userId) ?? true
       )
     )
