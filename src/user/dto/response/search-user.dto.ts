@@ -3,6 +3,7 @@ export interface SearchUserDto {
 }
 
 interface Student {
+  uuid: string;
   studentNo: number;
   name: string;
 }
