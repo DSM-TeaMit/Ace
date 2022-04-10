@@ -301,6 +301,7 @@ export class UserService {
   async searchUser(query: SearchUserRequestQueryDto): Promise<SearchUserDto> {
     return {
       students: (await this.userRepository.searchUser(query)).map((user) => ({
+        uuid: user.uuid,
         studentNo: user.studentNo,
         name: user.name,
       })),
