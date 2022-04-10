@@ -223,7 +223,7 @@ export class UserRepository extends AbstractRepository<User> {
       .getQueryAndParameters();
 
     const parameters = [...planQuery[1], limit];
-    if (page > 1) parameters.push([limit * (page - 1)]);
+    if (page > 1) parameters.push(limit * (page - 1));
     const res = await Promise.all([
       this.manager.query(
         `((${planQuery[0]}) UNION (${
