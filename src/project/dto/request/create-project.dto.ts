@@ -28,6 +28,10 @@ export class CreateProjectRequestDto {
   @IsEnum(['PERS', 'TEAM', 'CLUB'])
   type: 'PERS' | 'TEAM' | 'CLUB';
 
+  @IsString()
+  @Length(1, 20)
+  role: string;
+
   @ValidateNested()
   @Type(() => Member)
   members: Member[];
