@@ -122,6 +122,7 @@ export class UserService {
       studentNo: user.studentNo,
       name: user.name,
       email: user.email,
+      thumbnailUrl: user.thumbnailUrl,
       githubId: user.githubId,
       pendingCount: pendingProjects?.length,
       pendingProjects: pendingProjects,
