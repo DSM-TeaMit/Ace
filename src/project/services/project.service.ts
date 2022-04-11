@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -157,7 +158,8 @@ export class ProjectService {
         role: member.role,
       });
     }
-    await this.projectRepository.modifyMember(project.id, members);
+    if (!(await this.projectRepository.modifyMember(project.id, members)))
+      throw new InternalServerErrorException();
 
     return;
   }
