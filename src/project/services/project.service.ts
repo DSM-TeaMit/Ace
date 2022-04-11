@@ -43,6 +43,8 @@ export class ProjectService {
       throw new UnprocessableEntityException();
     if (payload.type === 'PERS' && payload.members.length > 0)
       throw new BadRequestException();
+    if (payload.type !== 'PERS' && payload.members.length < 1)
+      throw new BadRequestException();
     const members: {
       id: number;
       role: string;
@@ -134,6 +136,10 @@ export class ProjectService {
   ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
+    if (project.type === 'PERS' && payload.members.length > 0)
+      throw new BadRequestException();
+    if (project.type !== 'PERS' && payload.members.length < 1)
+      throw new BadRequestException();
     this.checkPermission(project, req);
     if (
       !(
@@ -143,9 +149,6 @@ export class ProjectService {
       )
     )
       throw new UnprocessableEntityException();
-
-    if (project.type === 'PERS' && payload.members.length > 1)
-      throw new BadRequestException();
     const members: {
       id: number;
       role: string;
