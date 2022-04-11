@@ -3,6 +3,7 @@ export interface ProfileMainResponseDto {
   name: string;
   email: string;
   githubId?: string;
+  thumbnailUrl: string;
   pendingCount: number;
   pendingProjects?: PendingProject[];
   projectCount: number;

@@ -35,6 +35,6 @@ export class JwtRegistrationStrategy extends PassportStrategy(
 
   async validate(payload: JwtPayload) {
     if (!payload.registrationOnly) throw new ForbiddenException();
-    return { email: payload.sub, role: payload.role };
+    return { email: payload.sub, role: payload.role, picture: payload.picture };
   }
 }
