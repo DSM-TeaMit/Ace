@@ -1,6 +1,5 @@
 import {
   ConflictException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -91,14 +90,7 @@ export class ReportService {
   async deleteReport(req: Request, param: ProjectParamsDto) {
     const report = await this.projectRepository.getReport(param);
     if (!report) throw new NotFoundException();
-    if (
-      !(
-        report.project.members
-          ?.map((member) => member.user.uuid)
-          .includes(req.user.userId) ?? true
-      )
-    )
-      throw new ForbiddenException();
+    this.projectService.checkPermission(report.project, req);
     this.projectRepository.deleteReport(report.project.id);
     return;
   }

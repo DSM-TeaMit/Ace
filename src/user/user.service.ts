@@ -296,6 +296,7 @@ export class UserService {
 
   async deleteUser(req: Request): Promise<void> {
     await this.userRepository.deleteUser(req.user.userId);
+    await this.cacheManager.set(req.user.userId, 'DELETED', { ttl: 86400 });
     return;
   }
 
