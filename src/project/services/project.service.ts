@@ -38,30 +38,31 @@ export class ProjectService {
     req: Request,
     payload: CreateProjectRequestDto,
   ): Promise<CreateProjectResponseDto> {
-    if (!payload.members.map((member) => member.uuid).includes(req.user.userId))
+    if (payload.members.map((member) => member.uuid).includes(req.user.userId))
       throw new UnprocessableEntityException();
-    if (payload.type === 'PERS' && payload.members.length > 1)
+    if (payload.type === 'PERS' && payload.members.length > 0)
       throw new BadRequestException();
     const members: {
       id: number;
       role: string;
     }[] = [];
-    let writer: User = undefined;
+    const writerId = (await this.userRepository.findOneByUuid(req.user.userId))
+      .id;
     for await (const member of payload.members) {
       const user = await this.userRepository.findOneByUuid(member.uuid);
       if (!user) throw new NotFoundException();
-      if (member.uuid === req.user.userId) writer = user;
       members.push({
         id: user.id,
         role: member.role,
       });
     }
+    members.push({ id: writerId, role: payload.role });
 
     return {
       uuid: await this.projectRepository.createProject(
         payload,
         members,
-        writer.id,
+        writerId,
       ),
     };
   }
