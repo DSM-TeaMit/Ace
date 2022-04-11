@@ -113,7 +113,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
         .createQueryBuilder()
         .delete()
         .from(Member)
-        .where('member.project = :projectId', { projectId })
+        .where('project = :projectId', { projectId })
         .execute();
       await queryRunner.manager
         .createQueryBuilder()
