@@ -150,6 +150,8 @@ export class ProjectService {
       id: number;
       role: string;
     }[] = [];
+    const writerId = (await this.userRepository.findOneByUuid(req.user.userId))
+      .id;
     for await (const member of payload.members) {
       const user = await this.userRepository.findOneByUuid(member.uuid);
       if (!user) throw new NotFoundException();
@@ -158,6 +160,7 @@ export class ProjectService {
         role: member.role,
       });
     }
+    members.push({ id: writerId, role: payload.role });
     if (!(await this.projectRepository.modifyMember(project.id, members)))
       throw new InternalServerErrorException();
 
