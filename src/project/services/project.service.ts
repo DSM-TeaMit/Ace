@@ -141,13 +141,7 @@ export class ProjectService {
     if (project.type !== 'PERS' && payload.members.length < 1)
       throw new BadRequestException();
     this.checkPermission(project, req);
-    if (
-      !(
-        payload.members
-          ?.map((member) => member.uuid)
-          .includes(req.user.userId) ?? true
-      )
-    )
+    if (payload.members.map((member) => member.uuid).includes(req.user.userId))
       throw new UnprocessableEntityException();
     const members: {
       id: number;
