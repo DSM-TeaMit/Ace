@@ -51,8 +51,10 @@ export class AuthService {
     const refreshToken = isUserExist
       ? this.jwtService.sign(payload, { expiresIn: '7d' })
       : undefined;
-    if (refreshToken)
+    if (refreshToken) {
+      await this.cacheManager.del(refreshToken);
       await this.cacheManager.set(refreshToken, user.uuid, { ttl: 604800 });
+    }
     return {
       type: isUserExist ? 'login' : 'registration',
       uuid: isUserExist ? user.uuid : undefined,
