@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   IsEnum,
+  IsNotEmpty,
   IsString,
   IsUUID,
   Length,
@@ -28,6 +29,11 @@ export class CreateProjectRequestDto {
   @IsEnum(['PERS', 'TEAM', 'CLUB'])
   type: 'PERS' | 'TEAM' | 'CLUB';
 
+  @IsString()
+  @Length(1, 20)
+  role: string;
+
+  @IsNotEmpty()
   @ValidateNested()
   @Type(() => Member)
   members: Member[];

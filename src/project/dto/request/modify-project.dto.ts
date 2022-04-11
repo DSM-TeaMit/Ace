@@ -25,6 +25,10 @@ class Member {
 }
 
 export class ModifyMemberRequestDto {
+  @IsString()
+  @Length(1, 20)
+  role: string;
+
   @ValidateNested()
   @Type(() => Member)
   members: Member[];

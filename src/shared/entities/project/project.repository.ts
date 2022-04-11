@@ -104,7 +104,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       id: number;
       role: string;
     }[],
-  ): Promise<void> {
+  ): Promise<boolean> {
     const queryRunner = getConnection().createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -113,7 +113,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
         .createQueryBuilder()
         .delete()
         .from(Member)
-        .where('member.project = :projectId', { projectId })
+        .where('project = :projectId', { projectId })
         .execute();
       await queryRunner.manager
         .createQueryBuilder()
@@ -128,10 +128,12 @@ export class ProjectRepository extends AbstractRepository<Project> {
         )
         .execute();
       await queryRunner.commitTransaction();
+      return true;
     } catch (e) {
       if (queryRunner.isTransactionActive) {
         await queryRunner.rollbackTransaction();
       }
+      return false;
     }
   }
 

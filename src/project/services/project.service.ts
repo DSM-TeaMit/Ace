@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -13,7 +14,6 @@ import { Request } from 'express';
 import { Project } from 'src/shared/entities/project/project.entity';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { Status } from 'src/shared/entities/status/status.entity';
-import { User } from 'src/shared/entities/user/user.entity';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { ConfirmProjectQueryDto } from '../dto/request/confirm-project.dto';
 import { CreateProjectRequestDto } from '../dto/request/create-project.dto';
@@ -38,30 +38,15 @@ export class ProjectService {
     req: Request,
     payload: CreateProjectRequestDto,
   ): Promise<CreateProjectResponseDto> {
-    if (!payload.members.map((member) => member.uuid).includes(req.user.userId))
-      throw new UnprocessableEntityException();
-    if (payload.type === 'PERS' && payload.members.length > 1)
-      throw new BadRequestException();
-    const members: {
-      id: number;
-      role: string;
-    }[] = [];
-    let writer: User = undefined;
-    for await (const member of payload.members) {
-      const user = await this.userRepository.findOneByUuid(member.uuid);
-      if (!user) throw new NotFoundException();
-      if (member.uuid === req.user.userId) writer = user;
-      members.push({
-        id: user.id,
-        role: member.role,
-      });
-    }
+    this.checkUserInMembers(payload.members, req);
+    this.checkMemberLength(payload.type, payload.members);
 
+    const members = await this.mapMembersToEntityArray(payload, req);
     return {
       uuid: await this.projectRepository.createProject(
         payload,
         members,
-        writer.id,
+        members[members.length - 1].id,
       ),
     };
   }
@@ -132,31 +117,13 @@ export class ProjectService {
   ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
+    this.checkMemberLength(project.type, payload.members);
     this.checkPermission(project, req);
-    if (
-      !(
-        payload.members
-          ?.map((member) => member.uuid)
-          .includes(req.user.userId) ?? true
-      )
-    )
-      throw new UnprocessableEntityException();
+    this.checkUserInMembers(payload.members, req);
 
-    if (project.type === 'PERS' && payload.members.length > 1)
-      throw new BadRequestException();
-    const members: {
-      id: number;
-      role: string;
-    }[] = [];
-    for await (const member of payload.members) {
-      const user = await this.userRepository.findOneByUuid(member.uuid);
-      if (!user) throw new NotFoundException();
-      members.push({
-        id: user.id,
-        role: member.role,
-      });
-    }
-    await this.projectRepository.modifyMember(project.id, members);
+    const members = await this.mapMembersToEntityArray(payload, req);
+    if (!(await this.projectRepository.modifyMember(project.id, members)))
+      throw new InternalServerErrorException();
 
     return;
   }
@@ -231,6 +198,42 @@ export class ProjectService {
       )
     )
       throw new ForbiddenException();
+  }
+
+  checkUserInMembers(members: { uuid: string; role: string }[], req: Request) {
+    if (members.map((member) => member.uuid).includes(req.user.userId))
+      throw new UnprocessableEntityException();
+  }
+
+  checkMemberLength(type: string, members: { uuid: string; role: string }[]) {
+    if (
+      (type === 'PERS' && members.length > 0) ||
+      (type !== 'PERS' && members.length < 1)
+    )
+      throw new BadRequestException();
+  }
+
+  async mapMembersToEntityArray(
+    payload: { role: string; members: { uuid: string; role: string }[] },
+    req: Request,
+  ) {
+    const members: {
+      id: number;
+      role: string;
+    }[] = [];
+    const writerId = (await this.userRepository.findOneByUuid(req.user.userId))
+      .id;
+    for await (const member of payload.members) {
+      const user = await this.userRepository.findOneByUuid(member.uuid);
+      if (!user) throw new NotFoundException();
+      members.push({
+        id: user.id,
+        role: member.role,
+      });
+    }
+    members.push({ id: writerId, role: payload.role });
+
+    return members;
   }
 
   getDocumentStatus(project: Project, type: 'plan' | 'report') {
