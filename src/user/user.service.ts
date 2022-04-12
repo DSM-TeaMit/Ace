@@ -300,9 +300,17 @@ export class UserService {
     return;
   }
 
-  async searchUser(query: SearchUserRequestQueryDto): Promise<SearchUserDto> {
+  async searchUser(
+    req: Request,
+    query: SearchUserRequestQueryDto,
+  ): Promise<SearchUserDto> {
     return {
-      students: (await this.userRepository.searchUser(query)).map((user) => ({
+      students: (
+        await this.userRepository.searchUser({
+          ...query,
+          excludeUuid: req.user.userId,
+        })
+      ).map((user) => ({
         uuid: user.uuid,
         studentNo: user.studentNo,
         name: user.name,

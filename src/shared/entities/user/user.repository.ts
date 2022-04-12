@@ -241,12 +241,18 @@ export class UserRepository extends AbstractRepository<User> {
     return [res[0], +res[1][0].count];
   }
 
-  async searchUser({ name }: { name: string }) {
+  async searchUser({
+    name,
+    excludeUuid,
+  }: {
+    name: string;
+    excludeUuid: string;
+  }) {
     const qb = this.createQueryBuilder('user')
       .select()
-      .where('user.deleted = false');
-
-    if (name) qb.andWhere('user.name = :name', { name });
+      .where('user.deleted = false')
+      .andWhere('user.name LIKE :keyword', { keyword: `%${name}%` })
+      .andWhere('user.uuid != :excludeUuid', { excludeUuid });
 
     return qb.getMany();
   }

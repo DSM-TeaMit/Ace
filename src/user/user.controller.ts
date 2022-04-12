@@ -41,8 +41,11 @@ export class UserController {
   @Roles(Role.User)
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
-  async searchUser(@Query() query: SearchUserRequestQueryDto) {
-    return this.userService.searchUser(query);
+  async searchUser(
+    @Req() req: Request,
+    @Query() query: SearchUserRequestQueryDto,
+  ) {
+    return this.userService.searchUser(req, query);
   }
 
   @Delete()
