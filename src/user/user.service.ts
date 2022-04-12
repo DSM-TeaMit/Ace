@@ -63,7 +63,7 @@ export class UserService {
         : undefined;
     return {
       thumbnailUrl: user?.thumbnailUrl ?? undefined,
-      emoji: admin?.thumbnailUrl,
+      emoji: admin?.emoji,
       studentNo: user?.studentNo,
       name: user?.name ?? admin?.name,
       type: req.user.role,
