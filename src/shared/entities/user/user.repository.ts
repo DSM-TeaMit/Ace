@@ -182,7 +182,7 @@ export class UserRepository extends AbstractRepository<User> {
       .skip(limit * (page - 1));
 
     const planQuery = cloneDeep(queryBuilderBase)
-      .addSelect(["'plan' AS type", 'status.planSubmittedAt AS submittedAt'])
+      .addSelect(["'PLAN' AS type", 'status.planSubmittedAt AS submittedAt'])
       .andWhere(
         new Brackets((qb) => {
           qb.where(
@@ -202,7 +202,7 @@ export class UserRepository extends AbstractRepository<User> {
 
     const reportQuery = cloneDeep(queryBuilderBase)
       .addSelect([
-        "'report' AS type",
+        "'REPORT' AS type",
         'status.reportSubmittedAt AS submittedAt',
       ])
       .andWhere(
