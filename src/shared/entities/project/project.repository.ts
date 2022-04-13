@@ -259,7 +259,6 @@ export class ProjectRepository extends AbstractRepository<Project> {
       ),
       this.manager.query(`SELECT COUNT(A) FROM (${searchQuery}) A`, parameters),
     ]);
-    console.log(res);
     return [
       res[0].map((project) => ({
         uuid: project.project_uuid,
