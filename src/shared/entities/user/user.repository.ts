@@ -198,6 +198,9 @@ export class UserRepository extends AbstractRepository<User> {
           );
         }),
       )
+      .andWhere(
+        'EXISTS(SELECT 1 FROM "plan" "plan" WHERE project.id = plan.project_id)',
+      )
       .getQueryAndParameters();
 
     const reportQuery = cloneDeep(queryBuilderBase)
@@ -219,6 +222,9 @@ export class UserRepository extends AbstractRepository<User> {
             { accepted },
           );
         }),
+      )
+      .andWhere(
+        'EXISTS(SELECT 1 FROM "report" "report" WHERE project.id = report.project_id)',
       )
       .getQueryAndParameters();
 
