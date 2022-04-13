@@ -226,7 +226,7 @@ export class UserService {
       projects: res[0].map((project) => {
         return {
           uuid: project.uuid,
-          projectName: project.name,
+          projectName: project.projectname,
           thumbnailUrl: project.thumbnailurl,
           emoji: project.emoji,
           type: project.type,
@@ -270,7 +270,7 @@ export class UserService {
         projects: projects[0].map((project) => {
           return {
             uuid: project.uuid,
-            projectName: project.name,
+            projectName: project.projectname,
             thumbnailUrl: project.thumbnailurl,
             emoji: project.emoji,
             type: project.type,

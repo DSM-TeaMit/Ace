@@ -156,10 +156,10 @@ export class UserRepository extends AbstractRepository<User> {
     [
       {
         uuid: string;
-        name: string;
+        projectname: string;
         thumbnailurl?: string;
         emoji: string;
-        type: 'plan' | 'report';
+        type: 'PLAN' | 'REPORT';
         submittedAt: Date;
       }[],
       number,
