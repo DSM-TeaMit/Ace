@@ -25,15 +25,17 @@ export class ReportService {
   ): Promise<void> {
     if (await this.projectRepository.getReport(param))
       this.modifyReport(req, param, payload);
-    else this.createReport(param, payload);
+    else if (
+      (await this.projectRepository.findOne(param)).status.isPlanAccepted
+    )
+      this.createReport(param, payload);
+    else throw new ConflictException();
   }
 
   async createReport(
     param: ProjectParamsDto,
     payload: CreateReportRequestDto,
   ): Promise<void> {
-    if (await this.projectRepository.getReport(param))
-      throw new ConflictException();
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
     this.projectRepository.createReport(project.id, payload);
@@ -44,7 +46,6 @@ export class ReportService {
     param: ProjectParamsDto,
   ): Promise<GetReportResponseDto> {
     const report = await this.projectRepository.getReport(param);
-    if (!report) throw new NotFoundException();
     return {
       projectName: report.project.name,
       projectType: report.project.type,
