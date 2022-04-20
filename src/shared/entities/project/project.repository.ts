@@ -19,17 +19,15 @@ import { Member } from '../member/member.entity';
 import { Plan } from '../plan/plan.entity';
 import { Report } from '../report/report.entity';
 import { Status } from '../status/status.entity';
+import { User } from '../user/user.entity';
 import { Project } from './project.entity';
 
 @EntityRepository(Project)
 export class ProjectRepository extends AbstractRepository<Project> {
   async createProject(
     payload: CreateProjectRequestDto,
-    members: {
-      id: number;
-      role: string;
-    }[],
-    writerId: number,
+    members: Partial<Member>[],
+    writer: User,
   ): Promise<string | undefined> {
     const queryRunner = getConnection().createQueryRunner();
     await queryRunner.connect();
@@ -47,7 +45,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
             type: payload.type,
             field: payload.field,
             emoji: getRandomEmoji(),
-            writer: () => writerId.toString(),
+            writer: writer,
           })
           .execute()
       ).identifiers[0].id;
@@ -58,8 +56,9 @@ export class ProjectRepository extends AbstractRepository<Project> {
         .values(
           members.map((member) => ({
             project: () => projectId.toString(),
-            user: () => member.id.toString(),
+            user: member.user,
             role: member.role,
+            studentNo: member.studentNo,
           })),
         )
         .execute();
@@ -100,10 +99,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
 
   async modifyMember(
     projectId: number,
-    members: {
-      id: number;
-      role: string;
-    }[],
+    members: Partial<Member>[],
   ): Promise<boolean> {
     const queryRunner = getConnection().createQueryRunner();
     await queryRunner.connect();
@@ -122,7 +118,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
         .values(
           members.map((member) => ({
             project: () => projectId.toString(),
-            user: () => member.id.toString(),
+            user: member.user,
             role: member.role,
           })),
         )
