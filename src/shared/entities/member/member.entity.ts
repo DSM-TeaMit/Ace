@@ -15,4 +15,7 @@ export class Member {
 
   @Column({ length: 20 })
   role: string;
+
+  @Column()
+  studentNo: number;
 }
