@@ -9,6 +9,7 @@ import { Cache } from 'cache-manager';
 import { Request } from 'express';
 import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
 import { DeleteAccountParamsDto } from './dto/request/delete-account.dto';
+import { GetAdminListDto } from './dto/request/get-admin-list.dto';
 import { GetCreatedByRequestorDto } from './dto/response/get-created-by-requestor.dto';
 
 @Injectable()
@@ -18,11 +19,15 @@ export class AdminService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
-  async getCreatedByRequestor(req: Request): Promise<GetCreatedByRequestorDto> {
-    const requestor = await this.adminRepository.findOne({
-      uuid: req.user.userId,
-    });
-    const accounts = await this.adminRepository.getChildAccounts(requestor.id);
+  async getAdminList(
+    req: Request,
+    query: GetAdminListDto,
+  ): Promise<GetCreatedByRequestorDto> {
+    const accounts = await this.adminRepository.getAdminList(
+      req.user.userId,
+      query.page,
+      query.limit,
+    );
     return {
       count: accounts[1],
       accounts: accounts[0].map((admin) => ({

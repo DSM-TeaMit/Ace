@@ -43,10 +43,12 @@ export class AdminRepository extends AbstractRepository<Admin> {
       .execute();
   }
 
-  async getChildAccounts(id: number): Promise<[Admin[], number]> {
+  async getAdminList(userId: string, page: number, limit: number) {
     return this.createQueryBuilder('admin')
       .select()
-      .where('admin.parentAccount = :id', { id })
+      .where('admin.uuid != :userId', { userId })
+      .take(limit)
+      .skip((page - 1) * limit)
       .getManyAndCount();
   }
 
