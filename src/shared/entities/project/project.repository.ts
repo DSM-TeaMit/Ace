@@ -1,3 +1,4 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import { CreatePlanRequestDto } from 'src/project/dto/request/create-plan.dto';
 import { CreateProjectRequestDto } from 'src/project/dto/request/create-project.dto';
 import { CreateReportRequestDto } from 'src/project/dto/request/create-report.dto';
@@ -79,6 +80,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       if (queryRunner.isTransactionActive) {
         await queryRunner.rollbackTransaction();
       }
+      throw new InternalServerErrorException();
     }
   }
 
@@ -100,7 +102,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
   async modifyMember(
     projectId: number,
     members: Partial<Member>[],
-  ): Promise<boolean> {
+  ): Promise<void> {
     const queryRunner = getConnection().createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -124,12 +126,11 @@ export class ProjectRepository extends AbstractRepository<Project> {
         )
         .execute();
       await queryRunner.commitTransaction();
-      return true;
     } catch (e) {
       if (queryRunner.isTransactionActive) {
         await queryRunner.rollbackTransaction();
       }
-      return false;
+      throw new InternalServerErrorException();
     }
   }
 

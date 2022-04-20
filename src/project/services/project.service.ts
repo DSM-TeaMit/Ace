@@ -5,7 +5,6 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -123,8 +122,7 @@ export class ProjectService {
     this.checkUserInMembers(payload.members, req);
 
     const members = await this.mapMembersToEntityArray(payload, req);
-    if (!(await this.projectRepository.modifyMember(project.id, members)))
-      throw new InternalServerErrorException();
+    await this.projectRepository.modifyMember(project.id, members);
 
     return;
   }
