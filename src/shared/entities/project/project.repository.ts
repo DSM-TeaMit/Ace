@@ -1,3 +1,4 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import { CreatePlanRequestDto } from 'src/project/dto/request/create-plan.dto';
 import { CreateProjectRequestDto } from 'src/project/dto/request/create-project.dto';
 import { CreateReportRequestDto } from 'src/project/dto/request/create-report.dto';
@@ -19,17 +20,15 @@ import { Member } from '../member/member.entity';
 import { Plan } from '../plan/plan.entity';
 import { Report } from '../report/report.entity';
 import { Status } from '../status/status.entity';
+import { User } from '../user/user.entity';
 import { Project } from './project.entity';
 
 @EntityRepository(Project)
 export class ProjectRepository extends AbstractRepository<Project> {
   async createProject(
     payload: CreateProjectRequestDto,
-    members: {
-      id: number;
-      role: string;
-    }[],
-    writerId: number,
+    members: Partial<Member>[],
+    writer: User,
   ): Promise<string | undefined> {
     const queryRunner = getConnection().createQueryRunner();
     await queryRunner.connect();
@@ -47,7 +46,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
             type: payload.type,
             field: payload.field,
             emoji: getRandomEmoji(),
-            writer: () => writerId.toString(),
+            writer: writer,
           })
           .execute()
       ).identifiers[0].id;
@@ -58,8 +57,9 @@ export class ProjectRepository extends AbstractRepository<Project> {
         .values(
           members.map((member) => ({
             project: () => projectId.toString(),
-            user: () => member.id.toString(),
+            user: member.user,
             role: member.role,
+            studentNo: member.studentNo,
           })),
         )
         .execute();
@@ -80,6 +80,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
       if (queryRunner.isTransactionActive) {
         await queryRunner.rollbackTransaction();
       }
+      throw new InternalServerErrorException();
     }
   }
 
@@ -100,11 +101,8 @@ export class ProjectRepository extends AbstractRepository<Project> {
 
   async modifyMember(
     projectId: number,
-    members: {
-      id: number;
-      role: string;
-    }[],
-  ): Promise<boolean> {
+    members: Partial<Member>[],
+  ): Promise<void> {
     const queryRunner = getConnection().createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -122,18 +120,17 @@ export class ProjectRepository extends AbstractRepository<Project> {
         .values(
           members.map((member) => ({
             project: () => projectId.toString(),
-            user: () => member.id.toString(),
+            user: member.user,
             role: member.role,
           })),
         )
         .execute();
       await queryRunner.commitTransaction();
-      return true;
     } catch (e) {
       if (queryRunner.isTransactionActive) {
         await queryRunner.rollbackTransaction();
       }
-      return false;
+      throw new InternalServerErrorException();
     }
   }
 

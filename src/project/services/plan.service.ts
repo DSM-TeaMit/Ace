@@ -56,7 +56,7 @@ export class PlanService {
         name: plan.project.writer.name,
       },
       members: plan.project.members.map((member) => ({
-        studentNo: member.user.studentNo,
+        studentNo: member.studentNo,
         name: member.user.name,
         role: member.role,
       })),
