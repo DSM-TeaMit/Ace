@@ -77,13 +77,15 @@ export class ProjectService {
       thumbnailUrl: project.thumbnailUrl,
       emoji: project.emoji,
       requestorType: this.getRequestorType(project, req),
-      members: project.members.map((member) => ({
-        uuid: member.user.uuid,
-        studentNo: member.studentNo,
-        name: member.user.name,
-        role: member.role,
-        thumbnailUrl: member.user.thumbnailUrl,
-      })),
+      members: this.sortProjectMembers(project.members, req.user.userId).map(
+        (member) => ({
+          uuid: member.user.uuid,
+          studentNo: member.studentNo,
+          name: member.user.name,
+          role: member.role,
+          thumbnailUrl: member.user.thumbnailUrl,
+        }),
+      ),
     };
   }
 
@@ -95,6 +97,18 @@ export class ProjectService {
     if (status.isReportSubmitted && status.isReportAccepted === null)
       return 'PENDING(REPORT)';
     if (status.isReportAccepted) return 'DONE';
+  }
+
+  sortProjectMembers(members: Member[], userId: string): Member[] {
+    const sortedMembers = [...members];
+    sortedMembers.sort((a, b) => a.studentNo - b.studentNo);
+    const index = members.findIndex((member) => member.user.uuid === userId);
+    if (index > -1) {
+      const user = members[index];
+      sortedMembers.splice(index, 1);
+      sortedMembers.unshift(user);
+    }
+    return sortedMembers;
   }
 
   async modifyProject(
