@@ -132,7 +132,6 @@ export class FileService {
   async getArchive(param: ProjectParamsDto, req: Request) {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
-    if (!project.status.isReportSubmitted) throw new NotFoundException();
 
     const s3Path = `${param.uuid}/archive`;
     const s3Filename = 'archive_outcomes.zip';
