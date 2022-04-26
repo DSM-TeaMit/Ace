@@ -72,10 +72,4 @@ export class FileController {
   getArchive(@Param() param: ProjectParamsDto, @Req() req: Request) {
     return this.fileService.getArchive(param, req);
   }
-
-  @Get(':uuid/archive/check')
-  @UseGuards(JwtAuthGuard)
-  checkArchiveExists(@Param() param: ProjectParamsDto) {
-    return this.fileService.checkArchiveExists(param);
-  }
 }
