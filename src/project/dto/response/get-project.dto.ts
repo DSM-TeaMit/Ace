@@ -26,6 +26,7 @@ interface Member {
 interface ReportInfo {
   uuid: string;
   projectName: string;
+  type: string;
   status: string;
   thumbnailUrl: string;
   emoji: string;

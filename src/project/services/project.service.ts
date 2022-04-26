@@ -93,6 +93,7 @@ export class ProjectService {
         ? {
             uuid: project.uuid,
             projectName: project.name,
+            type: 'plan',
             status: this.getDocumentStatus(project, 'plan'),
             thumbnailUrl: project.thumbnailUrl,
             emoji: project.emoji,
@@ -102,6 +103,7 @@ export class ProjectService {
         ? {
             uuid: project.uuid,
             projectName: project.name,
+            type: 'report',
             status: this.getDocumentStatus(project, 'report'),
             thumbnailUrl: project.thumbnailUrl,
             emoji: project.emoji,
