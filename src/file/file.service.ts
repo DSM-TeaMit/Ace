@@ -204,7 +204,6 @@ export class FileService {
     try {
       return await s3.headObject({ Bucket: bucket, Key: filename }).promise();
     } catch (e) {
-      console.log(e);
       if (e.code === 'NotFound') return null;
       else throw new InternalServerErrorException();
     }
