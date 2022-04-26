@@ -64,6 +64,7 @@ specifiers:
   typeorm-naming-strategies: ^2.0.0
   typescript: ^4.3.5
   uuid: ^8.3.2
+  xlsx: https://cdn.sheetjs.com/xlsx-0.18.7/xlsx-0.18.7.tgz
 
 dependencies:
   '@nestjs/common': 8.2.5_17d6ce38cc74803538e351a8f2ca91ba
@@ -98,6 +99,7 @@ dependencies:
   typeorm: 0.2.41_pg@8.7.1
   typeorm-naming-strategies: 2.0.0_typeorm@0.2.41
   uuid: 8.3.2
+  xlsx: '@cdn.sheetjs.com/xlsx-0.18.7/xlsx-0.18.7.tgz'
 
 devDependencies:
   '@nestjs/cli': 8.2.0_eslint@8.7.0
@@ -6392,4 +6394,12 @@ packages:
 
   /zen-observable/0.8.15:
     resolution: {integrity: sha512-PQ2PC7R9rslx84ndNBZB/Dkv8V8fZEpk83RLgXtYd0fwUgEjseMn1Dgajh2x6S8QbZAFa9p2qVCEuYZNgve0dQ==}
+    dev: false
+
+  '@cdn.sheetjs.com/xlsx-0.18.7/xlsx-0.18.7.tgz':
+    resolution: {tarball: https://cdn.sheetjs.com/xlsx-0.18.7/xlsx-0.18.7.tgz}
+    name: xlsx
+    version: 0.18.7
+    engines: {node: '>=0.8'}
+    hasBin: true
     dev: false
