@@ -11,6 +11,8 @@ export interface GetProjectResponseDto {
   emoji: string;
   requestorType: 'USER_NON_EDITABLE' | 'USER_EDITABLE' | 'ADMIN';
   members: Member[];
+  plan?: ReportInfo;
+  report?: ReportInfo;
 }
 
 interface Member {
@@ -19,4 +21,12 @@ interface Member {
   studentNo: number;
   name: string;
   role: string;
+}
+
+interface ReportInfo {
+  uuid: string;
+  projectName: string;
+  status: string;
+  thumbnailUrl: string;
+  emoji: string;
 }
