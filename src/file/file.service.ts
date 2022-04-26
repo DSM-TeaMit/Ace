@@ -15,6 +15,7 @@ import { ProjectParamsDto } from 'src/project/dto/request/project-params.dto';
 import { ProjectService } from 'src/project/services/project.service';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { v4 as uuid } from 'uuid';
+import { GetArchiveQueryDto } from './dto/request/get-archive.dto';
 import { GetImageParamsDto } from './dto/request/get-image.dto';
 import { UploadFileOptions } from './interfaces/uploadFileOptions.interface';
 
@@ -129,7 +130,11 @@ export class FileService {
     return;
   }
 
-  async getArchive(param: ProjectParamsDto, req: Request) {
+  async getArchive(
+    param: ProjectParamsDto,
+    query: GetArchiveQueryDto,
+    req: Request,
+  ): Promise<StreamableFile | void> {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
 
@@ -142,6 +147,7 @@ export class FileService {
     );
 
     if (!fileInfo) throw new NotFoundException();
+    if (query.dry) return;
 
     const projectType = (() => {
       switch (project.type) {
@@ -167,23 +173,6 @@ export class FileService {
       s3Filename,
       `${process.env.AWS_S3_BUCKET}/${s3Path}`,
     );
-  }
-
-  async checkArchiveExists(param: ProjectParamsDto) {
-    if (
-      await this.isExist(
-        'archive_outcomes.zip',
-        `${process.env.AWS_S3_BUCKET}/${param.uuid}/archive`,
-      )
-    ) {
-      return {
-        isExist: true,
-      };
-    } else {
-      return {
-        isExist: false,
-      };
-    }
   }
 
   async uploadSingleFile(options: UploadFileOptions): Promise<string> {
@@ -215,7 +204,6 @@ export class FileService {
     try {
       return await s3.headObject({ Bucket: bucket, Key: filename }).promise();
     } catch (e) {
-      console.log(e);
       if (e.code === 'NotFound') return null;
       else throw new InternalServerErrorException();
     }

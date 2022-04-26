@@ -3,6 +3,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -15,6 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../shared/decorators/roles.decorator';
 import { Role } from '../shared/enums/role.enum';
+import { GetArchiveQueryDto } from './dto/request/get-archive.dto';
 import { GetImageParamsDto } from './dto/request/get-image.dto';
 import { FileService } from './file.service';
 
@@ -67,15 +69,13 @@ export class FileController {
     return this.fileService.uploadArchive(file, param, req);
   }
 
-  @Get(':uuid/archive/download')
+  @Get(':uuid/archive')
   @UseGuards(JwtAuthGuard)
-  getArchive(@Param() param: ProjectParamsDto, @Req() req: Request) {
-    return this.fileService.getArchive(param, req);
-  }
-
-  @Get(':uuid/archive/check')
-  @UseGuards(JwtAuthGuard)
-  checkArchiveExists(@Param() param: ProjectParamsDto) {
-    return this.fileService.checkArchiveExists(param);
+  getArchive(
+    @Param() param: ProjectParamsDto,
+    @Query() query: GetArchiveQueryDto,
+    @Req() req: Request,
+  ) {
+    return this.fileService.getArchive(param, query, req);
   }
 }
