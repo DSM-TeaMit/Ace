@@ -46,6 +46,7 @@ export class ReportService {
     param: ProjectParamsDto,
   ): Promise<GetReportResponseDto> {
     const report = await this.projectRepository.getReport(param);
+    if (!report) throw new NotFoundException();
     return {
       projectName: report.project.name,
       projectType: report.project.type,
