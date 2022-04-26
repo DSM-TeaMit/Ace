@@ -57,6 +57,8 @@ export class ProjectService {
   ): Promise<GetProjectResponseDto> {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
+    const plan = await this.projectRepository.getPlan(param);
+    const report = await this.projectRepository.getReport(param);
     if (!(await this.cacheManager.get(req.user.userId))) {
       await this.projectRepository.increaseViewCount(
         project.id,
@@ -64,6 +66,7 @@ export class ProjectService {
       );
       await this.cacheManager.set(req.user.userId, 'VIEWCOUNT_CACHE');
     }
+
     const status = this.mapProjectStatus(project.status);
     return {
       uuid: project.uuid,
@@ -86,6 +89,24 @@ export class ProjectService {
           thumbnailUrl: member.user.thumbnailUrl,
         }),
       ),
+      plan: plan
+        ? {
+            uuid: project.uuid,
+            projectName: project.name,
+            status: this.getDocumentStatus(project, 'plan'),
+            thumbnailUrl: project.thumbnailUrl,
+            emoji: project.emoji,
+          }
+        : undefined,
+      report: report
+        ? {
+            uuid: project.uuid,
+            projectName: project.name,
+            status: this.getDocumentStatus(project, 'report'),
+            thumbnailUrl: project.thumbnailUrl,
+            emoji: project.emoji,
+          }
+        : undefined,
     };
   }
 
