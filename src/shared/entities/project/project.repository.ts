@@ -428,7 +428,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
     if (type === 'report')
       qb.set({
         isReportSubmitted: value,
-        isPlanAccepted: null,
+        isReportAccepted: null,
         reportSubmittedAt: new Date(),
       });
 
