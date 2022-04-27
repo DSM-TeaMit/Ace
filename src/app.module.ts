@@ -16,6 +16,7 @@ import { FileModule } from './file/file.module';
 import { ProjectModule } from './project/project.module';
 import { UserModule } from './user/user.module';
 import { CommentModule } from './comment/comment.module';
+import { ExcelModule } from './excel/excel.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CommentModule } from './comment/comment.module';
     ProjectModule,
     UserModule,
     CommentModule,
+    ExcelModule,
   ],
   controllers: [],
   providers: [],
