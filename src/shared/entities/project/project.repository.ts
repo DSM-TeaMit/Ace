@@ -122,6 +122,7 @@ export class ProjectRepository extends AbstractRepository<Project> {
             project: () => projectId.toString(),
             user: member.user,
             role: member.role,
+            studentNo: member.studentNo,
           })),
         )
         .execute();
