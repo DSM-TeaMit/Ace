@@ -95,7 +95,7 @@ export class FeedService {
 
     return {
       count: projects[1],
-      projects: projects[0].map((project) => {
+      reports: projects[0].map((project) => {
         const { status } = project;
         const isPlanOrReport =
           status.isPlanSubmitted === true && status.isPlanAccepted !== true

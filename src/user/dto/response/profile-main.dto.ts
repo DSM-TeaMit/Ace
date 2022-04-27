@@ -5,16 +5,16 @@ export interface ProfileMainResponseDto {
   githubId?: string;
   thumbnailUrl: string;
   pendingCount: number;
-  pendingProjects?: PendingProject[];
+  pendingReports?: ReportInfo[];
   projectCount: number;
   projects: Project[];
 }
 
-export interface PendingProject {
+export interface ReportInfo {
   uuid: string;
   projectName: string;
   type: string;
-  status: string;
+  status: 'NOT_SUBMITTED' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
   thumbnailUrl: string;
   emoji: string;
 }

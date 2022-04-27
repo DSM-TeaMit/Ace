@@ -11,6 +11,7 @@ import { Cache } from 'cache-manager';
 import { Request } from 'express';
 import { ExcelService } from 'src/excel/excel.service';
 import { FileService } from 'src/file/file.service';
+import { ProjectService } from 'src/project/services/project.service';
 import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
 import { Project } from 'src/shared/entities/project/project.entity';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
@@ -36,6 +37,7 @@ export class UserService {
     private readonly cacheManager: Cache,
     private readonly excelService: ExcelService,
     private readonly fileService: FileService,
+    private readonly projectService: ProjectService,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -121,24 +123,16 @@ export class UserService {
             project.status.isPlanSubmitted && !project.status.isPlanAccepted
               ? 'PLAN'
               : 'REPORT';
-          const status = (() => {
-            switch (type) {
-              case 'PLAN':
-                if (project.status.isPlanAccepted === false) return 'DECLINED';
-                else return 'PENDING';
-              case 'REPORT':
-                if (project.status.isReportAccepted === false)
-                  return 'DECLINED';
-                else return 'PENDING';
-            }
-          })();
           return {
             uuid: project.uuid,
             projectName: project.name,
             thumbnailUrl: project.thumbnailUrl,
             emoji: project.emoji,
             type,
-            status,
+            status: this.projectService.getDocumentStatus(
+              project,
+              type.toLowerCase() as 'plan' | 'report',
+            ) as 'NOT_SUBMITTED' | 'PENDING' | 'ACCEPTED' | 'REJECTED',
           };
         })
       : undefined;
@@ -150,7 +144,7 @@ export class UserService {
       thumbnailUrl: user.thumbnailUrl,
       githubId: user.githubId,
       pendingCount: pendingProjects?.length,
-      pendingProjects: pendingProjects,
+      pendingReports: pendingProjects,
       projectCount: projects[1],
       projects: projects[0].map((project) => ({
         uuid: project.uuid,
@@ -248,11 +242,15 @@ export class UserService {
       ])
     ).map((res) => ({
       count: res[1],
-      projects: res[0].map((project) => {
+      reports: res[0].map((project) => {
         return {
           uuid: project.uuid,
           projectName: project.projectname,
           thumbnailUrl: project.thumbnailurl,
+          status: this.getDocumentStatus(
+            project,
+            project.type.toLowerCase() as 'plan' | 'report',
+          ) as 'NOT_SUBMITTED' | 'PENDING' | 'ACCEPTED' | 'REJECTED',
           emoji: project.emoji,
           type: project.type,
         };
@@ -260,10 +258,10 @@ export class UserService {
     }));
 
     return {
-      accepted: projects[0],
-      rejected: projects[1],
-      pending: projects[2],
-      writing: projects[3],
+      ACCEPTED: projects[0],
+      REJECTED: projects[1],
+      PENDING: projects[2],
+      NOT_SUBMITTED: projects[3],
     };
   }
 
@@ -292,11 +290,15 @@ export class UserService {
     return {
       [query.type]: {
         count: projects[1],
-        projects: projects[0].map((project) => {
+        reports: projects[0].map((project) => {
           return {
             uuid: project.uuid,
             projectName: project.projectname,
             thumbnailUrl: project.thumbnailurl,
+            status: this.getDocumentStatus(
+              project,
+              project.type.toLowerCase() as 'plan' | 'report',
+            ),
             emoji: project.emoji,
             type: project.type,
           };
@@ -341,5 +343,34 @@ export class UserService {
         name: user.name,
       })),
     };
+  }
+
+  getDocumentStatus(
+    project: {
+      isplansubmitted: boolean;
+      isplanaccepted: boolean;
+      isreportsubmitted: boolean;
+      isreportaccepted: boolean;
+    },
+    type: 'plan' | 'report',
+  ) {
+    if (type === 'plan') {
+      if (!project.isplansubmitted && project.isplanaccepted === null)
+        return 'NOT_SUBMITTED';
+      if (project.isplansubmitted && project.isplanaccepted === null)
+        return 'PENDING';
+      if (project.isplanaccepted) return 'ACCEPTED';
+      if (!project.isplansubmitted && !project.isplanaccepted)
+        return 'REJECTED';
+    }
+    if (type === 'report') {
+      if (!project.isreportsubmitted && project.isreportaccepted === null)
+        return 'NOT_SUBMITTED';
+      if (project.isreportsubmitted && project.isreportaccepted === null)
+        return 'PENDING';
+      if (project.isreportaccepted) return 'ACCEPTED';
+      if (!project.isreportsubmitted && !project.isreportaccepted)
+        return 'REJECTED';
+    }
   }
 }
