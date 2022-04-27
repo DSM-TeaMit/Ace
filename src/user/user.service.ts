@@ -11,6 +11,7 @@ import { Cache } from 'cache-manager';
 import { Request } from 'express';
 import { ExcelService } from 'src/excel/excel.service';
 import { FileService } from 'src/file/file.service';
+import { ProjectService } from 'src/project/services/project.service';
 import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
 import { Project } from 'src/shared/entities/project/project.entity';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
@@ -36,6 +37,7 @@ export class UserService {
     private readonly cacheManager: Cache,
     private readonly excelService: ExcelService,
     private readonly fileService: FileService,
+    private readonly projectService: ProjectService,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -142,7 +144,7 @@ export class UserService {
       thumbnailUrl: user.thumbnailUrl,
       githubId: user.githubId,
       pendingCount: pendingProjects?.length,
-      pendingProjects: pendingProjects,
+      pendingReports: pendingProjects,
       projectCount: projects[1],
       projects: projects[0].map((project) => ({
         uuid: project.uuid,
@@ -240,7 +242,7 @@ export class UserService {
       ])
     ).map((res) => ({
       count: res[1],
-      projects: res[0].map((project) => {
+      reports: res[0].map((project) => {
         return {
           uuid: project.uuid,
           projectName: project.projectname,
@@ -256,10 +258,10 @@ export class UserService {
     }));
 
     return {
-      accepted: projects[0],
-      rejected: projects[1],
-      pending: projects[2],
-      writing: projects[3],
+      ACCEPTED: projects[0],
+      REJECTED: projects[1],
+      PENDING: projects[2],
+      NOT_SUBMITTED: projects[3],
     };
   }
 
@@ -288,7 +290,7 @@ export class UserService {
     return {
       [query.type]: {
         count: projects[1],
-        projects: projects[0].map((project) => {
+        reports: projects[0].map((project) => {
           return {
             uuid: project.uuid,
             projectName: project.projectname,

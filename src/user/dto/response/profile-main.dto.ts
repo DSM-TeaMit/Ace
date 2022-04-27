@@ -5,7 +5,7 @@ export interface ProfileMainResponseDto {
   githubId?: string;
   thumbnailUrl: string;
   pendingCount: number;
-  pendingProjects?: PendingProject[];
+  pendingReports?: ReportInfo[];
   projectCount: number;
   projects: Project[];
 }

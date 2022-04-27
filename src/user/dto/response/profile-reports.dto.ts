@@ -2,12 +2,12 @@ import { ReportInfo } from './profile-main.dto';
 
 interface ProjectBlock {
   count: number;
-  projects: ReportInfo[];
+  reports: ReportInfo[];
 }
 
 export interface ProfileReportsDto {
-  accepted: ProjectBlock;
-  rejected: ProjectBlock;
-  pending: ProjectBlock;
-  writing: ProjectBlock;
+  ACCEPTED: ProjectBlock;
+  REJECTED: ProjectBlock;
+  PENDING: ProjectBlock;
+  NOT_SUBMITTED: ProjectBlock;
 }

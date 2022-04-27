@@ -1,6 +1,6 @@
 export interface PendingProjectDto {
   count: number;
-  projects: Project[];
+  reports: Project[];
 }
 
 export interface Project {
