@@ -9,6 +9,8 @@ import {
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { Request } from 'express';
+import { ExcelService } from 'src/excel/excel.service';
+import { FileService } from 'src/file/file.service';
 import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
 import { Project } from 'src/shared/entities/project/project.entity';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
@@ -32,6 +34,8 @@ export class UserService {
     private readonly adminRepository: AdminRepository,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    private readonly excelService: ExcelService,
+    private readonly fileService: FileService,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -50,6 +54,27 @@ export class UserService {
       thumbnailUrl: req.user.picture,
     });
     return;
+  }
+
+  async migrateUsers(file: Express.MulterS3.File) {
+    const fileName = new Date()
+      .toLocaleDateString()
+      .replace(/(\s*)/g, '')
+      .slice(0, -1);
+    await this.fileService.uploadSingleFile({
+      file,
+      fileName,
+      fileType: 'excel',
+      allowedExt: /(xlsx)/,
+    });
+    const stream = (
+      await this.fileService.downloadFromS3(
+        `${fileName}.xlsx`,
+        `${process.env.AWS_S3_BUCKET}/excel`,
+      )
+    ).getStream();
+    const students = await this.excelService.parseExcel(stream);
+    await this.userRepository.migrateUsers(students);
   }
 
   async getHeaderInfo(req: Request): Promise<HeaderInfoResponseDto> {

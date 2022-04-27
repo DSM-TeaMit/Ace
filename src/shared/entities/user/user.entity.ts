@@ -21,6 +21,9 @@ export class User {
   @Column({ length: 40, unique: true })
   email: string;
 
+  @Column()
+  enrollYear: number;
+
   @Column({ length: 6 })
   name: string;
 

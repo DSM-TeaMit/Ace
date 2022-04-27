@@ -1,6 +1,6 @@
 {
   "name": "Ace",
-  "version": "0.51.1",
+  "version": "0.52.0",
   "description": "",
   "author": "",
   "private": true,
@@ -52,7 +52,8 @@
     "rxjs": "^7.2.0",
     "typeorm": "^0.2.41",
     "typeorm-naming-strategies": "^2.0.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.18.7/xlsx-0.18.7.tgz"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
