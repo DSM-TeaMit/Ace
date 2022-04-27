@@ -1,6 +1,8 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as redisStore from 'cache-manager-redis-store';
+import { ExcelModule } from 'src/excel/excel.module';
+import { FileModule } from 'src/file/file.module';
 import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
@@ -20,6 +22,8 @@ import { UserService } from './user.service';
       ProjectRepository,
       UserRepository,
     ]),
+    ExcelModule,
+    FileModule,
   ],
   controllers: [UserController],
   providers: [UserService],
