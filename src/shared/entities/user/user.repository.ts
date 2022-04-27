@@ -1,10 +1,16 @@
-import { AbstractRepository, Brackets, EntityRepository } from 'typeorm';
+import {
+  AbstractRepository,
+  Brackets,
+  EntityRepository,
+  getConnection,
+} from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { v4 } from 'uuid';
 import { cloneDeep } from 'lodash';
 import { Member } from '../member/member.entity';
 import { Project } from '../project/project.entity';
 import { User } from './user.entity';
+import { InternalServerErrorException } from '@nestjs/common';
 
 @EntityRepository(User)
 export class UserRepository extends AbstractRepository<User> {
@@ -261,5 +267,58 @@ export class UserRepository extends AbstractRepository<User> {
       .andWhere('user.uuid != :excludeUuid', { excludeUuid });
 
     return qb.getMany();
+  }
+
+  async migrateUsers(
+    students: {
+      studentNo: number;
+      name: string;
+      email: string;
+      enrollYear: number;
+    }[],
+  ) {
+    const queryRunner = getConnection().createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('SERIALIZABLE');
+    try {
+      await queryRunner.query('LOCK TABLE "user" IN ACCESS EXCLUSIVE MODE');
+      await queryRunner.manager
+        .createQueryBuilder()
+        .update(User)
+        .set({
+          deleted: true,
+        })
+        .execute();
+      for (const student of students) {
+        const res = await queryRunner.manager.findOne(User, {
+          where: { email: student.email, enrollYear: student.enrollYear },
+        });
+        if (!res)
+          await queryRunner.manager
+            .createQueryBuilder()
+            .insert()
+            .into(User)
+            .values({
+              uuid: v4(),
+              ...student,
+            })
+            .execute();
+        if (res)
+          await queryRunner.manager
+            .createQueryBuilder()
+            .update(User)
+            .set({ studentNo: student.studentNo, deleted: false })
+            .where('id = :id', { id: res.id })
+            .execute();
+      }
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+    } catch (e) {
+      if (queryRunner.isTransactionActive) {
+        await queryRunner.rollbackTransaction();
+      }
+      await queryRunner.release();
+      throw new InternalServerErrorException();
+    }
   }
 }
