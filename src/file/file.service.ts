@@ -187,12 +187,11 @@ export class FileService {
     const bucketS3 = process.env.AWS_S3_BUCKET;
     const filename = options.fileName ?? uuid();
     const location = `${process.env.BASE_URL}/file/${options.projectUuid}/${options.fileType}/${filename}${ext}`;
+    const bucket = options.projectUuid
+      ? `${bucketS3}/${options.projectUuid}/${options.fileType}`
+      : `${bucketS3}/${options.fileType}`;
     try {
-      await this.uploadToS3(
-        options.file.buffer,
-        `${bucketS3}/${options.projectUuid}/${options.fileType}`,
-        filename + ext,
-      );
+      await this.uploadToS3(options.file.buffer, bucket, filename + ext);
     } catch {
       throw new InternalServerErrorException();
     }
