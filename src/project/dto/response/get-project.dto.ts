@@ -1,3 +1,5 @@
+import { ReportInfo } from 'src/user/dto/response/profile-main.dto';
+
 export interface GetProjectResponseDto {
   uuid: string;
   projectName: string;
@@ -21,13 +23,4 @@ interface Member {
   studentNo: number;
   name: string;
   role: string;
-}
-
-interface ReportInfo {
-  uuid: string;
-  projectName: string;
-  type: string;
-  status: string;
-  thumbnailUrl: string;
-  emoji: string;
 }

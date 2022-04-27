@@ -10,7 +10,7 @@ export interface ProfileMainResponseDto {
   projects: Project[];
 }
 
-export interface PendingProject {
+export interface ReportInfo {
   uuid: string;
   projectName: string;
   type: string;
