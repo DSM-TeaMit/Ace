@@ -8,8 +8,11 @@ import {
   Put,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { JwtAuthGuard, JwtRegistrationGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -35,6 +38,15 @@ export class UserController {
   @UseGuards(JwtRegistrationGuard)
   async register(@Req() req: Request, @Body() payload: RegisterUserRequestDto) {
     return this.userService.register(req, payload);
+  }
+
+  @Post('migrate')
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('excel'))
+  uploadImages(@UploadedFile() file: Express.MulterS3.File) {
+    return this.userService.migrateUsers(file);
   }
 
   @Get('search')
