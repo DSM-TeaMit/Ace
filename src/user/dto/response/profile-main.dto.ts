@@ -14,7 +14,7 @@ export interface PendingProject {
   uuid: string;
   projectName: string;
   type: string;
-  status: string;
+  status: 'NOT_SUBMITTED' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
   thumbnailUrl: string;
   emoji: string;
 }

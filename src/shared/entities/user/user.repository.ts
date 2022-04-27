@@ -166,7 +166,10 @@ export class UserRepository extends AbstractRepository<User> {
         thumbnailurl?: string;
         emoji: string;
         type: 'PLAN' | 'REPORT';
-        submittedAt: Date;
+        isplansubmitted: boolean;
+        isplanaccepted: boolean;
+        isreportsubmitted: boolean;
+        isreportaccepted: boolean;
       }[],
       number,
     ]
@@ -179,6 +182,10 @@ export class UserRepository extends AbstractRepository<User> {
         'project.name AS projectName',
         'project.thumbnailUrl AS thumbnailUrl',
         'project.emoji AS emoji',
+        'status.isPlanSubmitted AS isPlanSubmitted',
+        'status.isPlanAccepted AS isPlanAccepted',
+        'status.isReportSubmitted AS isReportSubmitted',
+        'status.isReportAccepted AS isReportAccepted',
       ])
       .from(Project, 'project')
       .leftJoin('project.status', 'status')
