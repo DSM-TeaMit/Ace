@@ -125,9 +125,11 @@ export class ProjectService {
   sortProjectMembers(members: Member[], userId: string): Member[] {
     const sortedMembers = [...members];
     sortedMembers.sort((a, b) => a.studentNo - b.studentNo);
-    const index = members.findIndex((member) => member.user.uuid === userId);
+    const index = sortedMembers.findIndex(
+      (member) => member.user.uuid === userId,
+    );
     if (index > -1) {
-      const user = members[index];
+      const user = sortedMembers[index];
       sortedMembers.splice(index, 1);
       sortedMembers.unshift(user);
     }
