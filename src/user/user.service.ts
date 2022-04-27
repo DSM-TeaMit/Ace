@@ -113,12 +113,11 @@ export class UserService {
       4,
     );
 
-    const pendingProjects = isMine
-      ? (
-          (
-            await this.userRepository.getPendingProjects(user.id)
-          )[0] as Project[]
-        )?.map((project) => {
+    const pendingProjects = await this.userRepository.getPendingProjects(
+      user.id,
+    );
+    const pendingReports = isMine
+      ? pendingProjects[0]?.map((project) => {
           const type =
             project.status.isPlanSubmitted && !project.status.isPlanAccepted
               ? 'PLAN'
@@ -143,8 +142,8 @@ export class UserService {
       email: user.email,
       thumbnailUrl: user.thumbnailUrl,
       githubId: user.githubId,
-      pendingCount: pendingProjects?.length,
-      pendingReports: pendingProjects,
+      pendingCount: pendingProjects[1],
+      pendingReports,
       projectCount: projects[1],
       projects: projects[0].map((project) => ({
         uuid: project.uuid,
