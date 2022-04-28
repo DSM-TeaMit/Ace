@@ -41,6 +41,8 @@ export class AuthService {
     if (req.user.hd !== 'dsm.hs.kr') throw new ForbiddenException();
     const user = await this.userRepository.findOne(req.user.email);
     if (user?.deleted) throw new UnprocessableEntityException();
+    if (user?.thumbnailUrl !== req.user.picture)
+      await this.userRepository.updateThumbnailUrl(user.id, req.user.picture);
     const isUserExist = Boolean(user);
     const payload: JwtPayload = {
       sub: user?.uuid || req.user.email,
