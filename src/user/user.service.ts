@@ -278,10 +278,10 @@ export class UserService {
       user.id,
       query.page,
       query.limit,
-      { accepted: true, rejected: false, pending: true, writing: false }[
+      { ACCEPTED: true, REJECTED: false, PENDING: true, NOT_SUBMITTED: false }[
         query.type
       ],
-      { accepted: true, rejected: false, pending: null, writing: null }[
+      { ACCEPTED: true, REJECTED: false, PENDING: null, NOT_SUBMITTED: null }[
         query.type
       ],
     );
