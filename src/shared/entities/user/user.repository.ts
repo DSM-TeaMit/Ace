@@ -41,6 +41,18 @@ export class UserRepository extends AbstractRepository<User> {
     return user;
   }
 
+  async updateThumbnailUrl(userId: number, thumbnailUrl: string) {
+    return Boolean(
+      (
+        await this.createQueryBuilder('user')
+          .update(User)
+          .set({ thumbnailUrl })
+          .where('id = :userId', { userId })
+          .execute()
+      ).affected,
+    );
+  }
+
   async updateGithubId(userId: number, githubId: string): Promise<boolean> {
     return Boolean(
       (
