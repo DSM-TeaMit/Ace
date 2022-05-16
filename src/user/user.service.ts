@@ -21,7 +21,6 @@ import {
   ProfileRequestDto,
   ProfileRequestQueryDto,
 } from './dto/request/profile.dto';
-import { RegisterUserRequestDto } from './dto/request/register-user.dto';
 import { SearchUserRequestQueryDto } from './dto/request/search-user.dto';
 import { HeaderInfoResponseDto } from './dto/response/header-info.dto';
 import { ProfileMainResponseDto } from './dto/response/profile-main.dto';
@@ -40,23 +39,6 @@ export class UserService {
     private readonly projectService: ProjectService,
     private readonly userRepository: UserRepository,
   ) {}
-
-  async register(req: Request, payload: RegisterUserRequestDto) {
-    if (payload.githubId) {
-      const cache = await this.cacheManager.get<string>(req.user.email);
-      if (!cache) throw new UnprocessableEntityException();
-      if (cache !== payload.githubId) throw new ConflictException();
-      await this.cacheManager.del(req.user.email);
-    }
-    if (await this.userRepository.findOne(req.user.email))
-      throw new ConflictException();
-    await this.userRepository.insert({
-      ...payload,
-      email: req.user.email,
-      thumbnailUrl: req.user.picture,
-    });
-    return;
-  }
 
   async migrateUsers(file: Express.MulterS3.File) {
     const fileName = new Date()

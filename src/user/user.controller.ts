@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
-import { JwtAuthGuard, JwtRegistrationGuard } from 'src/auth/guards/jwt.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { Role } from 'src/shared/enums/role.enum';
@@ -24,21 +24,12 @@ import {
   ProfileRequestDto,
   ProfileRequestQueryDto,
 } from './dto/request/profile.dto';
-import { RegisterUserRequestDto } from './dto/request/register-user.dto';
 import { SearchUserRequestQueryDto } from './dto/request/search-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Post('register')
-  @Roles(Role.User)
-  @UseGuards(RolesGuard)
-  @UseGuards(JwtRegistrationGuard)
-  async register(@Req() req: Request, @Body() payload: RegisterUserRequestDto) {
-    return this.userService.register(req, payload);
-  }
 
   @Post('migrate')
   @Roles(Role.Admin)
