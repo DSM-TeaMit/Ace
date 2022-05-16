@@ -4,10 +4,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { GoogleOauthStrategy } from './strategies/google-oauth.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import {
-  JwtRegistrationStrategy,
-  JwtStrategy,
-} from './strategies/jwt.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from 'src/shared/entities/user/user.repository';
 import { GithubOauthStrategy } from './strategies/github-oauth.strategy';
@@ -33,7 +30,6 @@ import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
     AuthService,
     GithubOauthStrategy,
     GoogleOauthStrategy,
-    JwtRegistrationStrategy,
     JwtStrategy,
     LocalStrategy,
   ],
