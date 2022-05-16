@@ -4,6 +4,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RegisterAdminRequestDto } from './dto/request/register-admin.dto';
 import { Admin } from 'src/shared/entities/admin/admin.entity';
 import { RefreshTokenRequestDto } from './dto/request/refresh-token.dto';
+import { RefreshTokenDto } from './dto/response/refresh.dto';
 
 interface GithubResponse {
   email: string;
@@ -40,32 +42,20 @@ export class AuthService {
   async googleLogin(req: Request): Promise<LoginResponseDto> {
     if (req.user.hd !== 'dsm.hs.kr') throw new ForbiddenException();
     const user = await this.userRepository.findOne(req.user.email);
+    if (!user) throw new NotFoundException();
     if (user?.deleted) throw new UnprocessableEntityException();
     if (user?.thumbnailUrl !== req.user.picture)
       await this.userRepository.updateThumbnailUrl(user.id, req.user.picture);
-    const isUserExist = Boolean(user);
     const payload: JwtPayload = {
       sub: user?.uuid || req.user.email,
       role: 'user',
-      registrationOnly: !isUserExist,
-      picture: isUserExist ? undefined : req.user.picture,
+      picture: req.user.picture,
     };
-    const refreshToken = isUserExist
-      ? this.jwtService.sign(payload, { expiresIn: '7d' })
-      : undefined;
-    if (refreshToken) {
-      await this.cacheManager.del(refreshToken);
-      await this.cacheManager.set(refreshToken, user.uuid, { ttl: 604800 });
-    }
-    return {
-      type: isUserExist ? 'login' : 'registration',
-      uuid: isUserExist ? user.uuid : undefined,
-      studentNo: user?.studentNo,
-      name: user?.name,
-      userType: 'user',
-      accessToken: this.jwtService.sign(payload),
-      refreshToken,
-    };
+    const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    await this.cacheManager.del(refreshToken);
+    await this.cacheManager.set(refreshToken, user.uuid, { ttl: 604800 });
+    return new LoginResponseDto(user, accessToken, refreshToken);
   }
 
   async githubLogin(req: Request): Promise<void> {
@@ -97,16 +87,13 @@ export class AuthService {
     const payload: JwtPayload = {
       sub: req.user.userId,
       role: 'admin',
-      registrationOnly: false,
     };
     const { userInfo }: { userInfo: Admin } = req.user;
-    return {
-      uuid: req.user.userId,
-      name: userInfo.name,
-      userType: 'admin',
-      accessToken: this.jwtService.sign(payload),
-      refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
-    };
+    return new LoginResponseDto(
+      userInfo,
+      this.jwtService.sign(payload),
+      this.jwtService.sign(payload, { expiresIn: '7d' }),
+    );
   }
 
   async registerAdmin(
@@ -121,7 +108,7 @@ export class AuthService {
     return;
   }
 
-  async refresh(payload: RefreshTokenRequestDto): Promise<LoginResponseDto> {
+  async refresh(payload: RefreshTokenRequestDto): Promise<RefreshTokenDto> {
     interface Payload {
       sub: string;
       role: string;
@@ -154,9 +141,6 @@ export class AuthService {
     await this.cacheManager.set(refreshToken, tokenPayload.sub, {
       ttl: 604800,
     });
-    return {
-      accessToken,
-      refreshToken,
-    };
+    return new RefreshTokenDto(accessToken, refreshToken);
   }
 }
