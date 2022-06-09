@@ -35,7 +35,6 @@ export class PlanService {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
     await this.projectRepository.createPlan(project.id, payload);
-    return;
   }
 
   async getPlan(
@@ -44,31 +43,11 @@ export class PlanService {
   ): Promise<GetPlanResponseDto> {
     const plan = await this.projectRepository.getPlan(param);
     if (!plan) throw new NotFoundException();
-    return {
-      projectName: plan.project.name,
-      projectType: plan.project.type,
-      startDate: plan.startDate,
-      endDate: plan.endDate,
-      requestorType: this.projectService.getRequestorType(plan.project, req),
-      status: this.projectService.getDocumentStatus(plan.project, 'plan'),
-      writer: {
-        studentNo: plan.project.writer.studentNo,
-        name: plan.project.writer.name,
-      },
-      members: plan.project.members.map((member) => ({
-        studentNo: member.studentNo,
-        name: member.user.name,
-        role: member.role,
-      })),
-      goal: plan.goal,
-      content: plan.content,
-      includes: {
-        report: plan.includeResultReport,
-        code: plan.includeCode,
-        outcome: plan.includeOutcome,
-        others: plan.includeOthers,
-      },
-    };
+    return new GetPlanResponseDto(
+      plan,
+      this.projectService.getRequestorType(plan.project, req),
+      this.projectService.getDocumentStatus(plan.project, 'plan'),
+    );
   }
 
   async modifyPlan(
@@ -91,16 +70,13 @@ export class PlanService {
     )
       await this.projectRepository.setAccepted(plan.project.id, 'plan', null);
     await this.projectRepository.modifyPlan(plan.project.id, payload);
-
-    return;
   }
 
-  async deletePlan(req: Request, param: ProjectParamsDto) {
+  async deletePlan(req: Request, param: ProjectParamsDto): Promise<void> {
     const plan = await this.projectRepository.getPlan(param);
     if (!plan) throw new NotFoundException();
     this.projectService.checkPermission(plan.project, req);
     this.projectRepository.deletePlan(plan.project.id);
-    return;
   }
 
   async submitPlan(req: Request, param: ProjectParamsDto): Promise<void> {
