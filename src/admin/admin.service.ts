@@ -10,7 +10,7 @@ import { Request } from 'express';
 import { AdminRepository } from 'src/shared/entities/admin/admin.repository';
 import { DeleteAccountParamsDto } from './dto/request/delete-account.dto';
 import { GetAdminListDto } from './dto/request/get-admin-list.dto';
-import { GetCreatedByRequestorDto } from './dto/response/get-created-by-requestor.dto';
+import { GetAdminListResponseDto } from './dto/response/get-admin-list';
 
 @Injectable()
 export class AdminService {
@@ -22,21 +22,13 @@ export class AdminService {
   async getAdminList(
     req: Request,
     query: GetAdminListDto,
-  ): Promise<GetCreatedByRequestorDto> {
-    const accounts = await this.adminRepository.getAdminList(
+  ): Promise<GetAdminListResponseDto> {
+    const admins = await this.adminRepository.getAdminList(
       req.user.userId,
       query.page,
       query.limit,
     );
-    return {
-      count: accounts[1],
-      accounts: accounts[0].map((admin) => ({
-        uuid: admin.uuid,
-        uid: admin.uid,
-        name: admin.name,
-        emoji: admin.emoji,
-      })),
-    };
+    return new GetAdminListResponseDto(admins[0], admins[1]);
   }
 
   async deleteChildAccount(
@@ -57,6 +49,5 @@ export class AdminService {
 
     await this.adminRepository.deleteAccount(target.id);
     await this.cacheManager.set(req.user.userId, 'DELETED', { ttl: 86400 });
-    return;
   }
 }
