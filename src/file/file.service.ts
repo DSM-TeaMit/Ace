@@ -91,7 +91,7 @@ export class FileService {
       'Content-Type': `image/${ext}; charset=utf-8`,
     });
 
-    return await this.downloadFromS3(
+    return this.downloadFromS3(
       param.imageName,
       `${process.env.AWS_S3_BUCKET}/${param.uuid}/image`,
     );
@@ -169,7 +169,7 @@ export class FileService {
       'Content-Length': fileInfo.ContentLength,
     });
 
-    return await this.downloadFromS3(
+    return this.downloadFromS3(
       s3Filename,
       `${process.env.AWS_S3_BUCKET}/${s3Path}`,
     );
