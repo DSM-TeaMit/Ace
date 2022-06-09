@@ -7,7 +7,7 @@ import {
 } from '../dto/request/search.dto';
 import { FeedSearchResponseDto } from '../dto/response/feed-search.dto';
 import { FeedResponseDto } from '../dto/response/feed.dto';
-import { PendingProjectDto } from '../dto/response/pending-project.dto';
+import { PendingProjectsResponseDto } from '../dto/response/pending-project.dto';
 
 @Injectable()
 export class FeedService {
@@ -20,18 +20,7 @@ export class FeedService {
       { [query.order]: true },
     );
 
-    return {
-      count: projects[1],
-      projects: projects[0].map((project) => ({
-        uuid: project.uuid,
-        thumbnailUrl: project.thumbnailUrl,
-        emoji: project.emoji,
-        projectName: project.name,
-        projectType: project.type,
-        projectField: project.field,
-        viewCount: project.viewCount,
-      })),
-    };
+    return new FeedResponseDto(projects[0], projects[1]);
   }
 
   async search(query: SearchRequestDto): Promise<FeedSearchResponseDto> {
@@ -40,81 +29,26 @@ export class FeedService {
       this.projectRepository.search({ ...query, searchBy: 'memberName' }),
     ]);
 
-    return {
-      projectName: {
-        count: projects[0][1],
-        projects: projects[0][0].map((project) => ({
-          uuid: project.uuid,
-          thumbnailUrl: project.thumbnailUrl,
-          emoji: project.emoji,
-          projectName: project.name,
-          projectType: project.type,
-          projectField: project.field,
-          viewCount: project.viewCount,
-        })),
-      },
-      memberName: {
-        count: projects[1][1],
-        projects: projects[1][0].map((project) => ({
-          uuid: project.uuid,
-          thumbnailUrl: project.thumbnailUrl,
-          emoji: project.emoji,
-          projectName: project.name,
-          projectType: project.type,
-          projectField: project.field,
-          viewCount: project.viewCount,
-        })),
-      },
-    };
+    return new FeedSearchResponseDto({
+      projectName: new FeedResponseDto(projects[0][0], projects[0][1]),
+      memberName: new FeedResponseDto(projects[1][0], projects[1][1]),
+    });
   }
 
   async searchEach(
     query: SearchTypeRequestDto,
   ): Promise<Partial<FeedSearchResponseDto>> {
     const projects = await this.projectRepository.search(query);
-
-    return {
-      [query.searchBy]: {
-        count: projects[1],
-        projects: projects[0].map((project) => ({
-          uuid: project.uuid,
-          thumbnailUrl: project.thumbnailUrl,
-          projectName: project.name,
-          projectType: project.type,
-          projectField: project.field,
-          viewCount: project.viewCount,
-        })),
-      },
-    };
+    return new FeedSearchResponseDto({
+      [query.searchBy]: new FeedResponseDto(projects[0], projects[1]),
+    });
   }
 
   async getPendingProjects(
     query: Omit<FeedRequestDto, 'order'>,
-  ): Promise<PendingProjectDto> {
+  ): Promise<PendingProjectsResponseDto> {
     const projects = await this.projectRepository.getPendingProjects(query);
 
-    return {
-      count: projects[1],
-      reports: projects[0].map((project) => {
-        const { status } = project;
-        const isPlanOrReport =
-          status.isPlanSubmitted === true && status.isPlanAccepted !== true
-            ? 'plan'
-            : 'report';
-        return {
-          uuid: project.uuid,
-          projectName: project.name,
-          projectType: project.type,
-          reportType: isPlanOrReport.toUpperCase() as 'PLAN' | 'REPORT',
-          submittedAt: project.status[`${isPlanOrReport}SubmittedAt`],
-          thumbnailUrl: project.thumbnailUrl,
-          emoji: project.emoji,
-          writer: {
-            studentNo: project.writer.studentNo,
-            name: project.writer.name,
-          },
-        };
-      }),
-    };
+    return new PendingProjectsResponseDto(projects[0], projects[1]);
   }
 }
