@@ -1,6 +1,6 @@
 import { Exclude, Expose } from 'class-transformer';
 
-export class RefreshTokenDto {
+export class RefreshTokenResponseDto {
   @Exclude() private _accessToken: string;
   @Exclude() private _refreshToken: string;
 

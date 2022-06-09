@@ -20,7 +20,7 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RegisterAdminRequestDto } from './dto/request/register-admin.dto';
 import { Admin } from 'src/shared/entities/admin/admin.entity';
 import { RefreshTokenRequestDto } from './dto/request/refresh-token.dto';
-import { RefreshTokenDto } from './dto/response/refresh.dto';
+import { RefreshTokenResponseDto } from './dto/response/refresh.dto';
 
 interface GithubResponse {
   email: string;
@@ -108,7 +108,9 @@ export class AuthService {
     return;
   }
 
-  async refresh(payload: RefreshTokenRequestDto): Promise<RefreshTokenDto> {
+  async refresh(
+    payload: RefreshTokenRequestDto,
+  ): Promise<RefreshTokenResponseDto> {
     interface Payload {
       sub: string;
       role: string;
@@ -141,6 +143,6 @@ export class AuthService {
     await this.cacheManager.set(refreshToken, tokenPayload.sub, {
       ttl: 604800,
     });
-    return new RefreshTokenDto(accessToken, refreshToken);
+    return new RefreshTokenResponseDto(accessToken, refreshToken);
   }
 }
