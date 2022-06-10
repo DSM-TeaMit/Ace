@@ -15,8 +15,8 @@ export class LoggerInterceptor implements NestInterceptor {
   private logger = new Logger('HTTP');
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const ctx = context.switchToHttp();
-    const request = ctx.getRequest();
-    const response = ctx.getResponse();
+    const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse<Response>();
 
     return next.handle().pipe(
       tap({
