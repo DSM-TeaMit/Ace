@@ -42,13 +42,13 @@ export class ProjectService {
     this.checkMemberLength(payload.type, payload.members);
 
     const members = await this.mapMembersToEntityArray(payload, req);
-    return {
-      uuid: await this.projectRepository.createProject(
-        payload,
-        members,
-        members[members.length - 1].user,
-      ),
-    };
+    const uuid = await this.projectRepository.createProject(
+      payload,
+      members,
+      members[members.length - 1].user,
+    );
+
+    return new CreateProjectResponseDto(uuid);
   }
 
   async getProject(
@@ -67,49 +67,30 @@ export class ProjectService {
       await this.cacheManager.set(req.user.userId, 'VIEWCOUNT_CACHE');
     }
 
+    const members = this.sortProjectMembers(
+      project.members,
+      req.user.userId,
+    ).map((member) => ({
+      project: undefined,
+      user: undefined,
+      uuid: member.user.uuid,
+      studentNo: member.studentNo,
+      name: member.user.name,
+      role: member.role,
+      thumbnailUrl: member.user.thumbnailUrl,
+    }));
     const status = this.mapProjectStatus(project.status);
-    return {
-      uuid: project.uuid,
-      projectName: project.name,
-      projectDescription: project.description,
-      projectView: project.viewCount,
-      projectType: project.type,
-      projectField: project.field,
-      projectStatus: status,
-      projectResult: project.result,
-      thumbnailUrl: project.thumbnailUrl,
-      emoji: project.emoji,
-      requestorType: this.getRequestorType(project, req),
-      members: this.sortProjectMembers(project.members, req.user.userId).map(
-        (member) => ({
-          uuid: member.user.uuid,
-          studentNo: member.studentNo,
-          name: member.user.name,
-          role: member.role,
-          thumbnailUrl: member.user.thumbnailUrl,
-        }),
-      ),
-      plan: plan
-        ? {
-            uuid: project.uuid,
-            projectName: project.name,
-            type: 'plan',
-            status: this.getDocumentStatus(project, 'plan'),
-            thumbnailUrl: project.thumbnailUrl,
-            emoji: project.emoji,
-          }
-        : undefined,
-      report: report
-        ? {
-            uuid: project.uuid,
-            projectName: project.name,
-            type: 'report',
-            status: this.getDocumentStatus(project, 'report'),
-            thumbnailUrl: project.thumbnailUrl,
-            emoji: project.emoji,
-          }
-        : undefined,
-    };
+
+    return new GetProjectResponseDto(
+      {
+        ...project,
+        members,
+        plan,
+        report,
+      },
+      this.getRequestorType(project, req),
+      status,
+    );
   }
 
   mapProjectStatus(status: Status) {
@@ -145,8 +126,6 @@ export class ProjectService {
     if (!project) throw new NotFoundException();
     this.checkPermission(project, req);
     await this.projectRepository.modifyProject(project.id, payload);
-
-    return;
   }
 
   async modifyMember(
@@ -162,8 +141,6 @@ export class ProjectService {
 
     const members = await this.mapMembersToEntityArray(payload, req);
     await this.projectRepository.modifyMember(project.id, members);
-
-    return;
   }
 
   async deleteProject(req: Request, param: ProjectParamsDto): Promise<void> {
@@ -179,15 +156,13 @@ export class ProjectService {
       throw new ForbiddenException();
 
     await this.projectRepository.deleteProject(param.uuid);
-
-    return;
   }
 
   async confirmProject(
     req: Request,
     param: ProjectParamsDto,
     query: ConfirmProjectQueryDto,
-  ) {
+  ): Promise<void> {
     let projectId = undefined;
     switch (query.type) {
       case 'plan':
