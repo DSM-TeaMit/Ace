@@ -18,11 +18,15 @@ export class LoggerInterceptor implements NestInterceptor {
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
 
+    const now = Date.now();
+
     return next.handle().pipe(
       tap({
         next: () => {
           this.logger.log(
-            `${request.ip} ${request.method} ${request.originalUrl} ${response.statusCode}`,
+            `${request.ip} ${request.method} ${request.originalUrl} ${
+              response.statusCode
+            } ${Date.now() - now}ms`,
           );
         },
         error: (err: Error) => {
@@ -30,11 +34,15 @@ export class LoggerInterceptor implements NestInterceptor {
             const statusCode = err.getStatus();
             if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
               this.logger.error(
-                `${request.ip} ${request.method} ${request.originalUrl} ${statusCode}`,
+                `${request.ip} ${request.method} ${
+                  request.originalUrl
+                } ${statusCode} ${Date.now() - now}ms`,
               );
             } else {
               this.logger.warn(
-                `${request.ip} ${request.method} ${request.originalUrl} ${statusCode}`,
+                `${request.ip} ${request.method} ${
+                  request.originalUrl
+                } ${statusCode} ${Date.now() - now}ms`,
               );
             }
           }
