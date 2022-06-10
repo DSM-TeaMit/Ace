@@ -47,18 +47,11 @@ export class ReportService {
   ): Promise<GetReportResponseDto> {
     const report = await this.projectRepository.getReport(param);
     if (!report) throw new NotFoundException();
-    return {
-      projectName: report.project.name,
-      projectType: report.project.type,
-      requestorType: this.projectService.getRequestorType(report.project, req),
-      status: this.projectService.getDocumentStatus(report.project, 'report'),
-      subject: report.subject,
-      writer: {
-        studentNo: report.project.writer.studentNo,
-        name: report.project.writer.name,
-      },
-      content: report.content,
-    };
+    const requestorType = this.projectService.getRequestorType(
+      report.project,
+      req,
+    );
+    return new GetReportResponseDto(report, requestorType);
   }
 
   async modifyReport(
@@ -85,19 +78,16 @@ export class ReportService {
         null,
       );
     await this.projectRepository.modifyReport(report.project.id, payload);
-
-    return;
   }
 
-  async deleteReport(req: Request, param: ProjectParamsDto) {
+  async deleteReport(req: Request, param: ProjectParamsDto): Promise<void> {
     const report = await this.projectRepository.getReport(param);
     if (!report) throw new NotFoundException();
     this.projectService.checkPermission(report.project, req);
     this.projectRepository.deleteReport(report.project.id);
-    return;
   }
 
-  async submitReport(req: Request, param: ProjectParamsDto) {
+  async submitReport(req: Request, param: ProjectParamsDto): Promise<void> {
     const report = await this.projectRepository.getReport(param);
     if (!report) throw new NotFoundException();
     this.projectService.checkPermission(report.project, req);

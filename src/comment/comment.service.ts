@@ -34,30 +34,14 @@ export class CommentService {
       project.id,
       query.type.toUpperCase() as 'PROJECT' | 'PLAN' | 'REPORT',
     );
-    return {
-      count: comments[1],
-      comments: comments[0].map((comment) => ({
-        uuid: comment.uuid,
-        writerId: comment.admin?.uuid ?? comment.user?.uuid,
-        writerType: comment.admin ? 'admin' : 'user',
-        writerName: comment.admin?.name ?? comment.user?.name,
-        writerSno: comment.user?.studentNo,
-        isMine: (comment.admin?.uuid ?? comment.user?.uuid) === req.user.userId,
-        content: comment.content,
-        thumbnailUrl:
-          comment.admin?.thumbnailUrl ??
-          comment.user?.thumbnailUrl ??
-          undefined,
-        emoji: comment.admin?.emoji,
-      })),
-    };
+    return new GetCommentResponseDto(comments[0], comments[1], req.user.userId);
   }
 
   async createComments(
     payload: CreateCommentRequestDto,
     param: ProjectParamsDto,
     req: Request,
-  ) {
+  ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
 
@@ -84,7 +68,6 @@ export class CommentService {
         content: payload.content,
       },
     );
-    return;
   }
 
   async deleteComment(param: ProjectParamsDto, req: Request): Promise<void> {
@@ -94,6 +77,5 @@ export class CommentService {
       throw new ForbiddenException();
 
     await this.commentRepository.delete(param.uuid);
-    return;
   }
 }
