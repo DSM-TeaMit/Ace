@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { WsException } from '@nestjs/websockets';
 import { Request } from 'express';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { CreatePlanRequestDto } from '../dto/request/create-plan.dto';
@@ -19,12 +20,11 @@ export class PlanService {
   ) {}
 
   async createOrModifyPlan(
-    req: Request,
     param: ProjectParamsDto,
     payload: CreatePlanRequestDto,
   ): Promise<void> {
     if (await this.projectRepository.getPlan(param))
-      this.modifyPlan(req, param, payload);
+      this.modifyPlan(param, payload);
     else this.createPlan(param, payload);
   }
 
@@ -33,7 +33,6 @@ export class PlanService {
     payload: CreatePlanRequestDto,
   ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
-    if (!project) throw new NotFoundException();
     await this.projectRepository.createPlan(project.id, payload);
   }
 
@@ -51,18 +50,16 @@ export class PlanService {
   }
 
   async modifyPlan(
-    req: Request,
     param: ProjectParamsDto,
     payload: ModifyPlanRequestDto,
   ): Promise<void> {
     const plan = await this.projectRepository.getPlan(param);
-    if (!plan) throw new NotFoundException();
-    this.projectService.checkPermission(plan.project, req);
+    if (!plan) throw new WsException('Not Found');
     if (
       plan.project.status.isPlanSubmitted ||
       plan.project.status.isPlanAccepted
     )
-      throw new ConflictException();
+      throw new WsException('Conflict');
 
     if (
       !plan.project.status.isPlanSubmitted &&
@@ -75,14 +72,14 @@ export class PlanService {
   async deletePlan(req: Request, param: ProjectParamsDto): Promise<void> {
     const plan = await this.projectRepository.getPlan(param);
     if (!plan) throw new NotFoundException();
-    this.projectService.checkPermission(plan.project, req);
+    this.projectService.checkPermission(plan.project, req.user.userId);
     this.projectRepository.deletePlan(plan.project.id);
   }
 
   async submitPlan(req: Request, param: ProjectParamsDto): Promise<void> {
     const plan = await this.projectRepository.getPlan(param);
     if (!plan) throw new NotFoundException();
-    this.projectService.checkPermission(plan.project, req);
+    this.projectService.checkPermission(plan.project, req.user.userId);
     const status = plan.project.status;
     if (status.isPlanSubmitted) throw new ConflictException();
 

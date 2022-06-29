@@ -32,7 +32,7 @@ export class FileService {
   ): Promise<string> {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
-    this.projectService.checkPermission(project, req);
+    this.projectService.checkPermission(project, req.user.userId);
     const uploadedUrl = await this.uploadSingleFile({
       file,
       fileType: 'image',
@@ -49,7 +49,7 @@ export class FileService {
   ): Promise<string> {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
-    this.projectService.checkPermission(project, req);
+    this.projectService.checkPermission(project, req.user.userId);
     if (project.thumbnailUrl) {
       const fileUrlArray = project.thumbnailUrl.split('/');
       await this.deleteFromS3(
@@ -105,7 +105,7 @@ export class FileService {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
 
-    this.projectService.checkPermission(project, req);
+    this.projectService.checkPermission(project, req.user.userId);
 
     if (
       await this.isExist(
