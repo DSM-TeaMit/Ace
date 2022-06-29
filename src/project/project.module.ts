@@ -12,6 +12,9 @@ import { PlanService } from './services/plan.service';
 import { PlanController } from './controllers/plan.controller';
 import { ReportController } from './controllers/report.controller';
 import { ReportService } from './services/report.service';
+import { JwtModule } from '@nestjs/jwt';
+import { PlanGateway } from './gateways/plan.gateway';
+import { ReportGateway } from './gateways/report.gateway';
 
 @Module({
   imports: [
@@ -26,8 +29,19 @@ import { ReportService } from './services/report.service';
       port: process.env.REDIS_PORT,
       ttl: 86400,
     }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '1d' },
+    }),
   ],
-  providers: [FeedService, PlanService, ProjectService, ReportService],
+  providers: [
+    FeedService,
+    PlanService,
+    ProjectService,
+    ReportService,
+    PlanGateway,
+    ReportGateway,
+  ],
   controllers: [
     FeedController,
     PlanController,
