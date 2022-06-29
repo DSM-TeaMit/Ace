@@ -124,7 +124,7 @@ export class ProjectService {
   ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
-    this.checkPermission(project, req);
+    this.checkPermission(project, req.user.userId);
     await this.projectRepository.modifyProject(project.id, payload);
   }
 
@@ -136,7 +136,7 @@ export class ProjectService {
     const project = await this.projectRepository.findOne(param);
     if (!project) throw new NotFoundException();
     this.checkMemberLength(project.type, payload.members);
-    this.checkPermission(project, req);
+    this.checkPermission(project, req.user.userId);
     this.checkUserInMembers(payload.members, req);
 
     const members = await this.mapMembersToEntityArray(payload, req);
@@ -194,7 +194,7 @@ export class ProjectService {
     if (req.user.role === 'admin') return 'ADMIN';
     else {
       try {
-        this.checkPermission(project, req);
+        this.checkPermission(project, req.user.userId);
         return 'USER_EDITABLE';
       } catch {
         return 'USER_NON_EDITABLE';
@@ -202,12 +202,11 @@ export class ProjectService {
     }
   }
 
-  checkPermission(project: Project, req: Request) {
+  checkPermission(project: Project, uuid: string) {
     if (
       !(
-        project.members
-          ?.map((member) => member.user.uuid)
-          .includes(req.user.userId) ?? true
+        project.members?.map((member) => member.user.uuid).includes(uuid) ??
+        true
       )
     )
       throw new ForbiddenException();

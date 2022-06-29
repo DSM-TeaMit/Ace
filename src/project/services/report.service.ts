@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { WsException } from '@nestjs/websockets';
 import { Request } from 'express';
 import { ProjectRepository } from 'src/shared/entities/project/project.repository';
 import { CreateReportRequestDto } from '../dto/request/create-report.dto';
@@ -19,17 +20,16 @@ export class ReportService {
   ) {}
 
   async createOrModifyReport(
-    req: Request,
     param: ProjectParamsDto,
     payload: CreateReportRequestDto,
   ): Promise<void> {
     if (await this.projectRepository.getReport(param))
-      this.modifyReport(req, param, payload);
+      this.modifyReport(param, payload);
     else if (
       (await this.projectRepository.findOne(param)).status.isPlanAccepted
     )
       this.createReport(param, payload);
-    else throw new ConflictException();
+    else throw new WsException('Conflict');
   }
 
   async createReport(
@@ -37,7 +37,7 @@ export class ReportService {
     payload: CreateReportRequestDto,
   ): Promise<void> {
     const project = await this.projectRepository.findOne(param);
-    if (!project) throw new NotFoundException();
+    if (!project) throw new WsException('Not Found');
     this.projectRepository.createReport(project.id, payload);
   }
 
@@ -55,18 +55,16 @@ export class ReportService {
   }
 
   async modifyReport(
-    req: Request,
     param: ProjectParamsDto,
     payload: ModifyReportRequestDto,
   ): Promise<void> {
     const report = await this.projectRepository.getReport(param);
-    if (!report) throw new NotFoundException();
-    this.projectService.checkPermission(report.project, req);
+    if (!report) throw new WsException('Not Found');
     if (
       report.project.status.isReportSubmitted ||
       report.project.status.isReportAccepted
     )
-      throw new ConflictException();
+      throw new WsException('Conflict');
 
     if (
       !report.project.status.isReportSubmitted &&
@@ -83,14 +81,14 @@ export class ReportService {
   async deleteReport(req: Request, param: ProjectParamsDto): Promise<void> {
     const report = await this.projectRepository.getReport(param);
     if (!report) throw new NotFoundException();
-    this.projectService.checkPermission(report.project, req);
+    this.projectService.checkPermission(report.project, req.user.userId);
     this.projectRepository.deleteReport(report.project.id);
   }
 
   async submitReport(req: Request, param: ProjectParamsDto): Promise<void> {
     const report = await this.projectRepository.getReport(param);
     if (!report) throw new NotFoundException();
-    this.projectService.checkPermission(report.project, req);
+    this.projectService.checkPermission(report.project, req.user.userId);
     const status = report.project.status;
     if (status.isReportSubmitted) throw new ConflictException();
 
