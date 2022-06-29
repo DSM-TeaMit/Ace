@@ -3,6 +3,7 @@ FROM node:lts AS builder
 COPY package.json ./
 COPY pnpm-lock.yaml ./
 RUN npm install -g pnpm
+RUN pnpm config set auto-install-peers=true
 RUN pnpm install
 
 COPY ./src ./src
