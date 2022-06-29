@@ -24,6 +24,7 @@ import { ExcelModule } from './excel/excel.module';
       ...connectionOptions[process.env.NODE_ENV],
       entities: [Admin, Comment, Member, Plan, Project, Report, Status, User],
       namingStrategy: new SnakeNamingStrategy(),
+      keepConnectionAlive: true,
     }),
     AdminModule,
     AuthModule,
